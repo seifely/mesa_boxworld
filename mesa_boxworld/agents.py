@@ -219,6 +219,18 @@ class Item(Agent):
             self.decay -= 1
             print(self.decay)
 
+#########################################################################################################
+
+
+class Obstacle(Agent):
+    ''' Grey agents that are impassable, that Walker agents must navigate around. Cannot spawn over boxes. '''
+
+    def __init__(self, pos, model):
+        super().__init__(pos, model)
+
+    def step(self):
+        return
+
 
 
 

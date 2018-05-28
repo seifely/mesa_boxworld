@@ -7,7 +7,7 @@ from mesa.space import MultiGrid
 # from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 
-from mesa_boxworld.agents import Walker, ClosedBox, OpenedBox, Item
+from mesa_boxworld.agents import Walker, ClosedBox, OpenedBox, Item, Obstacle
 from mesa_boxworld.schedule import RandomActivationByType
 
 
@@ -23,11 +23,13 @@ class ThirdTestModel(Model):
     initial_boxes = 10
     # initial_items = initial_boxes//2  # -- currently divides int and results in a new int (as opposed to float)
     initial_items = 10
+    initial_obstacles = 2
 
     empty_boxes = {}
     full_boxes = {}
     known_items = {}
     all_boxes = {}
+    obstacles = {}
 
     verbose = False  # Print-monitoring
 
@@ -38,9 +40,11 @@ class ThirdTestModel(Model):
                  initial_boxes=10,
                  # initial_items=initial_boxes//2,
                  initial_items=10,
+                 initial_obstacles=2,
                  empty_boxes={},
                  full_boxes={},
-                 all_boxes={}):
+                 all_boxes={},
+                 obstacles={}):
 
         # Model Parameters Init
         self.height = height
@@ -48,10 +52,12 @@ class ThirdTestModel(Model):
         self.initial_walkers = initial_walkers
         self.initial_boxes = initial_boxes
         self.initial_items = initial_items
+        self.initial_obstacles = initial_obstacles
 
         self.empty_boxes = empty_boxes
         self.full_boxes = full_boxes
         self.all_boxes = all_boxes
+        self.obstacles = obstacles
 
         # Model Functions
         self.schedule = RandomActivationByType(self)
@@ -59,18 +65,11 @@ class ThirdTestModel(Model):
         self.datacollector = DataCollector(
             {"Walkers": lambda m: m.schedule.get_type_count(Walker)})
 
+        # No clue why these are up here in particular - these are the actual parts of the model!
         self.make_walker_agents()
         self.make_boxes()
         self.make_items()
-
-        # Create Walker:
-    def make_walker_agents(self):
-        for i in range(self.initial_walkers):
-            x = random.randrange(self.width)
-            y = random.randrange(self.height)
-            walker = Walker((x, y), self, True)
-            self.grid.place_agent(walker, (x, y))
-            self.schedule.add(walker)
+        self.make_obstacles()
 
         # create Boxes:
 
@@ -84,22 +83,32 @@ class ThirdTestModel(Model):
             # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
             self.empty_boxes[i] = (x, y)
             self.all_boxes[i] = (x, y)
-            print("Empty Box Created")
+            # print("Empty Box Created")
+
+        # Create Walker:
+    def make_walker_agents(self):
+        for i in range(self.initial_walkers):
+            x, y = self.grid.find_empty()
+            # x = random.randrange(self.width)
+            # y = random.randrange(self.height)
+            walker = Walker((x, y), self, True)
+            self.grid.place_agent(walker, (x, y))
+            self.schedule.add(walker)
 
     def make_items(self):
         # this function takes the dictionary of empty boxes, selects one and puts an item in it
         for j in range(self.initial_items):
             chosen_box = self.empty_boxes.pop(j)
-            print("Box Selected")
-            # chosen_box = self.empty_boxes.popitem()
             # print("Box Selected")
-            # use the above to pop an arbitrary value from the empty boxes list
+                    # chosen_box = self.empty_boxes.popitem()
+                    # print("Box Selected")
+                    # use the above to pop an arbitrary value from the empty boxes list
             item = Item(chosen_box, self, True)
             self.grid.place_agent(item, chosen_box)
             self.schedule.add(item)
-            print("Item Added")
+            # print("Item Added")
             self.full_boxes[j] = chosen_box
-            print("Box Filled")
+            # print("Box Filled")
 
         # if a random item placement is needed, uncomment below:
         # for i in range(self.initial_items):
@@ -111,6 +120,34 @@ class ThirdTestModel(Model):
 
         self.running = True
         self.datacollector.collect(self)
+
+    def make_obstacles(self):
+        for i in range(self.initial_obstacles):
+            x, y = self.grid.find_empty()
+            initial_obstacle = (x, y)
+            obstacle = Obstacle((x, y), self)
+            self.grid.place_agent(obstacle, initial_obstacle)
+            self.schedule.add(obstacle)
+            print("Obstacle added!")
+            # need to think about how going to store obstacle information
+
+            length = random.randrange(1, 10, 1)
+            print("Length is: ", length)
+            neighbours = self.grid.get_neighborhood(initial_obstacle, False, False, 1)
+            print("Neighbours: ", neighbours)
+
+            for j in range(length):
+                xx, yy = random.choice(neighbours)
+                current_obstacle = (xx, yy)
+
+                if self.grid.is_cell_empty(current_obstacle) == True:
+                    self.grid.place_agent(obstacle, current_obstacle)
+                    self.schedule.add(obstacle)
+                    print("Obstacle extension added!")
+                    neighbours = self.grid.get_neighborhood(current_obstacle, False, False, 1)
+                else:
+                    print("Couldn't place obstacle!")
+                    # this needs to be fixed so that it makes an alternate choice!
 
     def step(self):
         self.schedule.step()

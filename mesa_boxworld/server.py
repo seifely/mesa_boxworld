@@ -2,7 +2,7 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 
-from mesa_boxworld.agents import Walker, ClosedBox, OpenedBox, Item
+from mesa_boxworld.agents import Walker, ClosedBox, OpenedBox, Item, Obstacle
 from mesa_boxworld.model import ThirdTestModel
 
 
@@ -61,6 +61,16 @@ def third_test_portrayal(agent):
                      "scale": 0.7
                      }
 
+    elif type(agent) is Obstacle:
+            portrayal = {"Shape": "rect",
+                     "scale": 1,
+                     "Color": "gray",
+                     "Filled": "true",
+                     "Layer": 2,
+                     "w": 1,
+                     "h": 1
+                     }
+
     return portrayal
 
 
@@ -76,7 +86,8 @@ model_params = {#"height": UserSettableParameter('slider', 'Height', 20, 10, 50,
                 #"width": UserSettableParameter('slider', 'Width', 20, 10, 50, 10),
                 "initial_walkers": UserSettableParameter('slider', 'Initial Walker Population', 1, 1, 10, 1),
                 "initial_boxes": UserSettableParameter('slider', 'Initial Box Number', 10, 1, 20, 1),
-                "initial_items": UserSettableParameter('slider', 'Initial Item Number', 10, 1, 20, 1)}
+                "initial_items": UserSettableParameter('slider', 'Initial Item Number', 10, 1, 20, 1),
+                "initial_obstacles": UserSettableParameter('slider', 'Initial Whole Obstacle Number', 2, 1, 10, 1)}
 
 #model_params = {"height": 20, "width": 20, "initial_walkers": 1, "initial_boxes": 10, "initial_items": 10}
 
