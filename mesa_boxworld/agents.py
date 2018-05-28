@@ -103,19 +103,52 @@ class Walker(Agent):
         current_x, current_y = self.pos
         goal_x, goal_y = goal
 
+
+
         if self.pos != goal:
             if current_x > goal_x:
                 next_move = ((current_x - 1), current_y)
-                self.model.grid.move_agent(self, next_move)
+                next_cell = self.model.grid.get_cell_list_contents([next_move])
+                potential_obstacle = [obj for obj in next_cell
+                               if isinstance(obj, Obstacle)]
+
+                if len(potential_obstacle) > 0:
+                    print("I can't go here!")
+                elif len(potential_obstacle) == 0:
+                    self.model.grid.move_agent(self, next_move)
+
             elif current_x < goal_x:
                 next_move = ((current_x + 1), current_y)
-                self.model.grid.move_agent(self, next_move)
+                next_cell = self.model.grid.get_cell_list_contents([next_move])
+                potential_obstacle = [obj for obj in next_cell
+                                      if isinstance(obj, Obstacle)]
+
+                if len(potential_obstacle) > 0:
+                    print("I can't go here!")
+                elif len(potential_obstacle) == 0:
+                    self.model.grid.move_agent(self, next_move)
+
             if current_y > goal_y:
                 next_move = (current_x, (current_y - 1))
-                self.model.grid.move_agent(self, next_move)
+                next_cell = self.model.grid.get_cell_list_contents([next_move])
+                potential_obstacle = [obj for obj in next_cell
+                                      if isinstance(obj, Obstacle)]
+
+                if len(potential_obstacle) > 0:
+                    print("I can't go here!")
+                elif len(potential_obstacle) == 0:
+                    self.model.grid.move_agent(self, next_move)
+
             elif current_y < goal_y:
                 next_move = (current_x, (current_y + 1))
-                self.model.grid.move_agent(self, next_move)
+                next_cell = self.model.grid.get_cell_list_contents([next_move])
+                potential_obstacle = [obj for obj in next_cell
+                                      if isinstance(obj, Obstacle)]
+
+                if len(potential_obstacle) > 0:
+                    print("I can't go here!")
+                elif len(potential_obstacle) == 0:
+                    self.model.grid.move_agent(self, next_move)
 
         else:
             self.goal_reached = True
