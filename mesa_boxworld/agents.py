@@ -103,50 +103,78 @@ class Walker(Agent):
         current_x, current_y = self.pos
         goal_x, goal_y = goal
 
-
-
         if self.pos != goal:
             if current_x > goal_x:
-                next_move = ((current_x - 1), current_y)
+                next_move = ((current_x - 1), current_y)  # take a step left
                 next_cell = self.model.grid.get_cell_list_contents([next_move])
                 potential_obstacle = [obj for obj in next_cell
                                if isinstance(obj, Obstacle)]
 
                 if len(potential_obstacle) > 0:
-                    print("I can't go here!")
+                    print("I can't go here!")  # obstacle in step left
+                    avoidance_move = (current_x, (current_y - 1))
+                    while len(potential_obstacle) > 0:
+                        self.model.grid.move_agent(self, avoidance_move)
+                        if len(potential_obstacle) == 0:
+                            self.model.grid.move_agent(self, next_move)
+
                 elif len(potential_obstacle) == 0:
                     self.model.grid.move_agent(self, next_move)
 
             elif current_x < goal_x:
-                next_move = ((current_x + 1), current_y)
+                next_move = ((current_x + 1), current_y)  # take a step right
                 next_cell = self.model.grid.get_cell_list_contents([next_move])
                 potential_obstacle = [obj for obj in next_cell
                                       if isinstance(obj, Obstacle)]
 
                 if len(potential_obstacle) > 0:
-                    print("I can't go here!")
+                    print("I can't go here!")  # obstacle in step right
+                    avoidance_move = (current_x, (current_y + 1))
+                    while len(potential_obstacle) > 0:
+                        self.model.grid.move_agent(self, avoidance_move)
+                        if len(potential_obstacle) == 0:
+                            self.model.grid.move_agent(self, next_move)
+
                 elif len(potential_obstacle) == 0:
                     self.model.grid.move_agent(self, next_move)
 
             if current_y > goal_y:
-                next_move = (current_x, (current_y - 1))
+                next_move = (current_x, (current_y - 1))  # take a step down
                 next_cell = self.model.grid.get_cell_list_contents([next_move])
                 potential_obstacle = [obj for obj in next_cell
                                       if isinstance(obj, Obstacle)]
 
                 if len(potential_obstacle) > 0:
-                    print("I can't go here!")
+                    print("I can't go here!")  # obstacle in step down
+                    avoidance_move = ((current_x + 1), current_y)
+                    while len(potential_obstacle) > 0:
+                        self.model.grid.move_agent(self, avoidance_move)
+                        if len(potential_obstacle) == 0:
+                            self.model.grid.move_agent(self, next_move)
+
                 elif len(potential_obstacle) == 0:
                     self.model.grid.move_agent(self, next_move)
 
             elif current_y < goal_y:
-                next_move = (current_x, (current_y + 1))
+                next_move = (current_x, (current_y + 1))  # take a step up
                 next_cell = self.model.grid.get_cell_list_contents([next_move])
                 potential_obstacle = [obj for obj in next_cell
                                       if isinstance(obj, Obstacle)]
 
                 if len(potential_obstacle) > 0:
-                    print("I can't go here!")
+                    print("I can't go here!")  # obstacle in step up
+                    avoidance_move = ((current_x - 1), current_y)
+                    avoidance_cell = self.model.grid.get_cell_list_contents([avoidance_move])
+                    current_obstacle = [obj for obj in avoidance_cell
+                                      if isinstance(obj, Obstacle)]
+
+                    while len(current_obstacle) > 0:   # !!! I don't think this is going to work - perhaps have a
+                        # heuristic based on knowledge of how long obstacles usually are? Or take an
+                        # arbitrary number of steps, like 4?
+                        self.model.grid.move_agent(self, avoidance_move)
+                        if len(potential_obstacle) == 0:
+                            self.model.grid.move_agent(self, next_move)
+
                 elif len(potential_obstacle) == 0:
                     self.model.grid.move_agent(self, next_move)
 

@@ -148,6 +148,7 @@ class ThirdTestModel(Model):
                 else:
                     print("Couldn't place obstacle!")
                     # this needs to be fixed so that it makes an alternate choice!
+                    # !!! OBSTACLES NEED TO BE STRAIGHT LINES
 
     def step(self):
         self.schedule.step()
