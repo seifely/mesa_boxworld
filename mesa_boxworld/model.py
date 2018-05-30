@@ -128,13 +128,13 @@ class ThirdTestModel(Model):
             obstacle = Obstacle((x, y), self)
             self.grid.place_agent(obstacle, initial_obstacle)
             self.schedule.add(obstacle)
-            print("Obstacle added!")
+            # print("Obstacle added!")
             # need to think about how going to store obstacle information
 
             length = random.randrange(1, 10, 1)
-            print("Length is: ", length)
+            # print("Length is: ", length)
             neighbours = self.grid.get_neighborhood(initial_obstacle, False, False, 1)
-            print("Neighbours: ", neighbours)
+            # print("Neighbours: ", neighbours)
 
             for j in range(length):
                 xx, yy = random.choice(neighbours)
@@ -143,10 +143,10 @@ class ThirdTestModel(Model):
                 if self.grid.is_cell_empty(current_obstacle) == True:
                     self.grid.place_agent(obstacle, current_obstacle)
                     self.schedule.add(obstacle)
-                    print("Obstacle extension added!")
+                    # print("Obstacle extension added!")
                     neighbours = self.grid.get_neighborhood(current_obstacle, False, False, 1)
-                else:
-                    print("Couldn't place obstacle!")
+                # else:
+                    # print("Couldn't place obstacle!")
                     # this needs to be fixed so that it makes an alternate choice!
                     # !!! OBSTACLES NEED TO BE STRAIGHT LINES
 

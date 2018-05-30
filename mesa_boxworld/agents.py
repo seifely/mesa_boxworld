@@ -108,20 +108,35 @@ class Walker(Agent):
             if self.pos != goal:
                 if current_x > goal_x:
                     self.next_move = ((current_x - 1), current_y)
-                    self.model.grid.move_agent(self, self.next_move)
+                    if self.check_for_obstacles():
+                        self.avoid_obstacle()
+                    elif not self.check_for_obstacles():
+                        self.model.grid.move_agent(self, self.next_move)
                 elif current_x < goal_x:
                     self.next_move = ((current_x + 1), current_y)
-                    self.model.grid.move_agent(self, self.next_move)
+                    if self.check_for_obstacles():
+                        self.avoid_obstacle()
+                    elif not self.check_for_obstacles():
+                        self.model.grid.move_agent(self, self.next_move)
                 if current_y > goal_y:
                     self.next_move = (current_x, (current_y - 1))
-                    self.model.grid.move_agent(self, self.next_move)
+                    if self.check_for_obstacles():
+                        self.avoid_obstacle()
+                    elif not self.check_for_obstacles():
+                        self.model.grid.move_agent(self, self.next_move)
                 elif current_y < goal_y:
                     self.next_move = (current_x, (current_y + 1))
-                    self.model.grid.move_agent(self, self.next_move)
+                    if self.check_for_obstacles():
+                        self.avoid_obstacle()
+                    elif not self.check_for_obstacles():
+                        self.model.grid.move_agent(self, self.next_move)
 
             else:
                 self.goal_reached = True
                 return "Goal Reached!"
+
+        elif not self.able_to_move:
+            print("I'm not allowed to move right now.")
 
     def check_for_obstacles(self):
         next_cell = self.model.grid.get_cell_list_contents([self.next_move])
@@ -129,13 +144,45 @@ class Walker(Agent):
                               if isinstance(obj, Obstacle)]
         if len(potential_obstacle) > 0:
             print("There's an obstacle!")
+            # self.able_to_move = False
             return True
         elif len(potential_obstacle) == 0:
             return False
 
     def avoid_obstacle(self):
-        
-        return
+        current_x, current_y = self.pos
+
+        if self.next_move == ((current_x - 1), current_y): # if we were about to move left
+            print("I was going to move left.")
+            for n in range(4):
+                avoidance_move = (current_x, (current_y - 1))
+                print("Thought of avoidance move.")
+                self.model.grid.move_agent(self, avoidance_move)
+                print("Used avoidance move down.")
+
+        elif self.next_move == ((current_x + 1), current_y):  # if we were about to move right
+            print("I was going to move right.")
+            for n in range(4):
+                avoidance_move = (current_x, (current_y + 1))
+                print("Thought of avoidance move.")
+                self.model.grid.move_agent(self, avoidance_move)
+                print("Used avoidance move up.")
+
+        elif self.next_move == (current_x, (current_y - 1)):  # if we were about to move down
+            print("I was going to move down.")
+            for n in range(4):
+                avoidance_move = ((current_x + 1), current_y)
+                print("Thought of avoidance move.")
+                self.model.grid.move_agent(self, avoidance_move)
+                print("Used avoidance move right.")
+
+        elif self.next_move == (current_x, (current_y + 1)):  # if we were about to move up
+            print("I was going to move up.")
+            for n in range(4):
+                avoidance_move = ((current_x - 1), current_y)
+                print("Thought of avoidance move.")
+                self.model.grid.move_agent(self, avoidance_move)
+                print("Used avoidance move left.")
 
     def open_box(self):
         # If there is a Box available at the current location, open it.
@@ -187,13 +234,11 @@ class Walker(Agent):
             self.stepCount += 1  # This is not needed as the agent can access the step number through other means??
             if self.goal_reached == False :
                 self.simple_move_goal()
-                self.check_for_obstacles()
+                # self.check_for_obstacles()
                 self.open_box()
 
-                if self.check_for_obstacles():
-                    print("I can't go here.")
-                    self.able_to_move = False
-                    self.avoid_obstacle()
+                # if self.check_for_obstacles():
+                #     self.avoid_obstacle()
 
             if self.goal_reached == True :
                 self.calculate_box_distances_from_current_pos()

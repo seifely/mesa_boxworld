@@ -66,7 +66,7 @@ def third_test_portrayal(agent):
                      "scale": 1,
                      "Color": "gray",
                      "Filled": "true",
-                     "Layer": 2,
+                     "Layer": 1,
                      "w": 1,
                      "h": 1
                      }
