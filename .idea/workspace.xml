@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d2be1165-23fd-48d5-bbc8-6c2f5c53235b" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/mesa_boxworld/agents.py" afterPath="$PROJECT_DIR$/mesa_boxworld/agents.py" />
       <change beforePath="$PROJECT_DIR$/mesa_boxworld/model.py" afterPath="$PROJECT_DIR$/mesa_boxworld/model.py" />
-      <change beforePath="$PROJECT_DIR$/mesa_boxworld/server.py" afterPath="$PROJECT_DIR$/mesa_boxworld/server.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -26,11 +23,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="agents.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="agents.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="417">
-              <caret line="156" column="30" lean-forward="false" selection-start-line="156" selection-start-column="30" selection-end-line="156" selection-end-column="30" />
+            <state relative-caret-position="332">
+              <caret line="153" column="0" lean-forward="true" selection-start-line="153" selection-start-column="0" selection-end-line="153" selection-end-column="0" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
                 <element signature="e#1232#1551#0" expanded="false" />
@@ -47,15 +44,16 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="model.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="model.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mesa_boxworld/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="489">
-              <caret line="148" column="23" lean-forward="true" selection-start-line="148" selection-start-column="23" selection-end-line="148" selection-end-column="23" />
+            <state relative-caret-position="132">
+              <caret line="123" column="29" lean-forward="false" selection-start-line="123" selection-start-column="29" selection-end-line="123" selection-end-column="29" />
               <folding>
                 <element signature="e#2#15#0" expanded="true" />
                 <element signature="e#2741#3051#0" expanded="false" />
                 <element signature="e#3087#4156#0" expanded="false" />
+                <element signature="e#4196#7055#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -115,8 +113,8 @@
         <option value="$PROJECT_DIR$/run.py" />
         <option value="$PROJECT_DIR$/mesa_boxworld/run.py" />
         <option value="$PROJECT_DIR$/mesa_boxworld/server.py" />
-        <option value="$PROJECT_DIR$/mesa_boxworld/model.py" />
         <option value="$PROJECT_DIR$/mesa_boxworld/agents.py" />
+        <option value="$PROJECT_DIR$/mesa_boxworld/model.py" />
       </list>
     </option>
   </component>
@@ -271,6 +269,7 @@
             <element signature="e#2#15#0" expanded="true" />
             <element signature="e#2741#3051#0" expanded="false" />
             <element signature="e#3087#4156#0" expanded="false" />
+            <element signature="e#4196#7055#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -357,6 +356,7 @@
             <element signature="e#2#15#0" expanded="true" />
             <element signature="e#2741#3051#0" expanded="false" />
             <element signature="e#3087#4156#0" expanded="false" />
+            <element signature="e#4196#7055#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -425,22 +425,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/mesa_boxworld/model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="489">
-          <caret line="148" column="23" lean-forward="true" selection-start-line="148" selection-start-column="23" selection-end-line="148" selection-end-column="23" />
-          <folding>
-            <element signature="e#2#15#0" expanded="true" />
-            <element signature="e#2741#3051#0" expanded="false" />
-            <element signature="e#3087#4156#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="417">
-          <caret line="156" column="30" lean-forward="false" selection-start-line="156" selection-start-column="30" selection-end-line="156" selection-end-column="30" />
+        <state relative-caret-position="332">
+          <caret line="153" column="0" lean-forward="true" selection-start-line="153" selection-start-column="0" selection-end-line="153" selection-end-column="0" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
             <element signature="e#1232#1551#0" expanded="false" />
@@ -452,6 +440,19 @@
             <element signature="e#10799#10867#0" expanded="false" />
             <element signature="e#11000#11362#0" expanded="false" />
             <element signature="e#11499#11715#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mesa_boxworld/model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="123" column="29" lean-forward="false" selection-start-line="123" selection-start-column="29" selection-end-line="123" selection-end-column="29" />
+          <folding>
+            <element signature="e#2#15#0" expanded="true" />
+            <element signature="e#2741#3051#0" expanded="false" />
+            <element signature="e#3087#4156#0" expanded="false" />
+            <element signature="e#4196#7055#0" expanded="false" />
           </folding>
         </state>
       </provider>

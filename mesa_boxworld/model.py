@@ -131,24 +131,61 @@ class ThirdTestModel(Model):
             # print("Obstacle added!")
             # need to think about how going to store obstacle information
 
-            length = random.randrange(1, 10, 1)
+            length = random.randrange(1, 5, 1)
             # print("Length is: ", length)
             neighbours = self.grid.get_neighborhood(initial_obstacle, False, False, 1)
             # print("Neighbours: ", neighbours)
 
-            for j in range(length):
-                xx, yy = random.choice(neighbours)
-                current_obstacle = (xx, yy)
+            directions = ["north", "east", "south", "west"]
+            random_direction = random.choice(directions)
 
-                if self.grid.is_cell_empty(current_obstacle) == True:
-                    self.grid.place_agent(obstacle, current_obstacle)
-                    self.schedule.add(obstacle)
-                    # print("Obstacle extension added!")
-                    neighbours = self.grid.get_neighborhood(current_obstacle, False, False, 1)
-                # else:
-                    # print("Couldn't place obstacle!")
-                    # this needs to be fixed so that it makes an alternate choice!
-                    # !!! OBSTACLES NEED TO BE STRAIGHT LINES
+            current_x = initial_obstacle[0]
+            current_y = initial_obstacle[1]
+
+            for j in range(length):
+                if random_direction == "north":
+                    new_obstacle = (current_x, (current_y + 1))
+
+                    if self.grid.is_cell_empty(new_obstacle) == True:
+                        self.grid.place_agent(obstacle, new_obstacle)
+                        self.schedule.add(obstacle)
+                        current_y = current_y + 1
+                        print("Obstacle extension added!")
+                    else:
+                        print("Obstacle couldn't be placed.")
+
+                if random_direction == "east":
+                    new_obstacle = ((current_x + 1), current_y)
+
+                    if self.grid.is_cell_empty(new_obstacle) == True:
+                        self.grid.place_agent(obstacle, new_obstacle)
+                        self.schedule.add(obstacle)
+                        current_x = current_x + 1
+                        print("Obstacle extension added!")
+                    else:
+                        print("Obstacle couldn't be placed.")
+
+                if random_direction == "south":
+                    new_obstacle = (current_x, (current_y - 1))
+
+                    if self.grid.is_cell_empty(new_obstacle) == True:
+                        self.grid.place_agent(obstacle, new_obstacle)
+                        self.schedule.add(obstacle)
+                        current_y = current_y - 1
+                        print("Obstacle extension added!")
+                    else:
+                        print("Obstacle couldn't be placed.")
+
+                if random_direction == "west":
+                    new_obstacle = ((current_x - 1), current_y)
+
+                    if self.grid.is_cell_empty(new_obstacle) == True:
+                        self.grid.place_agent(obstacle, new_obstacle)
+                        self.schedule.add(obstacle)
+                        current_x = current_x - 1
+                        print("Obstacle extension added!")
+                    else:
+                        print("Obstacle couldn't be placed.")
 
     def step(self):
         self.schedule.step()
