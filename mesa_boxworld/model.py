@@ -24,14 +24,15 @@ class ThirdTestModel(Model):
     # initial_items = initial_boxes//2  # -- currently divides int and results in a new int (as opposed to float)
     initial_items = 10
     initial_obstacles = 2
+    obstacle_length = 7
 
     empty_boxes = {}
     full_boxes = {}
     known_items = {}
     all_boxes = {}
-    obstacles = {}
+    obstacles = []
 
-    verbose = False  # Print-monitoring
+    verbose = True  # Print-monitoring
 
     description = 'A model for simulating wolf and sheep (predator-prey) ecosystem modelling.'
 
@@ -41,10 +42,11 @@ class ThirdTestModel(Model):
                  # initial_items=initial_boxes//2,
                  initial_items=10,
                  initial_obstacles=2,
+                 obstacle_length=7,
                  empty_boxes={},
                  full_boxes={},
                  all_boxes={},
-                 obstacles={}):
+                 obstacles=[]):
 
         # Model Parameters Init
         self.height = height
@@ -53,6 +55,7 @@ class ThirdTestModel(Model):
         self.initial_boxes = initial_boxes
         self.initial_items = initial_items
         self.initial_obstacles = initial_obstacles
+        self.obstacle_length = obstacle_length
 
         self.empty_boxes = empty_boxes
         self.full_boxes = full_boxes
@@ -63,7 +66,7 @@ class ThirdTestModel(Model):
         self.schedule = RandomActivationByType(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
         self.datacollector = DataCollector(
-            {"Walkers": lambda m: m.schedule.get_type_count(Walker)})
+            {"Closed Boxes": lambda m: m.schedule.get_type_count(ClosedBox)})
 
         # No clue why these are up here in particular - these are the actual parts of the model!
         self.make_walker_agents()
@@ -129,9 +132,11 @@ class ThirdTestModel(Model):
             self.grid.place_agent(obstacle, initial_obstacle)
             self.schedule.add(obstacle)
             # print("Obstacle added!")
+
+            self.obstacles.append(initial_obstacle)
             # need to think about how going to store obstacle information
 
-            length = random.randrange(1, 5, 1)
+            length = random.randrange(1, self.obstacle_length, 1)
             # print("Length is: ", length)
             neighbours = self.grid.get_neighborhood(initial_obstacle, False, False, 1)
             # print("Neighbours: ", neighbours)
@@ -149,6 +154,7 @@ class ThirdTestModel(Model):
                     if self.grid.is_cell_empty(new_obstacle) == True:
                         self.grid.place_agent(obstacle, new_obstacle)
                         self.schedule.add(obstacle)
+                        self.obstacles.append(new_obstacle)
                         current_y = current_y + 1
                         print("Obstacle extension added!")
                     else:
@@ -160,6 +166,7 @@ class ThirdTestModel(Model):
                     if self.grid.is_cell_empty(new_obstacle) == True:
                         self.grid.place_agent(obstacle, new_obstacle)
                         self.schedule.add(obstacle)
+                        self.obstacles.append(new_obstacle)
                         current_x = current_x + 1
                         print("Obstacle extension added!")
                     else:
@@ -171,6 +178,7 @@ class ThirdTestModel(Model):
                     if self.grid.is_cell_empty(new_obstacle) == True:
                         self.grid.place_agent(obstacle, new_obstacle)
                         self.schedule.add(obstacle)
+                        self.obstacles.append(new_obstacle)
                         current_y = current_y - 1
                         print("Obstacle extension added!")
                     else:
@@ -182,10 +190,14 @@ class ThirdTestModel(Model):
                     if self.grid.is_cell_empty(new_obstacle) == True:
                         self.grid.place_agent(obstacle, new_obstacle)
                         self.schedule.add(obstacle)
+                        self.obstacles.append(new_obstacle)
                         current_x = current_x - 1
                         print("Obstacle extension added!")
                     else:
                         print("Obstacle couldn't be placed.")
+
+        # self.obstacles.sort()
+        print("Obstacle list:", self.obstacles)
 
     def step(self):
         self.schedule.step()
@@ -201,7 +213,9 @@ class ThirdTestModel(Model):
 
         if self.verbose:
             print('Initial number walkers: ',
-                  self.schedule.get_type_count(Walker))
+                  self.schedule.get_type_count(Walker),
+                  'Initial number closed boxes: ',
+                  self.schedule.get_type_count(ClosedBox))
 
         for i in range(step_count):
             self.step()
@@ -209,5 +223,6 @@ class ThirdTestModel(Model):
         if self.verbose:
             print('')
             print('Final number walkers: ',
-                  self.schedule.get_type_count(Walker))
-
+                  self.schedule.get_type_count(Walker),
+                  'Final number closed boxes: ',
+                  self.schedule.get_type_count(ClosedBox))

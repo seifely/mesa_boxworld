@@ -76,7 +76,7 @@ def third_test_portrayal(agent):
 
 canvas_element = CanvasGrid(third_test_portrayal, 20, 20, 500, 500)
 chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
-                             {"Label": "Boxes", "Color": "#666666"}])
+                             {"Label": "Closed Boxes", "Color": "#666666"}])
 
 
 #model_params = {"initial_items": UserSettableParameter('slider', 'Initial Item Number', 10, 1, 15, 1)}
@@ -87,12 +87,14 @@ model_params = {#"height": UserSettableParameter('slider', 'Height', 20, 10, 50,
                 "initial_walkers": UserSettableParameter('slider', 'Initial Walker Population', 1, 1, 10, 1),
                 "initial_boxes": UserSettableParameter('slider', 'Initial Box Number', 10, 1, 20, 1),
                 "initial_items": UserSettableParameter('slider', 'Initial Item Number', 10, 1, 20, 1),
-                "initial_obstacles": UserSettableParameter('slider', 'Initial Whole Obstacle Number', 2, 1, 10, 1)}
+                "initial_obstacles": UserSettableParameter('slider', 'Initial Whole Obstacle Number', 2, 1, 10, 1),
+                # "obstacle_length": UserSettableParameter('slider', 'Maximum Obstacle Length', 5, 1, 12, 1),
+                }
 
 #model_params = {"height": 20, "width": 20, "initial_walkers": 1, "initial_boxes": 10, "initial_items": 10}
 
 # "item_timeout": UserSettableParameter('slider', 'Item Decay Rate', 0.05, 0.01, 1.0, 0.01)
 
-server = ModularServer(ThirdTestModel, [canvas_element, chart_element], "Third Test Model", model_params)
+server = ModularServer(ThirdTestModel, [canvas_element, chart_element], "Boxworld Model", model_params)
 server.port = 8521
 
