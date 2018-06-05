@@ -23,7 +23,7 @@ class ThirdTestModel(Model):
     initial_boxes = 10
     # initial_items = initial_boxes//2  # -- currently divides int and results in a new int (as opposed to float)
     initial_items = 10
-    initial_obstacles = 2
+    initial_obstacles = 3
     obstacle_length = 7
 
     empty_boxes = {}
@@ -32,7 +32,7 @@ class ThirdTestModel(Model):
     all_boxes = {}
     obstacles = []
 
-    verbose = True  # Print-monitoring
+    verbose = False  # Print-monitoring
 
     description = 'A model for simulating wolf and sheep (predator-prey) ecosystem modelling.'
 
@@ -41,7 +41,7 @@ class ThirdTestModel(Model):
                  initial_boxes=10,
                  # initial_items=initial_boxes//2,
                  initial_items=10,
-                 initial_obstacles=2,
+                 initial_obstacles=3,
                  obstacle_length=7,
                  empty_boxes={},
                  full_boxes={},
@@ -136,7 +136,7 @@ class ThirdTestModel(Model):
             self.obstacles.append(initial_obstacle)
             # need to think about how going to store obstacle information
 
-            length = random.randrange(1, self.obstacle_length, 1)
+            length = random.randrange(3, self.obstacle_length, 1)
             # print("Length is: ", length)
             neighbours = self.grid.get_neighborhood(initial_obstacle, False, False, 1)
             # print("Neighbours: ", neighbours)
