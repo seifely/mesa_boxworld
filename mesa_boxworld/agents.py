@@ -110,9 +110,12 @@ class Walker(Agent):
         if self.normal_navigation:
             self.simple_move_goal()
             self.check_for_obstacles(self.next_move)
+            print("Bug_nav checked for next move obstacles")
             if self.obstacle_present:
                 self.normal_navigation = False
-
+                print("Normal navigation turned off.")
+            if not self.obstacle_present:
+                print("Bug_nav found no obstacle.")
         elif not self.normal_navigation:
             self.bug_navigation()
 
@@ -167,9 +170,9 @@ class Walker(Agent):
                 else:
                     self.model.grid.move_agent(self, self.next_move)
 
-            else:
-                self.goal_reached = True
-                return "Goal Reached!"
+        elif self.pos == self.goal:
+            self.goal_reached = True
+            print("Goal Reached!")
 
     def check_for_obstacles(self, cell):  # no longer used, generic obstacle checking
         next_cell = self.model.grid.get_cell_list_contents([cell])
@@ -204,104 +207,179 @@ class Walker(Agent):
         print("Following wall")
         current_x, current_y = self.pos
         avoidance_steps = 0
-        obstacle_width = 1  # this might need to be 2
+        obstacle_width = 2  # this might need to be 2
         # get the neighbourhood around self.pos
 
         if blocked_direction == "north":
-            while self.blocked_north():
-                avoidance_move = ((current_x - 1), current_y)
-                self.model.grid.move_agent(self, avoidance_move)
-                avoidance_steps = avoidance_steps + 1
+            print("Current XY: ", current_x, current_y)
 
-            for m in range(obstacle_width):
-                current_x, current_y = self.pos
-                avoidance_move = (current_x, (current_y + 1))
-                self.model.grid.move_agent(self, avoidance_move)
 
-            for n in range(avoidance_steps):
-                current_x, current_y = self.pos
-                avoidance_move = ((current_x + 1), current_y)
-                self.model.grid.move_agent(self, avoidance_move)
-
-            self.check_for_freedom()
-            if self.check_for_freedom():
-                print("I moved around it!")
-                self.normal_navigation = True
-            if not self.check_for_freedom():
-                print("I fucked up!")
-                # some kind of recursion
 
         elif blocked_direction == "east":
-            while self.blocked_east():
-                avoidance_move = (current_x, (current_y + 1))
-                self.model.grid.move_agent(self, avoidance_move)
-                avoidance_steps = avoidance_steps + 1
+            print("Current XY: ", current_x, current_y)
 
-            for m in range(obstacle_width):
-                current_x, current_y = self.pos
-                avoidance_move = ((current_x + 1), current_y)
-                self.model.grid.move_agent(self, avoidance_move)
 
-            for n in range(avoidance_steps):
-                current_x, current_y = self.pos
-                avoidance_move = (current_x, (current_y - 1))
-                self.model.grid.move_agent(self, avoidance_move)
-
-            self.check_for_freedom()
-            if self.check_for_freedom():
-                print("I moved around it!")
-                self.normal_navigation = True
-            if not self.check_for_freedom():
-                print("I fucked up!")
-                # some kind of recursion
 
         elif blocked_direction == "south":
-            while self.blocked_south():
-                avoidance_move = ((current_x + 1), current_y)
-                self.model.grid.move_agent(self, avoidance_move)
-                avoidance_steps = avoidance_steps + 1
 
-            for m in range(obstacle_width):
-                current_x, current_y = self.pos
-                avoidance_move = (current_x, (current_y - 1))
-                self.model.grid.move_agent(self, avoidance_move)
 
-            for n in range(avoidance_steps):
-                current_x, current_y = self.pos
-                avoidance_move = ((current_x - 1), current_y)
-                self.model.grid.move_agent(self, avoidance_move)
 
-            self.check_for_freedom()
-            if self.check_for_freedom():
-                print("I moved around it!")
-                self.normal_navigation = True
-            if not self.check_for_freedom():
-                print("I fucked up!")
-                # some kind of recursion
 
         elif blocked_direction == "west":
-            while self.blocked_west():
-                avoidance_move = (current_x, (current_y - 1))
-                self.model.grid.move_agent(self, avoidance_move)
-                avoidance_steps = avoidance_steps + 1
 
-            for m in range(obstacle_width):
-                current_x, current_y = self.pos
-                avoidance_move = ((current_x - 1), current_y)
-                self.model.grid.move_agent(self, avoidance_move)
 
-            for n in range(avoidance_steps):
-                current_x, current_y = self.pos
-                avoidance_move = (current_x, (current_y + 1))
-                self.model.grid.move_agent(self, avoidance_move)
 
-            self.check_for_freedom()
-            if self.check_for_freedom():
-                print("I moved around it!")
-                self.normal_navigation = True
-            if not self.check_for_freedom():
-                print("I fucked up!")
-                # some kind of recursion
+        self.check_for_freedom()
+        if self.check_for_freedom():
+            print("I moved around it!")
+            self.normal_navigation = True
+        if not self.check_for_freedom():
+            print("I fucked up!")
+            # some kind of recursion
+
+    # def follow_wall(self, blocked_direction):
+    #     print("Following wall")
+    #     current_x, current_y = self.pos
+    #     avoidance_steps = 0
+    #     obstacle_width = 2  # this might need to be 2
+    #     # get the neighbourhood around self.pos
+    #
+    #     if blocked_direction == "north":
+    #         print("Current XY: ", current_x, current_y)
+    #         while self.blocked_north():
+    #             print("while self.blocked_north():")
+    #             avoidance_move = ((current_x - 1), current_y)
+    #             print("     Avoidance move coords: ", avoidance_move)
+    #             self.model.grid.move_agent(self, avoidance_move)
+    #             avoidance_steps = avoidance_steps + 1
+    #             print("     Avoidance Step Value: ", avoidance_steps)
+    #
+    #         for m in range(obstacle_width):
+    #             print("for m in range(obstacle_width):")
+    #             current_x, current_y = self.pos
+    #             print("     Current XY: ", current_x, current_y)
+    #             avoidance_move = (current_x, (current_y + 1))
+    #             print("     Avoidance move coords: ", avoidance_move)
+    #             self.model.grid.move_agent(self, avoidance_move)
+    #
+    #         for n in range(avoidance_steps):
+    #             print("n in range(avoidance_steps)")
+    #             current_x, current_y = self.pos
+    #             print("     Current XY: ", current_x, current_y)
+    #             avoidance_move = ((current_x + 1), current_y)
+    #             print("     Avoidance move coords: ", avoidance_move)
+    #             self.model.grid.move_agent(self, avoidance_move)
+    #
+    #         self.check_for_freedom()
+    #         if self.check_for_freedom():
+    #             print("I moved around it!")
+    #             self.normal_navigation = True
+    #         if not self.check_for_freedom():
+    #             print("I fucked up!")
+    #             # some kind of recursion
+    #
+    #     elif blocked_direction == "east":
+    #         print("Current XY: ", current_x, current_y)
+    #         while self.blocked_east():
+    #             print("while self.blocked_east():")
+    #             avoidance_move = (current_x, (current_y + 1))
+    #             print("     Current XY: ", current_x, current_y)
+    #             print("     Avoidance move coords: ", avoidance_move)
+    #             self.model.grid.move_agent(self, avoidance_move)
+    #             avoidance_steps = avoidance_steps + 1
+    #             print("     Avoidance Step Value: ", avoidance_steps)
+    #
+    #         for m in range(obstacle_width):
+    #             print("for m in range(obstacle_width):")
+    #             current_x, current_y = self.pos
+    #             print("     Current XY: ", current_x, current_y)
+    #             avoidance_move = ((current_x + 1), current_y)
+    #             print("     Avoidance move coords: ", avoidance_move)
+    #             self.model.grid.move_agent(self, avoidance_move)
+    #
+    #         for n in range(avoidance_steps):
+    #             print("n in range(avoidance_steps)")
+    #             current_x, current_y = self.pos
+    #             print("     Current XY: ", current_x, current_y)
+    #             avoidance_move = (current_x, (current_y - 1))
+    #             print("     Avoidance move coords: ", avoidance_move)
+    #             self.model.grid.move_agent(self, avoidance_move)
+    #
+    #         self.check_for_freedom()
+    #         if self.check_for_freedom():
+    #             print("I moved around it!")
+    #             self.normal_navigation = True
+    #         if not self.check_for_freedom():
+    #             print("I fucked up!")
+    #             # some kind of recursion
+    #
+    #     elif blocked_direction == "south":
+    #         print("Current XY: ", current_x, current_y)
+    #         while self.blocked_south():
+    #             print("while self.blocked_south():")
+    #             avoidance_move = ((current_x + 1), current_y)
+    #             print("     Avoidance move coords: ", avoidance_move)
+    #             self.model.grid.move_agent(self, avoidance_move)
+    #             avoidance_steps = avoidance_steps + 1
+    #             print("     Avoidance Step Value: ", avoidance_steps)
+    #
+    #         for m in range(obstacle_width):
+    #             print("for m in range(obstacle_width):")
+    #             current_x, current_y = self.pos
+    #             print("     Current XY: ", current_x, current_y)
+    #             avoidance_move = (current_x, (current_y - 1))
+    #             print("     Avoidance move coords: ", avoidance_move)
+    #             self.model.grid.move_agent(self, avoidance_move)
+    #
+    #         for n in range(avoidance_steps):
+    #             print("n in range(avoidance_steps)")
+    #             current_x, current_y = self.pos
+    #             print("     Current XY: ", current_x, current_y)
+    #             avoidance_move = ((current_x - 1), current_y)
+    #             print("     Avoidance move coords: ", avoidance_move)
+    #             self.model.grid.move_agent(self, avoidance_move)
+    #
+    #         self.check_for_freedom()
+    #         if self.check_for_freedom():
+    #             print("I moved around it!")
+    #             self.normal_navigation = True
+    #         if not self.check_for_freedom():
+    #             print("I fucked up!")
+    #             # some kind of recursion
+    #
+    #     elif blocked_direction == "west":
+    #         print("Current XY: ", current_x, current_y)
+    #         while self.blocked_west():
+    #             print("while self.blocked_west():")
+    #             avoidance_move = (current_x, (current_y - 1))
+    #             print("     Avoidance move coords: ", avoidance_move)
+    #             self.model.grid.move_agent(self, avoidance_move)
+    #             avoidance_steps = avoidance_steps + 1
+    #             print("     Avoidance Step Value: ", avoidance_steps)
+    #
+    #         for m in range(obstacle_width):
+    #             print("for m in range(obstacle_width):")
+    #             current_x, current_y = self.pos
+    #             print("     Current XY: ", current_x, current_y)
+    #             avoidance_move = ((current_x - 1), current_y)
+    #             print("     Avoidance move coords: ", avoidance_move)
+    #             self.model.grid.move_agent(self, avoidance_move)
+    #
+    #         for n in range(avoidance_steps):
+    #             print("n in range(avoidance_steps)")
+    #             current_x, current_y = self.pos
+    #             print("     Current XY: ", current_x, current_y)
+    #             avoidance_move = (current_x, (current_y + 1))
+    #             print("     Avoidance move coords: ", avoidance_move)
+    #             self.model.grid.move_agent(self, avoidance_move)
+    #
+    #         self.check_for_freedom()
+    #         if self.check_for_freedom():
+    #             print("I moved around it!")
+    #             self.normal_navigation = True
+    #         if not self.check_for_freedom():
+    #             print("I fucked up!")
+    #             # some kind of recursion
 
     def blocked_north(self):
         current_x, current_y = self.pos
@@ -377,6 +455,8 @@ class Walker(Agent):
         elif self.blocked_west():
             print("West is blocked. Attempting avoidance...")
             self.follow_wall("west")
+        else:
+            print("I can't see any obstacles, though...")
 
         # self.check_for_freedom()
         # if self.check_for_freedom():
@@ -430,15 +510,18 @@ class Walker(Agent):
             # EACH STEP SHOULD RECORD THE AGENT'S POSITION AND USE POP FOR MEMORY LIMIT
         else:
             self.stepCount += 1  # This is not needed as the agent can access the step number through other means??
+            # print("Goal Reached?", self.goal_reached)
             if self.goal_reached == False :
                 self.bug0_nav()
                 self.open_box()
                 print("Current Step:", self.pos)
                 print("Next Step: ", self.next_move)
+                print("Current Goal:", self.goal)
 
             if self.goal_reached == True :
                 self.calculate_box_distances_from_current_pos()
                 self.set_goal()
+                # print("Setting new goal.")
                 self.goal_reached = False
                 if self.box_open_verbose == True:
                     print("Full Box List: ", self.model.full_boxes)
