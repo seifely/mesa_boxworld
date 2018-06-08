@@ -19,12 +19,12 @@ class Walker(Agent):
     goal = []
     closed_box_list = {}
     open_box_list = {}
-    goal_reached = False
+    goal_reached = False  # not currently used
     next_move = []
-    avoidance_goal = []
+    avoidance_goal = []  # not currently used
     avoidance_check = []
-    able_to_move = True
-    steps_memory = []
+    able_to_move = True  # not currently used
+    steps_memory = []  # not currently used
     obstacle_present = False
 
     # for debugging
@@ -32,7 +32,8 @@ class Walker(Agent):
     box_open_verbose = False
     quick_verbose = False
 
-    def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[], able_to_move=True, steps_memory=[], obstacle_present=False, avoidance_goal=[], avoidance_check=[]):
+    def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
+                 able_to_move=True, steps_memory=[], obstacle_present=False, avoidance_goal=[], avoidance_check=[]):
         super().__init__(pos, model)
         self.moore = moore
         self.pos = pos
@@ -108,303 +109,155 @@ class Walker(Agent):
         '''
         Step one cell in any allowable direction towards the closest box.
         '''
+
         if self.able_to_move:
             goal = self.goal
-            current_x, current_y = self.pos
-            goal_x, goal_y = goal
 
-            if self.pos != goal:
-                if current_x > goal_x:
-                    self.next_move = ((current_x - 1), current_y)
-                    self.check_for_obstacles(self.next_move)
-                    if self.obstacle_present == True:
-                        self.avoid_obstacle()
-                    elif self.obstacle_present == False:
-                        self.model.grid.move_agent(self, self.next_move)
 
-                elif current_x < goal_x:
-                    self.next_move = ((current_x + 1), current_y)
-                    self.check_for_obstacles(self.next_move)
-                    if self.obstacle_present == True:
-                        self.avoid_obstacle()
-                    elif self.obstacle_present == False:
-                        self.model.grid.move_agent(self, self.next_move)
+        elif not self.able_to_move:
+            print("I can't move right now.")
 
-                if current_y > goal_y:
-                    self.next_move = (current_x, (current_y - 1))
-                    self.check_for_obstacles(self.next_move)
-                    if self.obstacle_present == True:
-                        self.avoid_obstacle()
 
-                        # IS THIS BIR=T --------------------------------------------------------------------
-                        new_current_x, new_current_y = self.pos
-                        self.next_move = (new_current_x, (new_current_y - 1))
-                        self.model.grid.move_agent(self, self.next_move)
 
-                    elif self.obstacle_present == False:
-                        self.model.grid.move_agent(self, self.next_move)
 
-                elif current_y < goal_y:
-                    self.next_move = (current_x, (current_y + 1))
-                    self.check_for_obstacles(self.next_move)
-                    if self.obstacle_present == True:
-                        self.avoid_obstacle()
-                    elif self.obstacle_present == False:
-                        self.model.grid.move_agent(self, self.next_move)
 
-            else:
-                self.goal_reached = True
-                return "Goal Reached!"
+
+        # if self.able_to_move:
+        #     goal = self.goal
+        #     current_x, current_y = self.pos
+        #     goal_x, goal_y = goal
+        #
+        #     if self.pos != goal:
+        #         if current_x > goal_x:
+        #             self.next_move = ((current_x - 1), current_y)
+        #             self.check_for_obstacles(self.next_move)
+        #             if self.obstacle_present == True:
+        #                 self.avoid_obstacle()
+        #             elif self.obstacle_present == False:
+        #                 self.model.grid.move_agent(self, self.next_move)
+        #
+        #         elif current_x < goal_x:
+        #             self.next_move = ((current_x + 1), current_y)
+        #             self.check_for_obstacles(self.next_move)
+        #             if self.obstacle_present == True:
+        #                 self.avoid_obstacle()
+        #             elif self.obstacle_present == False:
+        #                 self.model.grid.move_agent(self, self.next_move)
+        #
+        #         if current_y > goal_y:
+        #             self.next_move = (current_x, (current_y - 1))
+        #             self.check_for_obstacles(self.next_move)
+        #             if self.obstacle_present == True:
+        #                 self.avoid_obstacle()
+        #
+        #                 # IS THIS BIR=T --------------------------------------------------------------------
+        #                 new_current_x, new_current_y = self.pos
+        #                 self.next_move = (new_current_x, (new_current_y - 1))
+        #                 self.model.grid.move_agent(self, self.next_move)
+        #
+        #             elif self.obstacle_present == False:
+        #                 self.model.grid.move_agent(self, self.next_move)
+        #
+        #         elif current_y < goal_y:
+        #             self.next_move = (current_x, (current_y + 1))
+        #             self.check_for_obstacles(self.next_move)
+        #             if self.obstacle_present == True:
+        #                 self.avoid_obstacle()
+        #             elif self.obstacle_present == False:
+        #                 self.model.grid.move_agent(self, self.next_move)
+        #
+        #     else:
+        #         self.goal_reached = True
+        #         return "Goal Reached!"
 
         elif not self.able_to_move:
             print("I'm not allowed to move right now.")
 
-    def check_for_obstacles(self, cell):
+    def check_for_obstacles(self, cell):  # no longer used, generic obstacle checking
         next_cell = self.model.grid.get_cell_list_contents([cell])
         potential_obstacle = [obj for obj in next_cell
                               if isinstance(obj, Obstacle)]
         if len(potential_obstacle) > 0:
-            print("Obstacle Detected!")
+            print("Generic Obstacle Detected!")
             # self.able_to_move = False
             self.obstacle_present = True
         elif len(potential_obstacle) == 0:
             self.obstacle_present = False
 
-    def avoid_obstacle(self):
+    def check_for_freedom(self):
         current_x, current_y = self.pos
-        # 
+        goal_x, goal_y = self.goal
 
-        # if we were about to move left, set new nav goal to 4 steps down, check for obstacle, 2 steps left
-        # set avoidance check to new
-        # navigate 4 steps down, check for obstacle (left), if no obstacle take two steps left
-        # break
+        # for n cells in list (of cells between here and the goal)
+        # check each one for Obstacle agent
+        # obstacle count + 1 for each that returns true
+        # if obstacle count == 0
+            # return True
+        # if obstacle count == 1
+            # return False
+            # initiate immediacy of obstacle check? How is the obstacle 1 step away or many?
+            # if obstacle is more than one step away (dist_x =< 1, dist_y =< 1)
+                # return True
 
-        # repeat this for each potential 4 directions
+    def follow_wall(self):
+        print("Following wall")
+        current_x, current_y = self.pos
 
-        #
+    def blocked_north(self):
+        current_x, current_y = self.pos
 
+        if self.next_move == (current_x, (current_y + 1)):
+            next_cell = self.model.grid.get_cell_list_contents([self.next_move])
+            potential_obstacle = [obj for obj in next_cell
+                                  if isinstance(obj, Obstacle)]
+            if len(potential_obstacle) > 0:
+                print("Obstacle Detected North!")
+                # self.able_to_move = False
+                self.obstacle_present = True
+            elif len(potential_obstacle) == 0:
+                self.obstacle_present = False
 
-    # def avoid_obstacle(self):
-    #     current_x, current_y = self.pos
-    #
-    #     # if about to move left, set goal to down (plus set avoidance check)
-    #     if self.next_move == ((current_x - 1), current_y):  # if we were about to move left
-    #         print("I was going to move left.")
-    #         goal_x = current_x
-    #         goal_y = current_y - 2
-    #         self.avoidance_check = ((current_x - 1), (current_y - 3))
-    #         print("Avoidance Check: ", self.avoidance_check)
-    #
-    #         if self.pos != self.avoidance_goal:
-    #             if current_x > goal_x:
-    #                 self.next_move = ((current_x - 1), current_y)
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             elif current_x < goal_x:
-    #                 self.next_move = ((current_x + 1), current_y)
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             if current_y > goal_y:
-    #                 self.next_move = (current_x, (current_y - 1))
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             elif current_y < goal_y:
-    #                 self.next_move = (current_x, (current_y + 1))
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #         self.next_move = ((current_x - 2), (current_y - 2))
-    #
-    #     elif self.next_move == ((current_x + 1), current_y):  # if we were about to move right
-    #         print("I was going to move right.")
-    #         goal_x = current_x
-    #         goal_y = current_y + 2
-    #         self.avoidance_check = ((current_x + 1), (current_y + 3))
-    #         print("Avoidance Check: ", self.avoidance_check)
-    #
-    #         if self.pos != self.avoidance_goal:
-    #             if current_x > goal_x:
-    #                 self.next_move = ((current_x - 1), current_y)
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             elif current_x < goal_x:
-    #                 self.next_move = ((current_x + 1), current_y)
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             if current_y > goal_y:
-    #                 self.next_move = (current_x, (current_y - 1))
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             elif current_y < goal_y:
-    #                 self.next_move = (current_x, (current_y + 1))
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #         self.next_move = ((current_x + 2), (current_y + 2))
-    #
-    #     elif self.next_move == (current_x, (current_y - 1)):  # if we were about to move down
-    #         print("I was going to move down.")
-    #         goal_x = current_x + 2
-    #         goal_y = current_y
-    #         self.avoidance_check = ((current_x + 3), (current_y - 1))
-    #         print("Avoidance Check: ", self.avoidance_check)
-    #
-    #         if self.pos != self.avoidance_goal:
-    #             if current_x > goal_x:
-    #                 self.next_move = ((current_x - 1), current_y)
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             elif current_x < goal_x:
-    #                 self.next_move = ((current_x + 1), current_y)
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             if current_y > goal_y:
-    #                 self.next_move = (current_x, (current_y - 1))
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             elif current_y < goal_y:
-    #                 self.next_move = (current_x, (current_y + 1))
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #         self.next_move = ((current_x + 2), (current_y - 2))
-    #
-    #     elif self.next_move == (current_x, (current_y + 1)):  # if we were about to move up
-    #         print("I was going to move up.")
-    #         goal_x = current_x - 2
-    #         goal_y = current_y
-    #         self.avoidance_check = ((current_x - 3), (current_y + 1))
-    #         print("Avoidance Check: ", self.avoidance_check)
-    #
-    #         if self.pos != self.avoidance_goal:
-    #             if current_x > goal_x:
-    #                 self.next_move = ((current_x - 1), current_y)
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             elif current_x < goal_x:
-    #                 self.next_move = ((current_x + 1), current_y)
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             if current_y > goal_y:
-    #                 self.next_move = (current_x, (current_y - 1))
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             elif current_y < goal_y:
-    #                 self.next_move = (current_x, (current_y + 1))
-    #                 self.model.grid.move_agent(self, self.next_move)
-    #
-    #             self.next_move = ((current_x - 2), (current_y + 2))
-    #
-    #     self.check_for_obstacles(self.avoidance_check)
-    #     if self.obstacle_present == True:
-    #         self.avoid_obstacle()
-    #     if self.obstacle_present == False:
-    #         print("Obstacle Avoided!")
+    def blocked_east(self):
+        current_x, current_y = self.pos
 
-    # def avoid_obstacle(self):
-    #     current_x, current_y = self.pos
-    #
-    #     if self.next_move == ((current_x - 1), current_y):  # if we were about to move left
-    #         print("I was going to move left.")
-    #         avoidance_x = current_x
-    #         avoidance_y = current_y - 4
-    #
-    #         while current_y > avoidance_y:  # does this need to be a while or an if?
-    #             avoidance_move = (current_x, (current_y - 1))
-    #             self.model.grid.move_agent(self, avoidance_move)
-    #             self.check_for_obstacles()
-    #             if self.obstacle_present == False:
-    #                 print("No more obstacle present.")
-    #                 break
-    #
-    #     elif self.next_move == ((current_x + 1), current_y):  # if we were about to move right
-    #         print("I was going to move right.")
-    #         avoidance_x = current_x
-    #         avoidance_y = current_y + 4
-    #
-    #         while current_y < avoidance_y:
-    #             avoidance_move = (current_x, (current_y + 1))
-    #             self.model.grid.move_agent(self, avoidance_move)
-    #             self.check_for_obstacles()
-    #             if self.obstacle_present == False:
-    #                 print("No more obstacle present.")
-    #                 break
-    #
-    #     elif self.next_move == (current_x, (current_y - 1)):  # if we were about to move down
-    #         print("I was going to move down.")
-    #         avoidance_x = current_x + 4
-    #         avoidance_y = current_y
-    #
-    #         while current_x < avoidance_x:
-    #             avoidance_move = ((current_x + 1), current_y)
-    #             self.model.grid.move_agent(self, avoidance_move)
-    #             self.check_for_obstacles()
-    #             if self.obstacle_present == False:
-    #                 print("No more obstacle present.")
-    #                 break
-    #
-    #     elif self.next_move == (current_x, (current_y + 1)):  # if we were about to move up
-    #         print("I was going to move up.")
-    #         avoidance_x = current_x - 4
-    #         avoidance_y = current_y
-    #
-    #         while current_x > avoidance_x:
-    #             avoidance_move = ((current_x - 1), current_y)
-    #             self.model.grid.move_agent(self, avoidance_move)
-    #             self.check_for_obstacles()
-    #             if self.obstacle_present == False:
-    #                 print("No more obstacle present.")
-    #                 break
+        if self.next_move == ((current_x + 1), current_y):
+            next_cell = self.model.grid.get_cell_list_contents([self.next_move])
+            potential_obstacle = [obj for obj in next_cell
+                                  if isinstance(obj, Obstacle)]
+            if len(potential_obstacle) > 0:
+                print("Obstacle Detected East!")
+                # self.able_to_move = False
+                self.obstacle_present = True
+            elif len(potential_obstacle) == 0:
+                self.obstacle_present = False
 
-    # def check_for_stuck(self):
-    #     if self.steps_memory[0] == self.steps_memory[2]:
-    #         print("Help! I'm stuck.")
-    #         return True
+    def blocked_south(self):
+        current_x, current_y = self.pos
 
-    # def avoid_obstacle(self):
-    #     current_x, current_y = self.pos
-    #
-    #     if self.next_move == ((current_x - 1), current_y):  # if we were about to move left
-    #         print("I was going to move left.")
-    #         for n in range(4):
-    #             avoidance_move = (current_x, (current_y - 1))
-    #             print("Thought of avoidance move.")
-    #             self.model.grid.move_agent(self, avoidance_move)
-    #             self.steps_memory.append(avoidance_move)
-    #             print("Used avoidance move down.")
-    #             self.check_for_obstacles()
-    #             # current_y = current_y - 1
-    #
-    #     elif self.next_move == ((current_x + 1), current_y):  # if we were about to move right
-    #         print("I was going to move right.")
-    #         for n in range(4):
-    #             avoidance_move = (current_x, (current_y + 1))
-    #             print("Thought of avoidance move.")
-    #             self.model.grid.move_agent(self, avoidance_move)
-    #             self.steps_memory.append(avoidance_move)
-    #             print("Used avoidance move up.")
-    #             self.check_for_obstacles()
-    #             # current_y = current_y + 1
-    #
-    #
-    #     elif self.next_move == (current_x, (current_y - 1)):  # if we were about to move down
-    #         print("I was going to move down.")
-    #         for n in range(4):
-    #             avoidance_move = ((current_x + 1), current_y)
-    #             print("Thought of avoidance move.")
-    #             self.model.grid.move_agent(self, avoidance_move)
-    #             self.steps_memory.append(avoidance_move)
-    #             print("Used avoidance move right.")
-    #             # current_x = current_x + 1
-    #             self.check_for_obstacles()
-    #
-    #     elif self.next_move == (current_x, (current_y + 1)):  # if we were about to move up
-    #         print("I was going to move up.")
-    #         for n in range(4):
-    #             avoidance_move = ((current_x - 1), current_y)
-    #             print("Thought of avoidance move.")
-    #             self.model.grid.move_agent(self, avoidance_move)
-    #             self.steps_memory.append(avoidance_move)
-    #             print("Used avoidance move left.")
-    #             # current_x = current_x - 1
-    #             self.check_for_obstacles()
+        if self.next_move == (current_x, (current_y - 1)):
+            next_cell = self.model.grid.get_cell_list_contents([self.next_move])
+            potential_obstacle = [obj for obj in next_cell
+                                  if isinstance(obj, Obstacle)]
+            if len(potential_obstacle) > 0:
+                print("Obstacle Detected South!")
+                # self.able_to_move = False
+                self.obstacle_present = True
+            elif len(potential_obstacle) == 0:
+                self.obstacle_present = False
+
+    def blocked_west(self):
+        current_x, current_y = self.pos
+
+        if self.next_move == ((current_x - 1), current_y):
+            next_cell = self.model.grid.get_cell_list_contents([self.next_move])
+            potential_obstacle = [obj for obj in next_cell
+                                  if isinstance(obj, Obstacle)]
+            if len(potential_obstacle) > 0:
+                print("Obstacle Detected West!")
+                # self.able_to_move = False
+                self.obstacle_present = True
+            elif len(potential_obstacle) == 0:
+                self.obstacle_present = False
 
     def open_box(self):
         # If there is a Box available at the current location, open it.
