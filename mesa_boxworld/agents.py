@@ -172,6 +172,7 @@ class Walker(Agent):
 
     def avoid_obstacle(self):
         current_x, current_y = self.pos
+        # 
 
         # if we were about to move left, set new nav goal to 4 steps down, check for obstacle, 2 steps left
         # set avoidance check to new
