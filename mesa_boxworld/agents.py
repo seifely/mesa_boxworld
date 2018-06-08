@@ -6,9 +6,6 @@ from mesa import Agent
 ###########################################################################################################
 class Walker(Agent):
     '''
-    A sheep that walks around, reproduces (asexually) and gets eaten.
-
-    The init is the same as the RandomWalker.
     '''
 
     moore = True
@@ -26,6 +23,7 @@ class Walker(Agent):
     able_to_move = True  # not currently used
     steps_memory = []  # not currently used
     obstacle_present = False
+    normal_navigation = True
 
     # for debugging
     distance_verbose = False
@@ -33,7 +31,8 @@ class Walker(Agent):
     quick_verbose = False
 
     def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
-                 able_to_move=True, steps_memory=[], obstacle_present=False, avoidance_goal=[], avoidance_check=[]):
+                 able_to_move=True, steps_memory=[], obstacle_present=False, avoidance_goal=[], avoidance_check=[],
+                 normal_navigation=True):
         super().__init__(pos, model)
         self.moore = moore
         self.pos = pos
@@ -45,6 +44,7 @@ class Walker(Agent):
         self.able_to_move = able_to_move
         self.steps_memory = steps_memory
         self.obstacle_present = obstacle_present
+        self.normal_navigation = normal_navigation
 
         self.closed_box_list = closed_box_list
         self.closed_box_list = self.model.all_boxes  # this used to be set to the full box list, but now agent = blind
@@ -105,73 +105,71 @@ class Walker(Agent):
         if self.distance_verbose == True:
             print("Goal is: ", self.goal)
 
+    def bug0_nav(self):
+
+        if self.normal_navigation:
+            self.simple_move_goal()
+            self.check_for_obstacles(self.next_move)
+            if self.obstacle_present:
+                self.normal_navigation = False
+
+        elif not self.normal_navigation:
+            self.bug_navigation()
+
+# AGENT NOTE: IT ALWAYS TRAVELS ALONG ITS Y AXIS BEFORE ITS X AXIS?
+
+        elif not self.able_to_move:
+            print("I can't move right now.")
+
     def simple_move_goal(self):
         '''
         Step one cell in any allowable direction towards the closest box.
         '''
 
-        if self.able_to_move:
-            goal = self.goal
+        goal = self.goal
+        current_x, current_y = self.pos
+        goal_x, goal_y = goal
 
+        if self.pos != goal:
+            if current_x > goal_x:
+                self.next_move = ((current_x - 1), current_y)
+                self.check_for_obstacles(self.next_move)
+                if self.obstacle_present:
+                    self.next_move = ((current_x - 1), current_y)
+                    return
+                else:
+                    self.model.grid.move_agent(self, self.next_move)
 
-        elif not self.able_to_move:
-            print("I can't move right now.")
+            elif current_x < goal_x:
+                self.next_move = ((current_x + 1), current_y)
+                self.check_for_obstacles(self.next_move)
+                if self.obstacle_present:
+                    self.next_move = ((current_x + 1), current_y)
+                    return
+                else:
+                    self.model.grid.move_agent(self, self.next_move)
 
+            if current_y > goal_y:
+                self.next_move = (current_x, (current_y - 1))
+                self.check_for_obstacles(self.next_move)
+                if self.obstacle_present:
+                    self.next_move = (current_x, (current_y - 1))
+                    return
+                else:
+                    self.model.grid.move_agent(self, self.next_move)
 
+            elif current_y < goal_y:
+                self.next_move = (current_x, (current_y + 1))
+                self.check_for_obstacles(self.next_move)
+                if self.obstacle_present:
+                    self.next_move = (current_x, (current_y + 1))
+                    return
+                else:
+                    self.model.grid.move_agent(self, self.next_move)
 
-
-
-
-        # if self.able_to_move:
-        #     goal = self.goal
-        #     current_x, current_y = self.pos
-        #     goal_x, goal_y = goal
-        #
-        #     if self.pos != goal:
-        #         if current_x > goal_x:
-        #             self.next_move = ((current_x - 1), current_y)
-        #             self.check_for_obstacles(self.next_move)
-        #             if self.obstacle_present == True:
-        #                 self.avoid_obstacle()
-        #             elif self.obstacle_present == False:
-        #                 self.model.grid.move_agent(self, self.next_move)
-        #
-        #         elif current_x < goal_x:
-        #             self.next_move = ((current_x + 1), current_y)
-        #             self.check_for_obstacles(self.next_move)
-        #             if self.obstacle_present == True:
-        #                 self.avoid_obstacle()
-        #             elif self.obstacle_present == False:
-        #                 self.model.grid.move_agent(self, self.next_move)
-        #
-        #         if current_y > goal_y:
-        #             self.next_move = (current_x, (current_y - 1))
-        #             self.check_for_obstacles(self.next_move)
-        #             if self.obstacle_present == True:
-        #                 self.avoid_obstacle()
-        #
-        #                 # IS THIS BIR=T --------------------------------------------------------------------
-        #                 new_current_x, new_current_y = self.pos
-        #                 self.next_move = (new_current_x, (new_current_y - 1))
-        #                 self.model.grid.move_agent(self, self.next_move)
-        #
-        #             elif self.obstacle_present == False:
-        #                 self.model.grid.move_agent(self, self.next_move)
-        #
-        #         elif current_y < goal_y:
-        #             self.next_move = (current_x, (current_y + 1))
-        #             self.check_for_obstacles(self.next_move)
-        #             if self.obstacle_present == True:
-        #                 self.avoid_obstacle()
-        #             elif self.obstacle_present == False:
-        #                 self.model.grid.move_agent(self, self.next_move)
-        #
-        #     else:
-        #         self.goal_reached = True
-        #         return "Goal Reached!"
-
-        elif not self.able_to_move:
-            print("I'm not allowed to move right now.")
+            else:
+                self.goal_reached = True
+                return "Goal Reached!"
 
     def check_for_obstacles(self, cell):  # no longer used, generic obstacle checking
         next_cell = self.model.grid.get_cell_list_contents([cell])
@@ -179,10 +177,12 @@ class Walker(Agent):
                               if isinstance(obj, Obstacle)]
         if len(potential_obstacle) > 0:
             print("Generic Obstacle Detected!")
-            # self.able_to_move = False
             self.obstacle_present = True
         elif len(potential_obstacle) == 0:
             self.obstacle_present = False
+
+    def check_neighbourhood(self):
+        return
 
     def check_for_freedom(self):
         current_x, current_y = self.pos
@@ -198,10 +198,110 @@ class Walker(Agent):
             # initiate immediacy of obstacle check? How is the obstacle 1 step away or many?
             # if obstacle is more than one step away (dist_x =< 1, dist_y =< 1)
                 # return True
+        return True
 
-    def follow_wall(self):
+    def follow_wall(self, blocked_direction):
         print("Following wall")
         current_x, current_y = self.pos
+        avoidance_steps = 0
+        obstacle_width = 1  # this might need to be 2
+        # get the neighbourhood around self.pos
+
+        if blocked_direction == "north":
+            while self.blocked_north():
+                avoidance_move = ((current_x - 1), current_y)
+                self.model.grid.move_agent(self, avoidance_move)
+                avoidance_steps = avoidance_steps + 1
+
+            for m in range(obstacle_width):
+                current_x, current_y = self.pos
+                avoidance_move = (current_x, (current_y + 1))
+                self.model.grid.move_agent(self, avoidance_move)
+
+            for n in range(avoidance_steps):
+                current_x, current_y = self.pos
+                avoidance_move = ((current_x + 1), current_y)
+                self.model.grid.move_agent(self, avoidance_move)
+
+            self.check_for_freedom()
+            if self.check_for_freedom():
+                print("I moved around it!")
+                self.normal_navigation = True
+            if not self.check_for_freedom():
+                print("I fucked up!")
+                # some kind of recursion
+
+        elif blocked_direction == "east":
+            while self.blocked_east():
+                avoidance_move = (current_x, (current_y + 1))
+                self.model.grid.move_agent(self, avoidance_move)
+                avoidance_steps = avoidance_steps + 1
+
+            for m in range(obstacle_width):
+                current_x, current_y = self.pos
+                avoidance_move = ((current_x + 1), current_y)
+                self.model.grid.move_agent(self, avoidance_move)
+
+            for n in range(avoidance_steps):
+                current_x, current_y = self.pos
+                avoidance_move = (current_x, (current_y - 1))
+                self.model.grid.move_agent(self, avoidance_move)
+
+            self.check_for_freedom()
+            if self.check_for_freedom():
+                print("I moved around it!")
+                self.normal_navigation = True
+            if not self.check_for_freedom():
+                print("I fucked up!")
+                # some kind of recursion
+
+        elif blocked_direction == "south":
+            while self.blocked_south():
+                avoidance_move = ((current_x + 1), current_y)
+                self.model.grid.move_agent(self, avoidance_move)
+                avoidance_steps = avoidance_steps + 1
+
+            for m in range(obstacle_width):
+                current_x, current_y = self.pos
+                avoidance_move = (current_x, (current_y - 1))
+                self.model.grid.move_agent(self, avoidance_move)
+
+            for n in range(avoidance_steps):
+                current_x, current_y = self.pos
+                avoidance_move = ((current_x - 1), current_y)
+                self.model.grid.move_agent(self, avoidance_move)
+
+            self.check_for_freedom()
+            if self.check_for_freedom():
+                print("I moved around it!")
+                self.normal_navigation = True
+            if not self.check_for_freedom():
+                print("I fucked up!")
+                # some kind of recursion
+
+        elif blocked_direction == "west":
+            while self.blocked_west():
+                avoidance_move = (current_x, (current_y - 1))
+                self.model.grid.move_agent(self, avoidance_move)
+                avoidance_steps = avoidance_steps + 1
+
+            for m in range(obstacle_width):
+                current_x, current_y = self.pos
+                avoidance_move = ((current_x - 1), current_y)
+                self.model.grid.move_agent(self, avoidance_move)
+
+            for n in range(avoidance_steps):
+                current_x, current_y = self.pos
+                avoidance_move = (current_x, (current_y + 1))
+                self.model.grid.move_agent(self, avoidance_move)
+
+            self.check_for_freedom()
+            if self.check_for_freedom():
+                print("I moved around it!")
+                self.normal_navigation = True
+            if not self.check_for_freedom():
+                print("I fucked up!")
+                # some kind of recursion
 
     def blocked_north(self):
         current_x, current_y = self.pos
@@ -213,9 +313,9 @@ class Walker(Agent):
             if len(potential_obstacle) > 0:
                 print("Obstacle Detected North!")
                 # self.able_to_move = False
-                self.obstacle_present = True
+                return True
             elif len(potential_obstacle) == 0:
-                self.obstacle_present = False
+                return False
 
     def blocked_east(self):
         current_x, current_y = self.pos
@@ -227,9 +327,9 @@ class Walker(Agent):
             if len(potential_obstacle) > 0:
                 print("Obstacle Detected East!")
                 # self.able_to_move = False
-                self.obstacle_present = True
+                return True
             elif len(potential_obstacle) == 0:
-                self.obstacle_present = False
+                return False
 
     def blocked_south(self):
         current_x, current_y = self.pos
@@ -241,9 +341,9 @@ class Walker(Agent):
             if len(potential_obstacle) > 0:
                 print("Obstacle Detected South!")
                 # self.able_to_move = False
-                self.obstacle_present = True
+                return True
             elif len(potential_obstacle) == 0:
-                self.obstacle_present = False
+                return False
 
     def blocked_west(self):
         current_x, current_y = self.pos
@@ -255,9 +355,32 @@ class Walker(Agent):
             if len(potential_obstacle) > 0:
                 print("Obstacle Detected West!")
                 # self.able_to_move = False
-                self.obstacle_present = True
+                return True
             elif len(potential_obstacle) == 0:
-                self.obstacle_present = False
+                return False
+
+    def bug_navigation(self):
+        print("I'm a bug!")
+
+        if self.blocked_north():
+            print("North is blocked. Attempting avoidance...")
+            self.follow_wall("north")
+
+        elif self.blocked_east():
+            print("East is blocked. Attempting avoidance...")
+            self.follow_wall("east")
+
+        elif self.blocked_south():
+            print("South is blocked. Attempting avoidance...")
+            self.follow_wall("south")
+
+        elif self.blocked_west():
+            print("West is blocked. Attempting avoidance...")
+            self.follow_wall("west")
+
+        # self.check_for_freedom()
+        # if self.check_for_freedom():
+        #     self.normal_navigation = True
 
     def open_box(self):
         # If there is a Box available at the current location, open it.
@@ -308,12 +431,10 @@ class Walker(Agent):
         else:
             self.stepCount += 1  # This is not needed as the agent can access the step number through other means??
             if self.goal_reached == False :
-                self.simple_move_goal()
-                # self.check_for_obstacles()
+                self.bug0_nav()
                 self.open_box()
-                print("Next Move is: ", self.next_move)
-                # if self.check_for_obstacles():
-                #     self.avoid_obstacle()
+                print("Current Step:", self.pos)
+                print("Next Step: ", self.next_move)
 
             if self.goal_reached == True :
                 self.calculate_box_distances_from_current_pos()
