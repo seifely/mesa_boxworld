@@ -1,5 +1,6 @@
 import random
 import math
+import operator
 
 from mesa import Agent
 
@@ -19,7 +20,7 @@ class Walker(Agent):
     goal_reached = False  # not currently used
     next_move = []
     avoidance_goal = []  # not currently used
-    avoidance_check = []
+    avoidance_check = [] # used???
     able_to_move = True  # not currently used
     steps_memory = []  # not currently used
     obstacle_present = False
@@ -49,6 +50,8 @@ class Walker(Agent):
         self.closed_box_list = closed_box_list
         self.closed_box_list = self.model.all_boxes  # this used to be set to the full box list, but now agent = blind
         self.open_box_list = open_box_list
+
+        # AGENT NOTE: IT ALWAYS TRAVELS ALONG ITS Y AXIS BEFORE ITS X AXIS?
 
     def random_move(self):
         '''
@@ -119,8 +122,6 @@ class Walker(Agent):
         elif not self.normal_navigation:
             self.bug_navigation()
 
-# AGENT NOTE: IT ALWAYS TRAVELS ALONG ITS Y AXIS BEFORE ITS X AXIS?
-
         elif not self.able_to_move:
             print("I can't move right now.")
 
@@ -187,21 +188,40 @@ class Walker(Agent):
     def check_neighbourhood(self):
         return
 
-    def check_for_freedom(self):
-        current_x, current_y = self.pos
-        goal_x, goal_y = self.goal
+    def points_between(self, p1, p2):
+        if p1[0] <= p2[0]:
+            xs = range(p1[0] + 1, p2[0]) or [p1[0]]
+            ys = range(p1[1] + 1, p2[1]) or [p1[1]]
+            return [(x, y) for x in xs for y in ys]
+        elif p1[0] > p2[0]:
+            swapped_p1 = p2
+            swapped_p2 = p1
+            xs = range(swapped_p1[0] + 1, swapped_p2[0]) or [swapped_p1[0]]
+            ys = range(swapped_p1[1] + 1, swapped_p2[1]) or [swapped_p1[1]]
+            return [(x, y) for x in xs for y in ys]  # be aware these will be in reverse order from the point to current
 
-        # for n cells in list (of cells between here and the goal)
-        # check each one for Obstacle agent
-        # obstacle count + 1 for each that returns true
-        # if obstacle count == 0
-            # return True
-        # if obstacle count == 1
-            # return False
+    def check_for_freedom(self):
+        obstacle_count = 0
+        goal = self.goal
+        current_location = self.pos
+        cells_between = self.points_between(goal, current_location)
+        print("Cells between here and my goal are: ", cells_between)
+
+        for each in range(len(cells_between)):
+            if self.check_for_obstacles(cells_between[each]):
+                obstacle_count = obstacle_count + 1
+
+        if obstacle_count == 0:
+            print("Line of Sight to Goal is Not Blocked")
+            self.normal_navigation = True
+            return True
+        if obstacle_count > 0:
+            print("Line of Sight to Goal is Blocked")
+            return False
+
             # initiate immediacy of obstacle check? How is the obstacle 1 step away or many?
             # if obstacle is more than one step away (dist_x =< 1, dist_y =< 1)
                 # return True
-        return True
 
     def follow_wall(self, blocked_direction):
         print("Following wall")
@@ -221,11 +241,13 @@ class Walker(Agent):
 
 
         elif blocked_direction == "south":
+            print("Current XY: ", current_x, current_y)
 
 
 
 
         elif blocked_direction == "west":
+            print("Current XY: ", current_x, current_y)
 
 
 
