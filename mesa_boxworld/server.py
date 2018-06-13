@@ -84,10 +84,10 @@ chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 
 model_params = {#"height": UserSettableParameter('slider', 'Height', 20, 10, 50, 10),
                 #"width": UserSettableParameter('slider', 'Width', 20, 10, 50, 10),
-                "initial_walkers": UserSettableParameter('slider', 'Initial Walker Population', 1, 1, 10, 1),
-                "initial_boxes": UserSettableParameter('slider', 'Initial Box Number', 10, 1, 20, 1),
+                # "initial_walkers": UserSettableParameter('slider', 'Initial Walker Population', 1, 1, 10, 1),
+                # "initial_boxes": UserSettableParameter('slider', 'Initial Box Number', 10, 1, 20, 1),
                 "initial_items": UserSettableParameter('slider', 'Initial Item Number', 10, 1, 20, 1),
-                "initial_obstacles": UserSettableParameter('slider', 'Initial Whole Obstacle Number', 3, 1, 10, 1),
+                # "initial_obstacles": UserSettableParameter('slider', 'Initial Whole Obstacle Number', 3, 1, 10, 1),
                 # "obstacle_length": UserSettableParameter('slider', 'Maximum Obstacle Length', 5, 1, 12, 1),
                 }
 
