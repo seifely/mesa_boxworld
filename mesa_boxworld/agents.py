@@ -117,8 +117,8 @@ class Walker(Agent):
             if self.obstacle_present:
                 self.normal_navigation = False
                 print("Normal navigation turned off.")
-            if not self.obstacle_present:
-                print("Bug_nav found no obstacle.")
+            # if not self.obstacle_present:
+            #     print("Bug_nav found no obstacle.")
         elif not self.normal_navigation:
             self.bug_navigation()
 
@@ -175,6 +175,52 @@ class Walker(Agent):
             self.goal_reached = True
             print("Goal Reached!")
 
+    def generic_movement(self, target):
+
+        goal = target
+        current_x, current_y = self.pos
+        goal_x, goal_y = goal
+
+        if self.pos != goal:
+            if current_x > goal_x:
+                self.next_move = ((current_x - 1), current_y)
+                self.check_for_obstacles(self.next_move)
+                if self.obstacle_present:
+                    self.next_move = ((current_x - 1), current_y)
+                    return
+                else:
+                    self.model.grid.move_agent(self, self.next_move)
+
+            elif current_x < goal_x:
+                self.next_move = ((current_x + 1), current_y)
+                self.check_for_obstacles(self.next_move)
+                if self.obstacle_present:
+                    self.next_move = ((current_x + 1), current_y)
+                    return
+                else:
+                    self.model.grid.move_agent(self, self.next_move)
+
+            if current_y > goal_y:
+                self.next_move = (current_x, (current_y - 1))
+                self.check_for_obstacles(self.next_move)
+                if self.obstacle_present:
+                    self.next_move = (current_x, (current_y - 1))
+                    return
+                else:
+                    self.model.grid.move_agent(self, self.next_move)
+
+            elif current_y < goal_y:
+                self.next_move = (current_x, (current_y + 1))
+                self.check_for_obstacles(self.next_move)
+                if self.obstacle_present:
+                    self.next_move = (current_x, (current_y + 1))
+                    return
+                else:
+                    self.model.grid.move_agent(self, self.next_move)
+
+        elif self.pos == self.goal:
+            return True  # not quite sure how to use this yet
+
     def check_for_obstacles(self, cell):  # no longer used, generic obstacle checking
         next_cell = self.model.grid.get_cell_list_contents([cell])
         potential_obstacle = [obj for obj in next_cell
@@ -182,8 +228,10 @@ class Walker(Agent):
         if len(potential_obstacle) > 0:
             print("Generic Obstacle Detected!")
             self.obstacle_present = True
+            return True
         elif len(potential_obstacle) == 0:
             self.obstacle_present = False
+            return False
 
     def check_neighbourhood(self):
         return
@@ -208,7 +256,10 @@ class Walker(Agent):
         print("Cells between here and my goal are: ", cells_between)
 
         for each in range(len(cells_between)):
+            print("Cell Observed: ", each)
+            print("obstacle_count: ", obstacle_count)
             if self.check_for_obstacles(cells_between[each]):
+                print("Obstacle in LOS found.")
                 obstacle_count = obstacle_count + 1
 
         if obstacle_count == 0:
@@ -232,24 +283,39 @@ class Walker(Agent):
 
         if blocked_direction == "north":
             print("Current XY: ", current_x, current_y)
-
-
+            move_left = ((current_x - 4), current_y)
+            self.generic_movement(move_left)
+            clear_obstacle = (current_x, (current_y + 2))
+            self.generic_movement(clear_obstacle)
+            move_right = ((current_x + 4), current_y)
+            self.generic_movement(move_right)
 
         elif blocked_direction == "east":
             print("Current XY: ", current_x, current_y)
-
-
+            move_left = (current_x, (current_y + 4))
+            self.generic_movement(move_left)
+            clear_obstacle = ((current_x + 2), current_y)
+            self.generic_movement(clear_obstacle)
+            move_right = (current_x, (current_y - 4))
+            self.generic_movement(move_right)
 
         elif blocked_direction == "south":
             print("Current XY: ", current_x, current_y)
-
-
-
+            move_left = ((current_x + 4), current_y)
+            self.generic_movement(move_left)
+            clear_obstacle = (current_x, (current_y - 2))
+            self.generic_movement(clear_obstacle)
+            move_right = ((current_x - 4), current_y)
+            self.generic_movement(move_right)
 
         elif blocked_direction == "west":
             print("Current XY: ", current_x, current_y)
-
-
+            move_left = (current_x, (current_y - 4))
+            self.generic_movement(move_left)
+            clear_obstacle = ((current_x - 2), current_y)
+            self.generic_movement(clear_obstacle)
+            move_right = (current_x, (current_y + 4))
+            self.generic_movement(move_right)
 
         self.check_for_freedom()
         if self.check_for_freedom():
@@ -403,82 +469,87 @@ class Walker(Agent):
     #             print("I fucked up!")
     #             # some kind of recursion
 
-    def blocked_north(self):
+    def directional_blockage_checker(self):
         current_x, current_y = self.pos
+        north_cell = (current_x, (current_y + 1))
+        east_cell = ((current_x + 1), current_y)
+        south_cell = (current_x, (current_y - 1))
+        west_cell = ((current_x - 1), current_y)
 
-        if self.next_move == (current_x, (current_y + 1)):
-            next_cell = self.model.grid.get_cell_list_contents([self.next_move])
-            potential_obstacle = [obj for obj in next_cell
-                                  if isinstance(obj, Obstacle)]
-            if len(potential_obstacle) > 0:
-                print("Obstacle Detected North!")
-                # self.able_to_move = False
-                return True
-            elif len(potential_obstacle) == 0:
-                return False
+        if self.check_for_obstacles(north_cell):
+            print("North blocked.")
+            return "north"
+        if self.check_for_obstacles(east_cell):
+            print("East blocked.")
+            return "east"
+        if self.check_for_obstacles(south_cell):
+            print("South blocked.")
+            return "south"
+        if self.check_for_obstacles(west_cell):
+            print("West blocked.")
+            return "west"
 
-    def blocked_east(self):
-        current_x, current_y = self.pos
-
-        if self.next_move == ((current_x + 1), current_y):
-            next_cell = self.model.grid.get_cell_list_contents([self.next_move])
-            potential_obstacle = [obj for obj in next_cell
-                                  if isinstance(obj, Obstacle)]
-            if len(potential_obstacle) > 0:
-                print("Obstacle Detected East!")
-                # self.able_to_move = False
-                return True
-            elif len(potential_obstacle) == 0:
-                return False
-
-    def blocked_south(self):
-        current_x, current_y = self.pos
-
-        if self.next_move == (current_x, (current_y - 1)):
-            next_cell = self.model.grid.get_cell_list_contents([self.next_move])
-            potential_obstacle = [obj for obj in next_cell
-                                  if isinstance(obj, Obstacle)]
-            if len(potential_obstacle) > 0:
-                print("Obstacle Detected South!")
-                # self.able_to_move = False
-                return True
-            elif len(potential_obstacle) == 0:
-                return False
-
-    def blocked_west(self):
-        current_x, current_y = self.pos
-
-        if self.next_move == ((current_x - 1), current_y):
-            next_cell = self.model.grid.get_cell_list_contents([self.next_move])
-            potential_obstacle = [obj for obj in next_cell
-                                  if isinstance(obj, Obstacle)]
-            if len(potential_obstacle) > 0:
-                print("Obstacle Detected West!")
-                # self.able_to_move = False
-                return True
-            elif len(potential_obstacle) == 0:
-                return False
+    # def blocked_north(self):
+    #     current_x, current_y = self.pos
+    #
+    #     if self.next_move == (current_x, (current_y + 1)):
+    #         next_cell = self.model.grid.get_cell_list_contents([self.next_move])
+    #         potential_obstacle = [obj for obj in next_cell
+    #                               if isinstance(obj, Obstacle)]
+    #         if len(potential_obstacle) > 0:
+    #             print("Obstacle Detected North!")
+    #             # self.able_to_move = False
+    #             return True
+    #         elif len(potential_obstacle) == 0:
+    #             return False
+    #
+    # def blocked_east(self):
+    #     current_x, current_y = self.pos
+    #
+    #     if self.next_move == ((current_x + 1), current_y):
+    #         next_cell = self.model.grid.get_cell_list_contents([self.next_move])
+    #         potential_obstacle = [obj for obj in next_cell
+    #                               if isinstance(obj, Obstacle)]
+    #         if len(potential_obstacle) > 0:
+    #             print("Obstacle Detected East!")
+    #             # self.able_to_move = False
+    #             return True
+    #         elif len(potential_obstacle) == 0:
+    #             return False
+    #
+    # def blocked_south(self):
+    #     current_x, current_y = self.pos
+    #
+    #     if self.next_move == (current_x, (current_y - 1)):
+    #         next_cell = self.model.grid.get_cell_list_contents([self.next_move])
+    #         potential_obstacle = [obj for obj in next_cell
+    #                               if isinstance(obj, Obstacle)]
+    #         if len(potential_obstacle) > 0:
+    #             print("Obstacle Detected South!")
+    #             # self.able_to_move = False
+    #             return True
+    #         elif len(potential_obstacle) == 0:
+    #             return False
+    #
+    # def blocked_west(self):
+    #     current_x, current_y = self.pos
+    #
+    #     if self.next_move == ((current_x - 1), current_y):
+    #         next_cell = self.model.grid.get_cell_list_contents([self.next_move])
+    #         potential_obstacle = [obj for obj in next_cell
+    #                               if isinstance(obj, Obstacle)]
+    #         if len(potential_obstacle) > 0:
+    #             print("Obstacle Detected West!")
+    #             # self.able_to_move = False
+    #             return True
+    #         elif len(potential_obstacle) == 0:
+    #             return False
 
     def bug_navigation(self):
-        print("I'm a bug!")
+        print("Bug Navigation ACTIVATED")
 
-        if self.blocked_north():
-            print("North is blocked. Attempting avoidance...")
-            self.follow_wall("north")
+        self.follow_wall(self.directional_blockage_checker())
 
-        elif self.blocked_east():
-            print("East is blocked. Attempting avoidance...")
-            self.follow_wall("east")
-
-        elif self.blocked_south():
-            print("South is blocked. Attempting avoidance...")
-            self.follow_wall("south")
-
-        elif self.blocked_west():
-            print("West is blocked. Attempting avoidance...")
-            self.follow_wall("west")
-        else:
-            print("I can't see any obstacles, though...")
 
         # self.check_for_freedom()
         # if self.check_for_freedom():

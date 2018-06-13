@@ -159,6 +159,7 @@ class ThirdTestModel(Model):
                         print("Obstacle extension added!")
                     else:
                         print("Obstacle couldn't be placed.")
+                        return
 
                 if random_direction == "east":
                     new_obstacle = ((current_x + 1), current_y)
@@ -171,6 +172,7 @@ class ThirdTestModel(Model):
                         print("Obstacle extension added!")
                     else:
                         print("Obstacle couldn't be placed.")
+                        return
 
                 if random_direction == "south":
                     new_obstacle = (current_x, (current_y - 1))
@@ -183,6 +185,7 @@ class ThirdTestModel(Model):
                         print("Obstacle extension added!")
                     else:
                         print("Obstacle couldn't be placed.")
+                        return
 
                 if random_direction == "west":
                     new_obstacle = ((current_x - 1), current_y)
@@ -195,6 +198,7 @@ class ThirdTestModel(Model):
                         print("Obstacle extension added!")
                     else:
                         print("Obstacle couldn't be placed.")
+                        return
 
         # self.obstacles.sort()
         print("Obstacle list:", self.obstacles)
