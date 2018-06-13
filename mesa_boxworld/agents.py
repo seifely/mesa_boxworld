@@ -282,7 +282,9 @@ class Walker(Agent):
         # get the neighbourhood around self.pos
 
         if blocked_direction == "north":
+            print("Blocked Direction is North")
             print("Current XY: ", current_x, current_y)
+            print("Goal XY: ", self.goal)
             move_left = ((current_x - 4), current_y)
             self.generic_movement(move_left)
             clear_obstacle = (current_x, (current_y + 2))
@@ -291,7 +293,9 @@ class Walker(Agent):
             self.generic_movement(move_right)
 
         elif blocked_direction == "east":
+            print("Blocked Direction is East")
             print("Current XY: ", current_x, current_y)
+            print("Goal XY: ", self.goal)
             move_left = (current_x, (current_y + 4))
             self.generic_movement(move_left)
             clear_obstacle = ((current_x + 2), current_y)
@@ -300,7 +304,9 @@ class Walker(Agent):
             self.generic_movement(move_right)
 
         elif blocked_direction == "south":
+            print("Blocked Direction is South")
             print("Current XY: ", current_x, current_y)
+            print("Goal XY: ", self.goal)
             move_left = ((current_x + 4), current_y)
             self.generic_movement(move_left)
             clear_obstacle = (current_x, (current_y - 2))
@@ -309,7 +315,9 @@ class Walker(Agent):
             self.generic_movement(move_right)
 
         elif blocked_direction == "west":
+            print("Blocked Direction is West")
             print("Current XY: ", current_x, current_y)
+            print("Goal XY: ", self.goal)
             move_left = (current_x, (current_y - 4))
             self.generic_movement(move_left)
             clear_obstacle = ((current_x - 2), current_y)
@@ -323,7 +331,7 @@ class Walker(Agent):
             self.normal_navigation = True
         if not self.check_for_freedom():
             print("I fucked up!")
-            # some kind of recursion
+            self.follow_wall(self.directional_blockage_checker())
 
     # def follow_wall(self, blocked_direction):
     #     print("Following wall")
