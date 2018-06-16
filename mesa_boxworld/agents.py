@@ -1,6 +1,5 @@
 import random
 import math
-import operator
 
 from mesa import Agent
 
@@ -115,12 +114,13 @@ class Walker(Agent):
             self.check_for_obstacles(self.next_move)
             print("Bug_nav checked for next move obstacles")
             if self.obstacle_present:
+                self.blocked_direction = self.directional_blockage_checker()
                 self.normal_navigation = False
                 print("Normal navigation turned off.")
             # if not self.obstacle_present:
             #     print("Bug_nav found no obstacle.")
         elif not self.normal_navigation:
-            self.bug_navigation()
+            self.bug_navigation(self.blocked_direction)
 
         elif not self.able_to_move:
             print("I can't move right now.")
@@ -134,91 +134,83 @@ class Walker(Agent):
         current_x, current_y = self.pos
         goal_x, goal_y = goal
 
-        if self.pos != goal:
-            if current_x > goal_x:
-                self.next_move = ((current_x - 1), current_y)
-                self.check_for_obstacles(self.next_move)
-                if self.obstacle_present:
+        if self.normal_navigation:
+            if self.pos != goal:
+                if current_x > goal_x:
                     self.next_move = ((current_x - 1), current_y)
-                    return
-                else:
-                    self.model.grid.move_agent(self, self.next_move)
+                    self.check_for_obstacles(self.next_move)
+                    if self.obstacle_present:
+                        self.next_move = ((current_x - 1), current_y)
+                        return
+                    else:
+                        self.model.grid.move_agent(self, self.next_move)
 
-            elif current_x < goal_x:
-                self.next_move = ((current_x + 1), current_y)
-                self.check_for_obstacles(self.next_move)
-                if self.obstacle_present:
+                elif current_x < goal_x:
                     self.next_move = ((current_x + 1), current_y)
-                    return
-                else:
-                    self.model.grid.move_agent(self, self.next_move)
+                    self.check_for_obstacles(self.next_move)
+                    if self.obstacle_present:
+                        self.next_move = ((current_x + 1), current_y)
+                        return
+                    else:
+                        self.model.grid.move_agent(self, self.next_move)
 
-            if current_y > goal_y:
-                self.next_move = (current_x, (current_y - 1))
-                self.check_for_obstacles(self.next_move)
-                if self.obstacle_present:
+                if current_y > goal_y:
                     self.next_move = (current_x, (current_y - 1))
-                    return
-                else:
-                    self.model.grid.move_agent(self, self.next_move)
+                    self.check_for_obstacles(self.next_move)
+                    if self.obstacle_present:
+                        self.next_move = (current_x, (current_y - 1))
+                        return
+                    else:
+                        self.model.grid.move_agent(self, self.next_move)
 
-            elif current_y < goal_y:
-                self.next_move = (current_x, (current_y + 1))
-                self.check_for_obstacles(self.next_move)
-                if self.obstacle_present:
+                elif current_y < goal_y:
                     self.next_move = (current_x, (current_y + 1))
-                    return
-                else:
-                    self.model.grid.move_agent(self, self.next_move)
+                    self.check_for_obstacles(self.next_move)
+                    if self.obstacle_present:
+                        self.next_move = (current_x, (current_y + 1))
+                        return
+                    else:
+                        self.model.grid.move_agent(self, self.next_move)
 
-        elif self.pos == self.goal:
-            self.goal_reached = True
-            print("Goal Reached!")
+            elif self.pos == self.goal:
+                self.goal_reached = True
+                print("Goal Reached!")
+
+        elif not self.normal_navigation:
+            print("I'm trying to use simple_move_goal but I'm not allowed to.")
 
     def generic_movement(self, target):
-
+        print("Generic Goal Set!")
         goal = target
         current_x, current_y = self.pos
         goal_x, goal_y = goal
 
         if self.pos != goal:
             if current_x > goal_x:
+                print("goal is:", goal)
                 self.next_move = ((current_x - 1), current_y)
                 self.check_for_obstacles(self.next_move)
-                if self.obstacle_present:
-                    self.next_move = ((current_x - 1), current_y)
-                    return
-                else:
-                    self.model.grid.move_agent(self, self.next_move)
+                self.model.grid.move_agent(self, self.next_move)
 
             elif current_x < goal_x:
+                print("goal is:", goal)
                 self.next_move = ((current_x + 1), current_y)
-                self.check_for_obstacles(self.next_move)
-                if self.obstacle_present:
-                    self.next_move = ((current_x + 1), current_y)
-                    return
-                else:
-                    self.model.grid.move_agent(self, self.next_move)
+                self.model.grid.move_agent(self, self.next_move)
 
             if current_y > goal_y:
+                print("goal is:", goal)
                 self.next_move = (current_x, (current_y - 1))
                 self.check_for_obstacles(self.next_move)
-                if self.obstacle_present:
-                    self.next_move = (current_x, (current_y - 1))
-                    return
-                else:
-                    self.model.grid.move_agent(self, self.next_move)
+                self.model.grid.move_agent(self, self.next_move)
 
             elif current_y < goal_y:
+                print("goal is:", goal)
                 self.next_move = (current_x, (current_y + 1))
                 self.check_for_obstacles(self.next_move)
-                if self.obstacle_present:
-                    self.next_move = (current_x, (current_y + 1))
-                    return
-                else:
-                    self.model.grid.move_agent(self, self.next_move)
+                self.model.grid.move_agent(self, self.next_move)
 
-        elif self.pos == self.goal:
+        if self.pos == goal:
+            print("Generic Goal Reached!")
             return True  # not quite sure how to use this yet
 
     def check_for_obstacles(self, cell):  # no longer used, generic obstacle checking
@@ -226,7 +218,7 @@ class Walker(Agent):
         potential_obstacle = [obj for obj in next_cell
                               if isinstance(obj, Obstacle)]
         if len(potential_obstacle) > 0:
-            print("Generic Obstacle Detected!")
+            print("Check for Obstacles = True!")
             self.obstacle_present = True
             return True
         elif len(potential_obstacle) == 0:
@@ -275,63 +267,97 @@ class Walker(Agent):
                 # return True
 
     def follow_wall(self, blocked_direction):
-        print("Following wall")
+        print("Following wall, blocked direction: ", blocked_direction)
         current_x, current_y = self.pos
-        avoidance_steps = 0
         obstacle_width = 2  # this might need to be 2
         # get the neighbourhood around self.pos
 
         if blocked_direction == "north":
-            print("Blocked Direction is North")
-            print("Current XY: ", current_x, current_y)
-            print("Goal XY: ", self.goal)
-            move_left = ((current_x - 4), current_y)
-            self.generic_movement(move_left)
-            clear_obstacle = (current_x, (current_y + 2))
-            self.generic_movement(clear_obstacle)
-            move_right = ((current_x + 4), current_y)
-            self.generic_movement(move_right)
+            # n = 6
+            # x, y = current_x, current_y
+            # first_goal = ((x - 6), y)
+            # self.generic_movement(first_goal)
+            # print("Avoidance Move Left")
+            # avoidance_steps = n
+            # second_goal = (current_x, (current_y + obstacle_width))
+            # if self.generic_movement(second_goal):
+            #     print("Avoidance Clearance of Obstacle")
+            # third_goal = ((current_x + avoidance_steps), current_y)
+            # if self.generic_movement(third_goal):
+            #     print("Avoidance Return to Spot")
+            # return
+            null_goal = ((current_x - 6), (current_y + 2))
+            if self.generic_movement(null_goal):
+                self.normal_navigation = True
+            return
 
         elif blocked_direction == "east":
-            print("Blocked Direction is East")
-            print("Current XY: ", current_x, current_y)
-            print("Goal XY: ", self.goal)
-            move_left = (current_x, (current_y + 4))
-            self.generic_movement(move_left)
-            clear_obstacle = ((current_x + 2), current_y)
-            self.generic_movement(clear_obstacle)
-            move_right = (current_x, (current_y - 4))
-            self.generic_movement(move_right)
+            # n = 6
+            # x, y = current_x, current_y
+            # first_goal = (x, y + 6)
+            # self.generic_movement(first_goal)
+            # print("Avoidance Move Left")
+            # avoidance_steps = n
+            # second_goal = ((current_x + obstacle_width), current_y)
+            # if self.generic_movement(second_goal):
+            #     print("Avoidance Clearance of Obstacle")
+            # third_goal = (current_x, (current_y - avoidance_steps))
+            # if self.generic_movement(third_goal):
+            #     print("Avoidance Return to Spot")
+            # return
+            null_goal = ((current_x + 2), (current_y + 6))
+            if self.generic_movement(null_goal):
+                self.normal_navigation = True
+            return
 
         elif blocked_direction == "south":
-            print("Blocked Direction is South")
-            print("Current XY: ", current_x, current_y)
-            print("Goal XY: ", self.goal)
-            move_left = ((current_x + 4), current_y)
-            self.generic_movement(move_left)
-            clear_obstacle = (current_x, (current_y - 2))
-            self.generic_movement(clear_obstacle)
-            move_right = ((current_x - 4), current_y)
-            self.generic_movement(move_right)
+            # n = 6
+            # x, y = current_x, current_y
+            # first_goal = ((x - 6), y)
+            # self.generic_movement(first_goal)
+            # print("Avoidance Move Left")
+            # avoidance_steps = n
+            # second_goal = (current_x, (current_y - obstacle_width))
+            # if self.generic_movement(second_goal):
+            #     print("Avoidance Clearance of Obstacle")
+            # third_goal = ((current_x - avoidance_steps), current_y)
+            # if self.generic_movement(third_goal):
+            #     print("Avoidance Return to Spot")
+            # return
+
+            null_goal = ((current_x + 6), (current_y - 2))
+            if self.generic_movement(null_goal):
+                self.normal_navigation = True
+            return
 
         elif blocked_direction == "west":
-            print("Blocked Direction is West")
-            print("Current XY: ", current_x, current_y)
-            print("Goal XY: ", self.goal)
-            move_left = (current_x, (current_y - 4))
-            self.generic_movement(move_left)
-            clear_obstacle = ((current_x - 2), current_y)
-            self.generic_movement(clear_obstacle)
-            move_right = (current_x, (current_y + 4))
-            self.generic_movement(move_right)
+            # n = 6
+            # x, y = current_x, current_y
+            # first_goal = (x, y - 6)
+            # self.generic_movement(first_goal)
+            # print("Avoidance Move Left")
+            # avoidance_steps = n
+            # second_goal = ((current_x - obstacle_width), current_y)
+            # if self.generic_movement(second_goal):
+            #     print("Avoidance Clearance of Obstacle")
+            # third_goal = (current_x, (current_y + avoidance_steps))
+            # if self.generic_movement(third_goal):
+            #     print("Avoidance Return to Spot")
+            # return
 
-        self.check_for_freedom()
-        if self.check_for_freedom():
-            print("I moved around it!")
-            self.normal_navigation = True
-        if not self.check_for_freedom():
-            print("I fucked up!")
-            self.follow_wall(self.directional_blockage_checker())
+            null_goal = (current_x - 2), (current_y - 6)
+            if self.generic_movement(null_goal):
+                self.normal_navigation = True
+            return
+
+        # self.check_for_freedom()
+        # if self.check_for_freedom():
+        #     print("I moved around it!")
+        #     self.normal_navigation = True
+        # if not self.check_for_freedom():
+        #     print("I fucked up!")
+        #     while not self.check_for_freedom():
+        #         self.random_move()
 
     # def follow_wall(self, blocked_direction):
     #     print("Following wall")
@@ -480,22 +506,61 @@ class Walker(Agent):
     def directional_blockage_checker(self):
         current_x, current_y = self.pos
         north_cell = (current_x, (current_y + 1))
+        north_east_cell = ((current_x + 1), (current_y + 1))
         east_cell = ((current_x + 1), current_y)
+        south_east_cell = ((current_x + 1), (current_y - 1))
         south_cell = (current_x, (current_y - 1))
+        south_west_cell = ((current_x - 1), (current_y - 1))
         west_cell = ((current_x - 1), current_y)
+        north_west_cell = ((current_x -1), (current_y + 1))
 
         if self.check_for_obstacles(north_cell):
             print("North blocked.")
             return "north"
+        if self.check_for_obstacles(north_east_cell):
+            if not self.check_for_obstacles(north_cell):
+                if not self.check_for_obstacles(north_west_cell):
+                    if not self.check_for_obstacles(west_cell):
+                        print("North East blocked.")
+                        return "north_east"
         if self.check_for_obstacles(east_cell):
             print("East blocked.")
             return "east"
+        if self.check_for_obstacles(south_east_cell):
+            if not self.check_for_obstacles(south_cell):
+                if not self.check_for_obstacles(south_west_cell):
+                    if not self.check_for_obstacles(east_cell):
+                        print("South East blocked.")
+                        return "south_east"
         if self.check_for_obstacles(south_cell):
             print("South blocked.")
             return "south"
+        if self.check_for_obstacles(south_west_cell):
+            if not self.check_for_obstacles(south_cell):
+                if not self.check_for_obstacles(south_east_cell):
+                    if not self.check_for_obstacles(west_cell):
+                        print("South West blocked.")
+                        return "south_east"
         if self.check_for_obstacles(west_cell):
             print("West blocked.")
             return "west"
+        if self.check_for_obstacles(north_west_cell):
+            if not self.check_for_obstacles(north_cell):
+                if not self.check_for_obstacles(north_east_cell):
+                    if not self.check_for_obstacles(east_cell):
+                        print("North West blocked.")
+                        return "north_west"
+
+        else:
+            if not self.check_for_obstacles(north_cell):
+                if not self.check_for_obstacles(north_east_cell):
+                    if not self.check_for_obstacles(north_west_cell):
+                        if not self.check_for_obstacles(south_cell):
+                            if not self.check_for_obstacles(south_east_cell):
+                                if not self.check_for_obstacles(south_west_cell):
+                                    if not self.check_for_obstacles(west_cell):
+                                        if not self.check_for_obstacles(east_cell):
+                                            return "local_free"
 
     # def blocked_north(self):
     #     current_x, current_y = self.pos
@@ -553,15 +618,274 @@ class Walker(Agent):
     #         elif len(potential_obstacle) == 0:
     #             return False
 
-    def bug_navigation(self):
+    def bug_navigation(self, blocked_direction):
         print("Bug Navigation ACTIVATED")
+        blocked_direction = blocked_direction
+        # self.follow_wall(blocked_direction)
 
-        self.follow_wall(self.directional_blockage_checker())
-
+        # ----------------- FOLLOWING 4 LINES WORK TO GUIDE TO GOAL THEN BREAK BACK TO NORMAL ---------------------
+        # null_goal = (0, 0)
+        # if self.generic_movement(null_goal):
+        #     self.normal_navigation = True
+        # return
 
         # self.check_for_freedom()
         # if self.check_for_freedom():
         #     self.normal_navigation = True
+        # return
+
+        if blocked_direction == "north":
+            null_goal = self.avoidance_goal_calculator("north", self.pos)
+            print("Null Goal: ", null_goal)
+
+            # null_goal = ((9), (9))
+            if self.generic_movement(null_goal):
+                if self.check_for_freedom():
+                    if self.left_right_sidestep(blocked_direction, self.pos):
+                        print("Normal Navigation turned on.")
+                        self.normal_navigation = True
+                elif not self.check_for_freedom():
+                    if self.directional_blockage_checker() == "local_free":
+                        if self.left_right_sidestep(blocked_direction, self.pos):
+                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            self.normal_navigation = True
+                    else:
+                        return
+                    # blocked = self.directional_blockage_checker()
+                    # self.bug_navigation(blocked)
+                return
+            return
+
+        elif blocked_direction == "east":
+            null_goal = self.avoidance_goal_calculator("east", self.pos)
+            print("Null Goal: ", null_goal)
+            # null_goal = ((9), (9))
+            if self.generic_movement(null_goal):
+                if self.check_for_freedom():
+                    if self.left_right_sidestep(blocked_direction, self.pos):
+                        print("Normal Navigation turned on.")
+                        self.normal_navigation = True
+                elif not self.check_for_freedom():
+                    if self.directional_blockage_checker() == "local_free":
+                        if self.left_right_sidestep(blocked_direction, self.pos):
+                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            self.normal_navigation = True
+                    else:
+                        return
+                    # blocked = self.directional_blockage_checker()
+                    # self.bug_navigation(blocked)
+                return
+            return
+
+        elif blocked_direction == "south":
+            null_goal = self.avoidance_goal_calculator("south", self.pos)
+            print("Null Goal: ", null_goal)
+            # null_goal = ((9), (9))
+            if self.generic_movement(null_goal):
+                if self.check_for_freedom():
+                    if self.left_right_sidestep(blocked_direction, self.pos):
+                        print("Normal Navigation turned on.")
+                        self.normal_navigation = True
+                elif not self.check_for_freedom():
+                    if self.directional_blockage_checker() == "local_free":
+                        if self.left_right_sidestep(blocked_direction, self.pos):
+                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            self.normal_navigation = True
+                    else:
+                        return
+                    # blocked = self.directional_blockage_checker()
+                    # self.bug_navigation(blocked)
+                return
+            return
+
+        elif blocked_direction == "west":
+            null_goal = self.avoidance_goal_calculator("west", self.pos)
+            print("Null Goal: ", null_goal)
+            # null_goal = (9), (9)
+            if self.generic_movement(null_goal):
+                if self.check_for_freedom():
+                    if self.left_right_sidestep(blocked_direction, self.pos):
+                        print("Normal Navigation turned on.")
+                        self.normal_navigation = True
+                elif not self.check_for_freedom():
+                    if self.directional_blockage_checker() == "local_free":
+                        if self.left_right_sidestep(blocked_direction, self.pos):
+                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            self.normal_navigation = True
+                    else:
+                        return
+                    # blocked = self.directional_blockage_checker()
+                    # self.bug_navigation(blocked)
+                return
+            return
+
+        elif blocked_direction == "north_west":
+            null_goal = self.avoidance_goal_calculator("north_west", self.pos)
+            print("Null Goal: ", null_goal)
+            # null_goal = (9), (9)
+            if self.generic_movement(null_goal):
+                if self.check_for_freedom():
+                    if self.left_right_sidestep(blocked_direction, self.pos):
+                        print("Normal Navigation turned on.")
+                        self.normal_navigation = True
+                elif not self.check_for_freedom():
+                    if self.directional_blockage_checker() == "local_free":
+                        if self.left_right_sidestep(blocked_direction, self.pos):
+                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            self.normal_navigation = True
+                    else:
+                        return
+                    # blocked = self.directional_blockage_checker()
+                    # self.bug_navigation(blocked)
+                return
+            return
+
+        elif blocked_direction == "north_east":
+            null_goal = self.avoidance_goal_calculator("north_east", self.pos)
+            print("Null Goal: ", null_goal)
+            # null_goal = (9), (9)
+            if self.generic_movement(null_goal):
+                if self.check_for_freedom():
+                    if self.left_right_sidestep(blocked_direction, self.pos):
+                        print("Normal Navigation turned on.")
+                        self.normal_navigation = True
+                elif not self.check_for_freedom():
+                    if self.directional_blockage_checker() == "local_free":
+                        if self.left_right_sidestep(blocked_direction, self.pos):
+                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            self.normal_navigation = True
+                    else:
+                        return
+                    # blocked = self.directional_blockage_checker()
+                    # self.bug_navigation(blocked)
+                return
+            return
+
+        elif blocked_direction == "south_east":
+            null_goal = self.avoidance_goal_calculator("south_east", self.pos)
+            print("Null Goal: ", null_goal)
+            # null_goal = (9), (9)
+            if self.generic_movement(null_goal):
+                if self.check_for_freedom():
+                    if self.left_right_sidestep(blocked_direction, self.pos):
+                        print("Normal Navigation turned on.")
+                        self.normal_navigation = True
+                elif not self.check_for_freedom():
+                    if self.directional_blockage_checker() == "local_free":
+                        if self.left_right_sidestep(blocked_direction, self.pos):
+
+                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            self.normal_navigation = True
+                    else:
+                        return
+                    # blocked = self.directional_blockage_checker()
+                    # self.bug_navigation(blocked)
+                return
+            return
+
+        elif blocked_direction == "south_west":
+            null_goal = self.avoidance_goal_calculator("south_west", self.pos)
+            print("Null Goal: ", null_goal)
+            # null_goal = (9), (9)
+            if self.generic_movement(null_goal):
+                if self.check_for_freedom():
+                    if self.left_right_sidestep(blocked_direction, self.pos):
+                        print("Normal Navigation turned on.")
+                        self.normal_navigation = True
+                elif not self.check_for_freedom():
+
+                    if self.directional_blockage_checker() == "local_free":
+                        if self.left_right_sidestep(blocked_direction, self.pos):
+                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            self.normal_navigation = True
+                    else:
+                        return
+                    # blocked = self.directional_blockage_checker()
+                    # self.bug_navigation(blocked)
+                return
+            return
+
+    def left_right_sidestep(self, blocked_direction, current_position):
+        current_x, current_y = current_position
+
+        if blocked_direction == "north":
+            print("Sidestepping")
+            sidestep = (current_x, (current_y + 2))
+            self.model.grid.move_agent(self, sidestep)
+            return True
+
+        elif blocked_direction == "east":
+            print("Sidestepping")
+            sidestep = ((current_x + 2), current_y)
+            self.model.grid.move_agent(self, sidestep)
+            return True
+
+        elif blocked_direction == "south":
+            print("Sidestepping")
+            sidestep = (current_x, (current_y - 2))
+            self.model.grid.move_agent(self, sidestep)
+            return True
+
+        elif blocked_direction == "west":
+            print("Sidestepping")
+            sidestep = ((current_x - 2), current_y)
+            self.model.grid.move_agent(self, sidestep)
+            return True
+
+    def avoidance_goal_calculator(self, blocked_direction, current_position):
+        current_x, current_y = current_position
+
+        if blocked_direction == "north":
+            print("Avoidance Goal Set: ", ((current_x - 1), (current_y)))
+            return ((current_x - 1), (current_y))
+
+        elif blocked_direction == "east":
+            print("Avoidance Goal Set: ", ((current_x), (current_y + 1)))
+            return ((current_x), (current_y + 1))
+
+        elif blocked_direction == "south":
+            print("Avoidance Goal Set: ", ((current_x + 1), (current_y)))
+            return ((current_x + 1), (current_y))
+
+        elif blocked_direction == "west":
+            print("Avoidance Goal Set: ", ((current_x), (current_y + 1)))
+            return ((current_x), (current_y + 1))
+
+        elif blocked_direction == "north_west":
+            n = random.choice(range(1))
+            if n == 1:
+                print("Avoidance Goal Set: ", ((current_x - 1), (current_y)))
+                return ((current_x - 1), (current_y))
+            elif n == 0:
+                print("Avoidance Goal Set: ", ((current_x ), (current_y + 1)))
+                return ((current_x), (current_y + 1))
+
+        elif blocked_direction == "north_east":
+            n = random.choice(range(1))
+            if n == 1:
+                print("Avoidance Goal Set: ", ((current_x + 1), (current_y)))
+                return ((current_x + 1), (current_y))
+            elif n == 0:
+                print("Avoidance Goal Set: ", ((current_x ), (current_y + 1)))
+                return ((current_x), (current_y + 1))
+
+        elif blocked_direction == "south_east":
+            n = random.choice(range(1))
+            if n == 1:
+                print("Avoidance Goal Set: ", ((current_x + 1), (current_y)))
+                return ((current_x + 1), (current_y))
+            elif n == 0:
+                print("Avoidance Goal Set: ", ((current_x ), (current_y - 1)))
+                return ((current_x), (current_y - 1))
+
+        elif blocked_direction == "south_west":
+            n = random.choice(range(1))
+            if n == 1:
+                print("Avoidance Goal Set: ", ((current_x - 1), (current_y)))
+                return ((current_x - 1), (current_y))
+            elif n == 0:
+                print("Avoidance Goal Set: ", ((current_x ), (current_y - 1)))
+                return ((current_x), (current_y - 1))
 
     def open_box(self):
         # If there is a Box available at the current location, open it.
@@ -617,7 +941,7 @@ class Walker(Agent):
                 self.open_box()
                 print("Current Step:", self.pos)
                 print("Next Step: ", self.next_move)
-                print("Current Goal:", self.goal)
+                # print("Current Goal:", self.goal)
 
             if self.goal_reached == True :
                 self.calculate_box_distances_from_current_pos()
@@ -678,9 +1002,4 @@ class Obstacle(Agent):
 
     def step(self):
         return
-
-
-
-
-
 
