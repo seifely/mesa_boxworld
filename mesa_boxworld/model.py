@@ -107,6 +107,7 @@ class ThirdTestModel(Model):
     def map_picker(self):
         available_maps = ["one", "two", "three", "four", "five"]
         self.map_choice = random.choice(available_maps)
+        print("Map ", self.map_choice)
 
         # create Boxes:
     def make_boxes(self):
