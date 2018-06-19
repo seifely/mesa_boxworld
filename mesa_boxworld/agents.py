@@ -4,6 +4,8 @@ import math
 from mesa import Agent
 
 ###########################################################################################################
+
+
 class Walker(Agent):
     '''
     '''
@@ -16,14 +18,16 @@ class Walker(Agent):
     goal = []
     closed_box_list = {}
     open_box_list = {}
-    goal_reached = False  # not currently used
+    goal_reached = False
     next_move = []
-    avoidance_goal = []  # not currently used
-    avoidance_check = [] # used???
     able_to_move = True  # not currently used
     steps_memory = []  # not currently used
     obstacle_present = False
     normal_navigation = True
+    navigation_mode = 1
+    score = 0
+    items_picked_up=0
+    inventory = {}
 
     # for debugging
     distance_verbose = False
@@ -31,20 +35,24 @@ class Walker(Agent):
     quick_verbose = False
 
     def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
-                 able_to_move=True, steps_memory=[], obstacle_present=False, avoidance_goal=[], avoidance_check=[],
-                 normal_navigation=True):
+                 able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True, navigation_mode=1,
+                 score=0, inventory={}, items_picked_up=0):
         super().__init__(pos, model)
+
         self.moore = moore
         self.pos = pos
         self.stepCount = stepCount
         self.goal = goal
         self.next_move = next_move
-        self.avoidance_goal = avoidance_goal
-        self.avoidance_check = avoidance_check
+        # self.avoidance_goal = avoidance_goal
         self.able_to_move = able_to_move
         self.steps_memory = steps_memory
         self.obstacle_present = obstacle_present
         self.normal_navigation = normal_navigation
+        self.navigation_mode = navigation_mode
+        self.score = score
+        self.inventory = inventory
+        self.items_picked_up = items_picked_up
 
         self.closed_box_list = closed_box_list
         self.closed_box_list = self.model.all_boxes  # this used to be set to the full box list, but now agent = blind
@@ -924,6 +932,48 @@ class Walker(Agent):
             # delete that key/value pair from the full boxes list  -  THIS IS ONLY NEEDED WHEN THE ITEMS ARE CONSUMED
             # del self.model.full_boxes[current_full_box_in_list]
 
+            # NEED TO ADD IN ADDING ITEM FOUND PLUS COLOUR TO AN OPEN LIST IN THE AGENT'S KNOWLEDGE/INVENTORY
+
+    def pickup_item(self):
+        x, y = self.pos
+
+        this_cell = self.model.grid.get_cell_list_contents([self.pos])
+        pink_item = [obj for obj in this_cell
+                       if isinstance(obj, pinkItem)]  # object in this cell, if it is an agent of type xItem
+        blue_item = [obj for obj in this_cell
+                     if isinstance(obj, blueItem)]
+        yellow_item = [obj for obj in this_cell
+                     if isinstance(obj, yellowItem)]
+
+        current_item_coords = self.pos
+
+        if len(pink_item) > 0:  # if there is a box here
+            item_to_consume = random.choice(current_item_coords)
+            item_colour = "pink"
+
+            self.model.grid._remove_agent(self.pos, item_to_consume)
+            self.score += 2
+            self.items_picked_up += 1
+            self.inventory[self.items_picked_up] = item_colour
+
+        elif len(yellow_item) > 0:  # if there is a box here
+            item_to_consume = random.choice(current_item_coords)
+            item_colour = "yellow"
+
+            self.model.grid._remove_agent(self.pos, item_to_consume)
+            self.score -= 1
+            self.items_picked_up += 1
+            self.inventory[self.items_picked_up] = item_colour
+
+        elif len(blue_item) > 0:
+            item_to_consume = random.choice(current_item_coords)
+            item_colour = "blue"
+
+            self.model.grid._remove_agent(self.pos, item_to_consume)
+            self.score += 1
+            self.items_picked_up += 1
+            self.inventory[self.items_picked_up] = item_colour
+
     def step(self):
         '''
         A model step. Move, open box if possible.
@@ -939,8 +989,10 @@ class Walker(Agent):
             if self.goal_reached == False :
                 self.bug0_nav()
                 self.open_box()
+                self.pickup_item()
                 print("Current Step:", self.pos)
                 print("Next Step: ", self.next_move)
+                print("Stepcount: ", self.stepCount)
                 # print("Current Goal:", self.goal)
 
             if self.goal_reached == True :
@@ -978,18 +1030,54 @@ class OpenedBox(Agent):
 
 #########################################################################################################
 
-class Item(Agent):
+class blueItem(Agent):
     ''' Want this to spawn a random item at locations under boxes, on layer 2, can be removed '''
 
-    def __init__(self, pos, model, consumed=False, decay=15):
+    def __init__(self, pos, model, consumed=False, decay=15, colour="blue", itemValue=1):
         super().__init__(pos, model)
         self.consumed = consumed
         self.decay = decay
+        self.colour = colour
+        self.itemValue = itemValue
 
     def step(self):
         if not self.consumed:
             self.decay -= 1
             print(self.decay)
+
+
+class yellowItem(Agent):
+    ''' Want this to spawn a random item at locations under boxes, on layer 2, can be removed '''
+
+    def __init__(self, pos, model, consumed=False, decay=15, colour="yellow", itemValue=-1):
+        super().__init__(pos, model)
+        self.consumed = consumed
+        self.decay = decay
+        self.colour = colour
+        self.itemValue = itemValue
+
+    def step(self):
+        if not self.consumed:
+            self.decay -= 1
+            print(self.decay)
+
+
+class pinkItem(Agent):
+    ''' Want this to spawn a random item at locations under boxes, on layer 2, can be removed '''
+
+    def __init__(self, pos, model, consumed=False, decay=15, colour="green", itemValue=2):
+        super().__init__(pos, model)
+        self.consumed = consumed
+        self.decay = decay
+        self.colour = colour
+        self.itemValue = itemValue
+
+    def step(self):
+        if not self.consumed:
+            self.decay -= 1
+            print(self.decay)
+
+
 
 #########################################################################################################
 

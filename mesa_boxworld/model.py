@@ -6,7 +6,7 @@ from mesa.space import MultiGrid
 # from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 
-from mesa_boxworld.agents import Walker, ClosedBox, OpenedBox, Item, Obstacle
+from mesa_boxworld.agents import Walker, ClosedBox, blueItem, yellowItem, pinkItem, Obstacle
 from mesa_boxworld.schedule import RandomActivationByType
 
 
@@ -21,7 +21,10 @@ class ThirdTestModel(Model):
     initial_walkers = 1
     initial_boxes = 10
     # initial_items = initial_boxes//2  # -- currently divides int and results in a new int (as opposed to float)
-    initial_items = 10
+    initial_total_items = 10
+    # initial_yellow_items = 3
+    # initial_green_items = 3
+    # initial_blue_items = 4
     # initial_obstacles = 3
     # obstacle_length = 7
 
@@ -40,7 +43,10 @@ class ThirdTestModel(Model):
                  initial_walkers=1,
                  initial_boxes=10,
                  # initial_items=initial_boxes//2,
-                 initial_items=10,
+                 initial_yellow_items=3,
+                 initial_blue_items=4,
+                 initial_green_items=3,
+                 initial_total_items=10,
                  # initial_obstacles=3,
                  # obstacle_length=7,
                  empty_boxes={},
@@ -54,7 +60,10 @@ class ThirdTestModel(Model):
         self.width = width
         self.initial_walkers = initial_walkers
         self.initial_boxes = initial_boxes
-        self.initial_items = initial_items
+        self.initial_total_items = initial_total_items
+        self.initial_yellow_items = initial_yellow_items
+        self.initial_blue_items = initial_blue_items
+        self.initial_green_items = initial_green_items
         # self.initial_obstacles = initial_obstacles
         # self.obstacle_length = obstacle_length
         self.map_choice = map_choice
@@ -67,7 +76,7 @@ class ThirdTestModel(Model):
         # Spawn Locations
         self.map_one_boxes = [(5, 7), (6, 20), (8, 5 ), (9, 10), (12, 12), (14, 17), (18, 12), (20, 4), (21, 12), (20, 21)]  # increased by 3
         self.map_one_obstacles = [(6, 19), (5, 19), (6, 19), (7, 19), (8, 19), (10, 14), (10, 13), (10, 12), (10, 11), (10, 10), (10, 9),
-                             (15, 20), (15, 19), (15, 18), (15, 17), (15, 16), (15, 15), (15, 14), (18, 17), (19, 17),
+                             (15, 20), (15, 19), (15, 18), (15, 17), (15, 16), (15, 15), (15, 14), (19, 17),
                              (20, 17), (21, 17), (22, 17), (19, 6), (20, 6), (21, 6)]  # increased by 3
 
         self.map_two_boxes = [(4, 5), (5, 14), (7, 19), (11, 8), (11, 21), (3, 15), (16, 5), (18, 16), (20, 22), (21, 20)]  # increased by 3
@@ -189,26 +198,26 @@ class ThirdTestModel(Model):
 
     def make_items(self):
         # this function takes the dictionary of empty boxes, selects one and puts an item in it
-        for j in range(self.initial_items):
+        for j in range(self.initial_total_items):
             chosen_box = self.empty_boxes.pop(j)
             # print("Box Selected")
                     # chosen_box = self.empty_boxes.popitem()
                     # print("Box Selected")
                     # use the above to pop an arbitrary value from the empty boxes list
-            item = Item(chosen_box, self, True)
+            types_available = ["yellow", "blue", "pink"]
+            item_type = random.choice(types_available)
+            if item_type == "yellow":
+                item = yellowItem(chosen_box, self, True)
+            elif item_type == "blue":
+                item = blueItem(chosen_box, self, True)
+            elif item_type == "pink":
+                item = pinkItem(chosen_box, self, True)
+
             self.grid.place_agent(item, chosen_box)
             self.schedule.add(item)
-            # print("Item Added")
+            # print("Coloured Item Added")
             self.full_boxes[j] = chosen_box
             # print("Box Filled")
-
-        # if a random item placement is needed, uncomment below:
-        # for i in range(self.initial_items):
-        #     x = random.randrange(self.width)
-        #     y = random.randrange(self.height)
-        #     item = Item((x, y), self, True)
-        #     self.grid.place_agent(item, (x, y))
-        #     self.schedule.add(item)
 
         self.running = True
         self.datacollector.collect(self)
