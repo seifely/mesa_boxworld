@@ -73,6 +73,13 @@ class ThirdTestModel(Model):
         self.all_boxes = all_boxes
         self.obstacles = obstacles
 
+        # Grid
+        self.grid_list = []
+        for x in range(self.width):
+            for y in range(self.height):
+                self.grid_list.append((x, y))
+
+
         # Spawn Locations
         self.map_one_boxes = [(5, 7), (6, 20), (8, 5 ), (9, 10), (12, 12), (14, 17), (18, 12), (20, 4), (21, 12), (20, 21)]  # increased by 3
         self.map_one_obstacles = [(6, 19), (5, 19), (6, 19), (7, 19), (8, 19), (10, 14), (10, 13), (10, 12), (10, 11), (10, 10), (10, 9),

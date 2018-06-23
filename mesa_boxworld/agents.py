@@ -2,6 +2,7 @@ import random
 import math
 
 from mesa import Agent
+from mesa_boxworld.astar_nav import Queue, AgentGrid
 
 ###########################################################################################################
 
@@ -83,7 +84,7 @@ class Walker(Agent):
             px, py = self.pos
             qx, qy = box_list[ii]
             # # calculate the euclidean distance to the next box in the list
-            distance_to_box = math.sqrt(math.pow((qx-px), 2) + (math.pow((qy-py), 2)))
+            distance_to_box = math.sqrt(math.pow((qx - px), 2) + (math.pow((qy - py), 2)))
             if self.distance_verbose == True:
                 print("Distance to box is ", distance_to_box)
             distances_to_boxes[ii] = distance_to_box
@@ -115,7 +116,7 @@ class Walker(Agent):
         if self.distance_verbose == True:
             print("Goal is: ", self.goal)
 
-    def bug0_nav(self):
+    def reactive_nav(self):
 
         if self.normal_navigation:
             self.simple_move_goal()
@@ -272,7 +273,7 @@ class Walker(Agent):
 
             # initiate immediacy of obstacle check? How is the obstacle 1 step away or many?
             # if obstacle is more than one step away (dist_x =< 1, dist_y =< 1)
-                # return True
+            # return True
 
     def follow_wall(self, blocked_direction):
         print("Following wall, blocked direction: ", blocked_direction)
@@ -520,7 +521,7 @@ class Walker(Agent):
         south_cell = (current_x, (current_y - 1))
         south_west_cell = ((current_x - 1), (current_y - 1))
         west_cell = ((current_x - 1), current_y)
-        north_west_cell = ((current_x -1), (current_y + 1))
+        north_west_cell = ((current_x - 1), (current_y + 1))
 
         if self.check_for_obstacles(north_cell):
             print("North blocked.")
@@ -781,7 +782,6 @@ class Walker(Agent):
                 elif not self.check_for_freedom():
                     if self.directional_blockage_checker() == "local_free":
                         if self.left_right_sidestep(blocked_direction, self.pos):
-
                             print("But, my local area is free of obstacles! I'll turn on Normal Nav")
                             self.normal_navigation = True
                     else:
@@ -865,7 +865,7 @@ class Walker(Agent):
                 print("Avoidance Goal Set: ", ((current_x - 1), (current_y)))
                 return ((current_x - 1), (current_y))
             elif n == 0:
-                print("Avoidance Goal Set: ", ((current_x ), (current_y + 1)))
+                print("Avoidance Goal Set: ", ((current_x), (current_y + 1)))
                 return ((current_x), (current_y + 1))
 
         elif blocked_direction == "north_east":
@@ -874,7 +874,7 @@ class Walker(Agent):
                 print("Avoidance Goal Set: ", ((current_x + 1), (current_y)))
                 return ((current_x + 1), (current_y))
             elif n == 0:
-                print("Avoidance Goal Set: ", ((current_x ), (current_y + 1)))
+                print("Avoidance Goal Set: ", ((current_x), (current_y + 1)))
                 return ((current_x), (current_y + 1))
 
         elif blocked_direction == "south_east":
@@ -883,7 +883,7 @@ class Walker(Agent):
                 print("Avoidance Goal Set: ", ((current_x + 1), (current_y)))
                 return ((current_x + 1), (current_y))
             elif n == 0:
-                print("Avoidance Goal Set: ", ((current_x ), (current_y - 1)))
+                print("Avoidance Goal Set: ", ((current_x), (current_y - 1)))
                 return ((current_x), (current_y - 1))
 
         elif blocked_direction == "south_west":
@@ -892,7 +892,7 @@ class Walker(Agent):
                 print("Avoidance Goal Set: ", ((current_x - 1), (current_y)))
                 return ((current_x - 1), (current_y))
             elif n == 0:
-                print("Avoidance Goal Set: ", ((current_x ), (current_y - 1)))
+                print("Avoidance Goal Set: ", ((current_x), (current_y - 1)))
                 return ((current_x), (current_y - 1))
 
     def open_box(self):
@@ -906,7 +906,7 @@ class Walker(Agent):
         if len(current_box) > 0:  # if there is a box here
             box_to_consume = random.choice(current_box)  # redundant line, pick a random box to consume
 
-        # if we want the box to be removed altogether
+            # if we want the box to be removed altogether
             self.model.grid._remove_agent(self.pos, box_to_consume)
             self.model.schedule.remove(box_to_consume)
 
@@ -914,7 +914,7 @@ class Walker(Agent):
             self.model.grid.place_agent(openedBox, self.pos)
 
             current_box_in_list = (
-            list(self.model.all_boxes.keys())[list(self.model.all_boxes.values()).index(current_box_coords)])
+                list(self.model.all_boxes.keys())[list(self.model.all_boxes.values()).index(current_box_coords)])
             # current_full_box_in_list = (
             # list(self.model.full_boxes.keys())[list(self.model.full_boxes.values()).index(current_box_coords)])
             if self.box_open_verbose == True:
@@ -922,7 +922,7 @@ class Walker(Agent):
             # this gets the key - for example, the box number
 
             del self.closed_box_list[current_box_in_list]
-            if self. box_open_verbose == True:
+            if self.box_open_verbose == True:
                 print("Box removed from Closed Box List")
             self.open_box_list[current_box_in_list] = (x, y)
             if self.box_open_verbose == True:
@@ -939,11 +939,11 @@ class Walker(Agent):
 
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         pink_item = [obj for obj in this_cell
-                       if isinstance(obj, pinkItem)]  # object in this cell, if it is an agent of type xItem
+                     if isinstance(obj, pinkItem)]  # object in this cell, if it is an agent of type xItem
         blue_item = [obj for obj in this_cell
                      if isinstance(obj, blueItem)]
         yellow_item = [obj for obj in this_cell
-                     if isinstance(obj, yellowItem)]
+                       if isinstance(obj, yellowItem)]
 
         current_item_coords = self.pos
 
@@ -974,34 +974,59 @@ class Walker(Agent):
             self.items_picked_up += 1
             self.inventory[self.items_picked_up] = item_colour
 
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
+    def deliberative_nav(self):
+        return
+
+    def breadth_first_search(self):
+        return
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
     def step(self):
         '''
-        A model step. Move, open box if possible.
+        A model step. Depending on the Nav Mode being used, either use reactive navigation to reach the closest
+        unopened box, or use A* navigation to traverse the map.
         '''
-        if self.stepCount == 0: # this should be done once at the start, then again when a box is opened
-            self.calculate_box_distances_from_current_pos()
-            self.set_goal()
-            self.stepCount += 1
-            # EACH STEP SHOULD RECORD THE AGENT'S POSITION AND USE POP FOR MEMORY LIMIT
-        else:
-            self.stepCount += 1  # This is not needed as the agent can access the step number through other means??
-            # print("Goal Reached?", self.goal_reached)
-            if self.goal_reached == False :
-                self.bug0_nav()
-                self.open_box()
-                self.pickup_item()
-                print("Current Step:", self.pos)
-                print("Next Step: ", self.next_move)
-                print("Stepcount: ", self.stepCount)
-                # print("Current Goal:", self.goal)
-
-            if self.goal_reached == True :
+        if self.navigation_mode == 1:
+            if self.stepCount == 0: # this should be done once at the start, then again when a box is opened
                 self.calculate_box_distances_from_current_pos()
                 self.set_goal()
-                # print("Setting new goal.")
-                self.goal_reached = False
-                if self.box_open_verbose == True:
-                    print("Full Box List: ", self.model.full_boxes)
+                self.stepCount += 1
+                # EACH STEP SHOULD RECORD THE AGENT'S POSITION AND USE POP FOR MEMORY LIMIT?
+            else:
+                self.stepCount += 1  # This is not needed as the agent can access the step number through other means??
+                # print("Goal Reached?", self.goal_reached)
+                if self.goal_reached == False :
+                    self.reactive_nav()
+                    self.open_box()
+                    self.pickup_item()
+                    # print("Current Step:", self.pos)
+                    # print("Next Step: ", self.next_move)
+                    # print("Current Goal:", self.goal)
+
+                if self.goal_reached == True :
+                    self.calculate_box_distances_from_current_pos()
+                    self.set_goal()
+                    print("Current Inventory: ", self.inventory)
+                    print("Current Score: ", self.score)
+                    print("Step Count: ", self.stepCount)
+                    # print("Setting new goal.")
+                    self.goal_reached = False
+                    if self.box_open_verbose == True:
+                        print("Full Box List: ", self.model.full_boxes)
+        elif self.navigation_mode == 2:
+            if self.stepCount == 0: # this should be done once at the start, then again when a box is opened
+                self.calculate_box_distances_from_current_pos()
+                self.set_goal()
+                self.stepCount += 1
+                # EACH STEP SHOULD RECORD THE AGENT'S POSITION AND USE POP FOR MEMORY LIMIT?
+            else:
+                self.stepCount += 1
+                if self.goal_reached == False:
+                    self.deliberative_nav()
+
 
 
 ############################################################################################################
@@ -1033,15 +1058,13 @@ class OpenedBox(Agent):
 class blueItem(Agent):
     ''' Want this to spawn a random item at locations under boxes, on layer 2, can be removed '''
 
-    def __init__(self, pos, model, consumed=False, decay=15, colour="blue", itemValue=1):
+    def __init__(self, pos, model, decay=15, colour="blue", itemValue=1):
         super().__init__(pos, model)
-        self.consumed = consumed
         self.decay = decay
         self.colour = colour
         self.itemValue = itemValue
 
     def step(self):
-        if not self.consumed:
             self.decay -= 1
             print(self.decay)
 
@@ -1049,15 +1072,13 @@ class blueItem(Agent):
 class yellowItem(Agent):
     ''' Want this to spawn a random item at locations under boxes, on layer 2, can be removed '''
 
-    def __init__(self, pos, model, consumed=False, decay=15, colour="yellow", itemValue=-1):
+    def __init__(self, pos, model, decay=15, colour="yellow", itemValue=-1):
         super().__init__(pos, model)
-        self.consumed = consumed
         self.decay = decay
         self.colour = colour
         self.itemValue = itemValue
 
     def step(self):
-        if not self.consumed:
             self.decay -= 1
             print(self.decay)
 
@@ -1065,15 +1086,13 @@ class yellowItem(Agent):
 class pinkItem(Agent):
     ''' Want this to spawn a random item at locations under boxes, on layer 2, can be removed '''
 
-    def __init__(self, pos, model, consumed=False, decay=15, colour="green", itemValue=2):
+    def __init__(self, pos, model, decay=15, colour="green", itemValue=2):
         super().__init__(pos, model)
-        self.consumed = consumed
         self.decay = decay
         self.colour = colour
         self.itemValue = itemValue
 
     def step(self):
-        if not self.consumed:
             self.decay -= 1
             print(self.decay)
 
