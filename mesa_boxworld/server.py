@@ -2,7 +2,7 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 
-from mesa_boxworld.agents import Walker, ClosedBox, OpenedBox, Item, Obstacle
+from mesa_boxworld.agents import Walker, ClosedBox, OpenedBox, yellowItem, blueItem, pinkItem, Obstacle
 from mesa_boxworld.model import ThirdTestModel
 
 
@@ -48,13 +48,39 @@ def third_test_portrayal(agent):
                      }
 
 
-    elif type(agent) is Item:
+    elif type(agent) is yellowItem:
         # if agent.consumed:
         portrayal = {"Shape": "circle",
                      "scale": 1,
                      "Color": "yellow",
                      "Filled": "true",
-                     "Layer": 1,
+                     "Layer": 3,
+                     "r": 0.5,
+                     "text": "✿",
+                     "text_color": "black",
+                     "scale": 0.7
+                     }
+
+    elif type(agent) is pinkItem:
+        # if agent.consumed:
+        portrayal = {"Shape": "circle",
+                     "scale": 1,
+                     "Color": "pink",
+                     "Filled": "true",
+                     "Layer": 3,
+                     "r": 0.5,
+                     "text": "✿",
+                     "text_color": "black",
+                     "scale": 0.7
+                     }
+
+    elif type(agent) is blueItem:
+        # if agent.consumed:
+        portrayal = {"Shape": "circle",
+                     "scale": 1,
+                     "Color": "turquoise",
+                     "Filled": "true",
+                     "Layer": 3,
                      "r": 0.5,
                      "text": "✿",
                      "text_color": "black",
@@ -74,7 +100,7 @@ def third_test_portrayal(agent):
     return portrayal
 
 
-canvas_element = CanvasGrid(third_test_portrayal, 20, 20, 500, 500)
+canvas_element = CanvasGrid(third_test_portrayal, 25, 25, 500, 500)
 chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
                              {"Label": "Closed Boxes", "Color": "#666666"}])
 
@@ -85,9 +111,9 @@ chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 model_params = {#"height": UserSettableParameter('slider', 'Height', 20, 10, 50, 10),
                 #"width": UserSettableParameter('slider', 'Width', 20, 10, 50, 10),
                 "initial_walkers": UserSettableParameter('slider', 'Initial Walker Population', 1, 1, 10, 1),
-                "initial_boxes": UserSettableParameter('slider', 'Initial Box Number', 10, 1, 20, 1),
-                "initial_items": UserSettableParameter('slider', 'Initial Item Number', 10, 1, 20, 1),
-                "initial_obstacles": UserSettableParameter('slider', 'Initial Whole Obstacle Number', 3, 1, 10, 1),
+                # "initial_boxes": UserSettableParameter('slider', 'Initial Box Number', 10, 1, 20, 1),
+                # "initial_items": UserSettableParameter('slider', 'Initial Item Number', 10, 1, 20, 1),
+                # "initial_obstacles": UserSettableParameter('slider', 'Initial Whole Obstacle Number', 3, 1, 10, 1),
                 # "obstacle_length": UserSettableParameter('slider', 'Maximum Obstacle Length', 5, 1, 12, 1),
                 }
 
