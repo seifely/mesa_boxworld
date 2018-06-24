@@ -36,7 +36,7 @@ class Walker(Agent):
     quick_verbose = False
 
     def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
-                 able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True, navigation_mode=1,
+                 able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True, navigation_mode=2,
                  score=0, inventory={}, items_picked_up=0):
         super().__init__(pos, model)
 
@@ -233,9 +233,6 @@ class Walker(Agent):
         elif len(potential_obstacle) == 0:
             self.obstacle_present = False
             return False
-
-    def check_neighbourhood(self):
-        return
 
     def points_between(self, p1, p2):
         if p1[0] <= p2[0]:
@@ -977,10 +974,30 @@ class Walker(Agent):
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
     def deliberative_nav(self):
+        self.breadth_first_search(self.model.grid_list, self.pos, self.goal)
         return
 
-    def breadth_first_search(self):
-        return
+    def breadth_first_search(self, graph, start, goal):
+        frontier = Queue()
+        frontier.put(start)
+        came_from = {}
+        came_from[start] = None
+
+        while not frontier.empty():
+            current = frontier.get()
+
+            if current == goal:
+                break
+
+            for next in graph.neighbors(current):
+                if next not in came_from:
+                    frontier.put(next)
+                    came_from[next] = current
+                    print("came_from: ", came_from)
+
+        print("final came_from: ", came_from)
+        return came_from
+
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
