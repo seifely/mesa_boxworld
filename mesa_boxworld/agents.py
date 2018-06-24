@@ -2,7 +2,10 @@ import random
 import math
 
 from mesa import Agent
-from mesa_boxworld.astar_nav import Queue, AgentGrid
+from queue import PriorityQueue
+# priotyQs (also: Heap Q's) are binary trees where every parent node has a value >= any of its children. It keeps
+# track
+# of the minimum value, helping retrieve that min value at all times
 
 ###########################################################################################################
 
@@ -974,30 +977,35 @@ class Walker(Agent):
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
     def deliberative_nav(self):
-        self.breadth_first_search(self.model.grid_list, self.pos, self.goal)
         return
 
-    def breadth_first_search(self, graph, start, goal):
-        frontier = Queue()
-        frontier.put(start)
-        came_from = {}
-        came_from[start] = None
+        # generate a list of possible next steps (children) toward the goal from current pos
+        # store in ordered list (priority queue), based on distance to goal, closest first
+        # select closest child to the goal
+        # repeat until goal reached or no more children.
+        #  --- two important factors: how you measure distance to goal, and how to generate children
 
-        while not frontier.empty():
-            current = frontier.get()
+    def state_string(self, value, parent, start, goal):
+        children = []  # list of all neighbouring possibilities - squares immediately around current pos
+        dist = 0
+        if parent:
+            path = parent.path[:]  # copy the parent's path to our new path - [:] is very important!
+            path.append(value)  # value of the current child
+            start = parent.start
+            goal = parent.goal
+        else:
+            path = [value]
 
-            if current == goal:
-                break
+        dist = self.getdistance(start, goal)
 
-            for next in graph.neighbors(current):
-                if next not in came_from:
-                    frontier.put(next)
-                    came_from[next] = current
-                    print("came_from: ", came_from)
+    def getdistance(self, current, goal):
+        return len(self.points_between(current, goal))
 
-        print("final came_from: ", came_from)
-        return came_from
+    def createchildren(self, point):
+        return
 
+    def astar(self):
+        return
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
