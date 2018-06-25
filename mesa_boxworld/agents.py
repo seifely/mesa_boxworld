@@ -977,7 +977,7 @@ class Walker(Agent):
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
     def deliberative_nav(self):
-        return
+        self.astar_search(self.pos, self.goal)
 
         # generate a list of possible next steps (children) toward the goal from current pos
         # store in ordered list (priority queue), based on distance to goal, closest first
@@ -985,27 +985,108 @@ class Walker(Agent):
         # repeat until goal reached or no more children.
         #  --- two important factors: how you measure distance to goal, and how to generate children
 
-    def state_string(self, value, parent, start, goal):
-        children = []  # list of all neighbouring possibilities - squares immediately around current pos
+    # convert grid to graph using nodes
+    def get_nodes(self):  # return nodes possible to navigate (not including obstacles)
+        all_nodes = self.model.grid_list
+
+        if self.model.map_choice == "one":
+            for item in range(len(self.model.map_one_obstacles)):
+                value = self.model.map_one_obstacles[item]
+                all_nodes.remove(value)
+        elif self.model.map_choice == "two":
+            for item in range(len(self.model.map_two_obstacles)):
+                value = self.model.map_one_obstacles[item]
+                all_nodes.remove(value)
+        elif self.model.map_choice == "three":
+            for item in range(len(self.model.map_three_obstacles)):
+                value = self.model.map_one_obstacles[item]
+                all_nodes.remove(value)
+        elif self.model.map_choice == "four":
+            for item in range(len(self.model.map_four_obstacles)):
+                value = self.model.map_one_obstacles[item]
+                all_nodes.remove(value)
+        elif self.model.map_choice == "five":
+            for item in range(len(self.model.map_five_obstacles)):
+                value = self.model.map_one_obstacles[item]
+                all_nodes.remove(value)
+
+        return all_nodes
+
+    def passable(self, id):
+        if id in self.get_nodes():
+            return True
+
+    def get_neighbours(self, node):  # neighbours are other nodes connected by an edge to parent node
+        dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+        result = []
+        for dir in dirs:
+            if self.passable([node[0] + dir[0], node[1] + dir[1]]):
+                result.append([node[0] + dir[0], node[1] + dir[1]])
+                print("Neighbours of", node, ": ", result)
+        return result
+
+    def get_distance(self, current, target, euclid=False):
         dist = 0
-        if parent:
-            path = parent.path[:]  # copy the parent's path to our new path - [:] is very important!
-            path.append(value)  # value of the current child
-            start = parent.start
-            goal = parent.goal
-        else:
-            path = [value]
+        px, py = current
+        qx, qy = target
+        euclidean_distance = math.sqrt(math.pow((qx - px), 2) + (math.pow((qy - py), 2)))
 
-        dist = self.getdistance(start, goal)
+        if current[0] <= target[0]:
+            xs = range(current[0] + 1, target[0]) or [current[0]]
+            ys = range(current[1] + 1, target[1]) or [current[1]]
+            grid_sq_distance = [(x, y) for x in xs for y in ys]
 
-    def getdistance(self, current, goal):
-        return len(self.points_between(current, goal))
+        elif current[0] > target[0]:
+            swapped_p1 = target
+            swapped_p2 = current
+            xs = range(swapped_p1[0] + 1, swapped_p2[0]) or [swapped_p1[0]]
+            ys = range(swapped_p1[1] + 1, swapped_p2[1]) or [swapped_p1[1]]
+            grid_sq_distance = [(x, y) for x in xs for y in ys]
 
-    def createchildren(self, point):
+        if euclid:
+            return euclidean_distance
+        elif not euclid:
+            return grid_sq_distance
+
+    def heuristic(self, a, b):
+        (x1, y1) = a
+        (x2, y2) = b
+        return abs(x1 - x2) + abs(y1 - y2)
+
+    def get_cost(self, a, b):
+        distance = self.get_distance(a, b, euclid=False)
+        return 3*abs(distance)
+
+    def astar_search(self, start, goal):  # doesn't actually use node list as we check for passability in neighbour generator
+        frontier = PriorityQueue()
+        frontier.put(start, 0)
+        came_from = {}
+        cost_so_far = {}
+        came_from[start] = None
+        cost_so_far[start] = 0
+
+        while not frontier.empty():
+            current = frontier.get()
+
+            if current == goal:
+                break
+
+            for next in self.get_neighbours(current):
+                new_cost = cost_so_far[current] + self.get_cost(current, next)
+                if next not in cost_so_far or new_cost < cost_so_far [next]:
+                    cost_so_far[next] = new_cost
+                    priority = new_cost + self.heuristic(goal, next)
+                    frontier.put(next, priority)
+                    came_from[next] = current
+
+        print("Came From List: ", came_from)
+        print("Cost So Far: ", cost_so_far)
+        return came_from, cost_so_far
+
+    def construct_path(self, came_from, start, goal):
         return
 
-    def astar(self):
-        return
+
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
