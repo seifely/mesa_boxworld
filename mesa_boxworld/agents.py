@@ -57,6 +57,7 @@ class Walker(Agent):
         self.score = score
         self.inventory = inventory
         self.items_picked_up = items_picked_up
+        self.passable_nodes = []
 
         self.closed_box_list = closed_box_list
         self.closed_box_list = self.model.all_boxes  # this used to be set to the full box list, but now agent = blind
@@ -990,40 +991,95 @@ class Walker(Agent):
         all_nodes = self.model.grid_list
 
         if self.model.map_choice == "one":
-            for item in range(len(self.model.map_one_obstacles)):
+            for item in range(len(self.model.map_one_obstacles) - 1):
                 value = self.model.map_one_obstacles[item]
-                all_nodes.remove(value)
-        elif self.model.map_choice == "two":
-            for item in range(len(self.model.map_two_obstacles)):
-                value = self.model.map_one_obstacles[item]
-                all_nodes.remove(value)
-        elif self.model.map_choice == "three":
-            for item in range(len(self.model.map_three_obstacles)):
-                value = self.model.map_one_obstacles[item]
-                all_nodes.remove(value)
-        elif self.model.map_choice == "four":
-            for item in range(len(self.model.map_four_obstacles)):
-                value = self.model.map_one_obstacles[item]
-                all_nodes.remove(value)
-        elif self.model.map_choice == "five":
-            for item in range(len(self.model.map_five_obstacles)):
-                value = self.model.map_one_obstacles[item]
-                all_nodes.remove(value)
+                print("item: ", item)
+                print("get_nodes value: ", value)
+                if value in all_nodes:
+                    all_nodes.remove(value)
+                    print("Removed Value")
 
-        return all_nodes
+
+        elif self.model.map_choice == "two":
+            for item in range(len(self.model.map_two_obstacles) - 1):
+                value = self.model.map_one_obstacles[item]
+                print("item: ", item)
+                print("get_nodes value: ", value)
+                if value in all_nodes:
+                    all_nodes.remove(value)
+                    print("Removed Value")
+
+        elif self.model.map_choice == "three":
+            for item in range(len(self.model.map_three_obstacles) - 1):
+                value = self.model.map_one_obstacles[item]
+                print("item: ", item)
+                print("get_nodes value: ", value)
+                if value in all_nodes:
+                    all_nodes.remove(value)
+                    print("Removed Value")
+
+        elif self.model.map_choice == "four":
+            for item in range(len(self.model.map_four_obstacles) - 1):
+                value = self.model.map_one_obstacles[item]
+                print("item: ", item)
+                print("get_nodes value: ", value)
+                if value in all_nodes:
+                    all_nodes.remove(value)
+                    print("Removed Value")
+
+        elif self.model.map_choice == "five":
+            for item in range(len(self.model.map_five_obstacles) - 1):
+                value = self.model.map_one_obstacles[item]
+                print("item: ", item)
+                print("get_nodes value: ", value)
+                if value in all_nodes:
+                    all_nodes.remove(value)
+                    print("Removed Value")
+
+        self.passable_nodes = all_nodes
 
     def passable(self, id):
-        if id in self.get_nodes():
+        if id in self.passable_nodes:
             return True
+        else:
+            return False
 
-    def get_neighbours(self, node):  # neighbours are other nodes connected by an edge to parent node
-        dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]]
-        result = []
-        for dir in dirs:
-            if self.passable([node[0] + dir[0], node[1] + dir[1]]):
-                result.append([node[0] + dir[0], node[1] + dir[1]])
-                print("Neighbours of", node, ": ", result)
-        return result
+    def in_bounds(self, id):
+        (x, y) = id
+        return 0 <= x < self.model.width and 0 <= y < self.model.height
+
+    def get_neighbours(self, id):
+        (x, y) = id
+        results = [(x+1, y), (x, y-1), (x-1, y), (x, y+1)]
+        print("Neighbours of", id, ": ", results)
+        if (x + y) % 2 == 0: results.reverse() # aesthetics
+        passable_results =[]
+
+        for x in range(len(results)):
+            value = results[x]
+            print("Value:", value)
+            if self.passable(value):
+                print("Value is Passable")
+                if self.in_bounds(value):
+                    print("Value is in Bounds")
+                    passable_results.append(value)
+                    print("Neighbour Added.")
+
+        # results = filter(self.passable, results)  # need to find a way to check if the neighbours are passable or not
+        print("Passable Neighbours: ", passable_results)
+        return passable_results
+
+    # def get_neighbours(self, node):  # neighbours are other nodes connected by an edge to parent node
+    #     dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+    #     result = []
+    #     for dir in dirs:
+    #         if self.passable([node[0] + dir[0], node[1] + dir[1]]):
+    #             result.append([node[0] + dir[0], node[1] + dir[1]])
+    #             print("Neighbours of", node, ": ", result)
+    #         if not self.passable([node[0] + dir[0], node[1] + dir[1]]):
+    #             print("That node can't be added as a neighbour")
+    #     print("Neighbours got!")
+    #     return result
 
     def get_distance(self, current, target, euclid=False):
         dist = 0
@@ -1046,7 +1102,7 @@ class Walker(Agent):
         if euclid:
             return euclidean_distance
         elif not euclid:
-            return grid_sq_distance
+            return len(grid_sq_distance)
 
     def heuristic(self, a, b):
         (x1, y1) = a
@@ -1059,19 +1115,25 @@ class Walker(Agent):
 
     def astar_search(self, start, goal):  # doesn't actually use node list as we check for passability in neighbour generator
         frontier = PriorityQueue()
+        print("Established Frontier Q")
         frontier.put(start, 0)
+        print("Put start location")
         came_from = {}
+        print("Opened Came From")
         cost_so_far = {}
+        print("Opened Cost So Far")
         came_from[start] = None
         cost_so_far[start] = 0
 
         while not frontier.empty():
+            print("Frontier isn't empty")
             current = frontier.get()
-
+            print("Current:", current)
             if current == goal:
                 break
 
             for next in self.get_neighbours(current):
+                print("Neighbours of current are:", self.get_neighbours(current))
                 new_cost = cost_so_far[current] + self.get_cost(current, next)
                 if next not in cost_so_far or new_cost < cost_so_far [next]:
                     cost_so_far[next] = new_cost
