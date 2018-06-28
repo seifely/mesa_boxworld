@@ -1191,7 +1191,7 @@ class Walker(Agent):
         return path
 
     def use_path(self, path):
-        for i in range(len(path)):
+        for i in range(len(path)): 
             next_step = path[i]
             self.model.grid.move_agent(self, next_step)
 
