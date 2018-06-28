@@ -1,7 +1,19 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c093891e-a310-4f98-8641-960e99a86047" name="Default" comment="" />
+=======
+<<<<<<< HEAD
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="d2be1165-23fd-48d5-bbc8-6c2f5c53235b" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/mesa_boxworld/agents.py" afterPath="$PROJECT_DIR$/mesa_boxworld/agents.py" />
+      <change beforePath="$PROJECT_DIR$/mesa_boxworld/astar_nav.py" afterPath="$PROJECT_DIR$/mesa_boxworld/astar_nav.py" />
+    </list>
+>>>>>>> 2503efe586e0c33a5e44643582959712f8e26365
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -10,6 +22,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
+<<<<<<< HEAD
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="agents.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
@@ -34,13 +47,119 @@
         </entry>
       </file>
     </leaf>
+=======
+    <splitter split-orientation="horizontal" split-proportion="0.54802954">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="agents.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="612">
+                  <caret line="1004" column="14" lean-forward="false" selection-start-line="1004" selection-start-column="14" selection-end-line="1004" selection-end-column="14" />
+                  <folding>
+                    <element signature="e#0#13#0" expanded="true" />
+                    <element signature="e#2125#2444#0" expanded="false" />
+                    <element signature="e#2510#3427#0" expanded="false" />
+                    <element signature="e#3462#4245#0" expanded="false" />
+                    <element signature="e#4284#4954#0" expanded="false" />
+                    <element signature="e#4996#7148#0" expanded="false" />
+                    <element signature="e#7198#8467#0" expanded="false" />
+                    <element signature="e#8563#9000#0" expanded="false" />
+                    <element signature="e#9048#9579#0" expanded="false" />
+                    <element signature="e#9622#10612#0" expanded="false" />
+                    <element signature="e#10668#14476#0" expanded="false" />
+                    <element signature="e#12567#13332#0" expanded="false" />
+                    <element signature="e#14482#14525#0" expanded="false" />
+                    <element signature="e#21682#24615#0" expanded="false" />
+                    <element signature="e#24621#24647#0" expanded="false" />
+                    <element signature="e#27105#36238#0" expanded="false" />
+                    <element signature="e#36320#37191#0" expanded="false" />
+                    <element signature="e#37279#39590#0" expanded="false" />
+                    <element signature="e#39624#41616#0" expanded="false" />
+                    <element signature="e#41653#43180#0" expanded="false" />
+                    <marker date="1529868278340" expanded="true" signature="44376:44397" ph="..." />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="model.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/mesa_boxworld/model.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="1700">
+                  <caret line="108" column="25" lean-forward="false" selection-start-line="108" selection-start-column="25" selection-end-line="108" selection-end-column="25" />
+                  <folding>
+                    <element signature="e#1#14#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="astar_nav.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/mesa_boxworld/astar_nav.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="726">
+                  <caret line="99" column="20" lean-forward="false" selection-start-line="99" selection-start-column="20" selection-end-line="99" selection-end-column="20" />
+                  <folding>
+                    <element signature="e#0#18#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>data</find>
+      <find>generic ob</find>
+      <find>avoidance_check</find>
+      <find>goal_reached</find>
+      <find>Item</find>
+      <find>avoidance_goal</find>
+      <find>astar</find>
+    </findStrings>
+>>>>>>> 2503efe586e0c33a5e44643582959712f8e26365
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+<<<<<<< HEAD
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-7" />
     <option name="width" value="974" />
+=======
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/model.py" />
+        <option value="$PROJECT_DIR$/server.py" />
+        <option value="$PROJECT_DIR$/run.py" />
+        <option value="$PROJECT_DIR$/mesa_boxworld/run.py" />
+        <option value="$PROJECT_DIR$/mesa_boxworld/server.py" />
+        <option value="$PROJECT_DIR$/mesa_boxworld/model.py" />
+        <option value="$PROJECT_DIR$/mesa_boxworld/astar_nav.py" />
+        <option value="$PROJECT_DIR$/mesa_boxworld/agents.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="199" />
+    <option name="width" value="1728" />
+>>>>>>> 2503efe586e0c33a5e44643582959712f8e26365
     <option name="height" value="1057" />
   </component>
   <component name="ProjectView">
@@ -59,7 +178,10 @@
     </navigator>
     <panes>
       <pane id="Scratches" />
+<<<<<<< HEAD
       <pane id="Scope" />
+=======
+>>>>>>> 2503efe586e0c33a5e44643582959712f8e26365
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -76,8 +198,23 @@
           <select />
         </subPane>
       </pane>
+<<<<<<< HEAD
     </panes>
   </component>
+=======
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="settings.editor.selected.configurable" value="configurable.group.language" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/work/movement_test/agents.py" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\grace\Documents\GitHub\mesa_boxworld\mesa_boxworld" />
+    </key>
+  </component>
+>>>>>>> 2503efe586e0c33a5e44643582959712f8e26365
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -90,6 +227,57 @@
       </list>
     </option>
   </component>
+<<<<<<< HEAD
+=======
+  <component name="RunManager" selected="Python.run (1)">
+    <configuration name="run (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/mesa_boxworld" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="mesa_boxworld" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/mesa_boxworld/run.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="run" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="mesa_boxworld" />
+      <option name="SCRIPT_NAME" value="C:\Users\grace\Documents\GitHub\mesa_boxworld\mesa_boxworld\run.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <list size="2">
+      <item index="0" class="java.lang.String" itemvalue="Python.run" />
+      <item index="1" class="java.lang.String" itemvalue="Python.run (1)" />
+    </list>
+    <recent_temporary>
+      <list size="2">
+        <item index="0" class="java.lang.String" itemvalue="Python.run (1)" />
+        <item index="1" class="java.lang.String" itemvalue="Python.run" />
+      </list>
+    </recent_temporary>
+  </component>
+>>>>>>> 2503efe586e0c33a5e44643582959712f8e26365
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
   </component>
@@ -98,19 +286,34 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
+<<<<<<< HEAD
       <changelist id="c093891e-a310-4f98-8641-960e99a86047" name="Default" comment="" />
       <created>1530202912743</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1530202912743</updated>
+=======
+      <changelist id="d2be1165-23fd-48d5-bbc8-6c2f5c53235b" name="Default" comment="" />
+      <created>1527266617137</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1527266617137</updated>
+>>>>>>> 2503efe586e0c33a5e44643582959712f8e26365
     </task>
     <servers />
   </component>
   <component name="ToolWindowManager">
+<<<<<<< HEAD
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.092708334" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+=======
+    <frame x="199" y="0" width="1728" height="1057" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.05140187" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+>>>>>>> 2503efe586e0c33a5e44643582959712f8e26365
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32948583" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -133,7 +336,13 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
+<<<<<<< HEAD
     <breakpoint-manager />
+=======
+    <breakpoint-manager>
+      <option name="time" value="28" />
+    </breakpoint-manager>
+>>>>>>> 2503efe586e0c33a5e44643582959712f8e26365
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
@@ -467,6 +676,7 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/mesa_boxworld/astar_nav.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="646">
@@ -480,17 +690,71 @@
           <caret line="38" column="87" lean-forward="false" selection-start-line="38" selection-start-column="87" selection-end-line="38" selection-end-column="87" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
+=======
+    <entry file="file://$PROJECT_DIR$/mesa_boxworld/model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1700">
+          <caret line="108" column="25" lean-forward="false" selection-start-line="108" selection-start-column="25" selection-end-line="108" selection-end-column="25" />
+          <folding>
+            <element signature="e#1#14#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/mesa_boxworld/astar_nav.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="726">
+          <caret line="99" column="20" lean-forward="false" selection-start-line="99" selection-start-column="20" selection-end-line="99" selection-end-column="20" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+>>>>>>> 2503efe586e0c33a5e44643582959712f8e26365
+          </folding>
+        </state>
+      </provider>
+    </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/mesa_boxworld/model.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1700">
           <caret line="108" column="25" lean-forward="false" selection-start-line="108" selection-start-column="25" selection-end-line="108" selection-end-column="25" />
           <folding />
+=======
+    <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="612">
+          <caret line="1004" column="14" lean-forward="false" selection-start-line="1004" selection-start-column="14" selection-end-line="1004" selection-end-column="14" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#2125#2444#0" expanded="false" />
+            <element signature="e#2510#3427#0" expanded="false" />
+            <element signature="e#3462#4245#0" expanded="false" />
+            <element signature="e#4284#4954#0" expanded="false" />
+            <element signature="e#4996#7148#0" expanded="false" />
+            <element signature="e#7198#8467#0" expanded="false" />
+            <element signature="e#8563#9000#0" expanded="false" />
+            <element signature="e#9048#9579#0" expanded="false" />
+            <element signature="e#9622#10612#0" expanded="false" />
+            <element signature="e#10668#14476#0" expanded="false" />
+            <element signature="e#12567#13332#0" expanded="false" />
+            <element signature="e#14482#14525#0" expanded="false" />
+            <element signature="e#21682#24615#0" expanded="false" />
+            <element signature="e#24621#24647#0" expanded="false" />
+            <element signature="e#27105#36238#0" expanded="false" />
+            <element signature="e#36320#37191#0" expanded="false" />
+            <element signature="e#37279#39590#0" expanded="false" />
+            <element signature="e#39624#41616#0" expanded="false" />
+            <element signature="e#41653#43180#0" expanded="false" />
+            <marker date="1529868278340" expanded="true" signature="44376:44397" ph="..." />
+          </folding>
+>>>>>>> 2503efe586e0c33a5e44643582959712f8e26365
         </state>
       </provider>
     </entry>
   </component>
+<<<<<<< HEAD
 </project>
+=======
+</project>
+=======
+>>>>>>> 1ba3229f86009ddf830fcd0ca6e161cd950e7038
+>>>>>>> 2503efe586e0c33a5e44643582959712f8e26365

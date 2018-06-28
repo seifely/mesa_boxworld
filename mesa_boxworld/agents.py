@@ -2,7 +2,10 @@ import random
 import math
 
 from mesa import Agent
-from mesa_boxworld.astar_nav import Queue, AgentGrid
+from queue import PriorityQueue
+# priotyQs (also: Heap Q's) are binary trees where every parent node has a value >= any of its children. It keeps
+# track
+# of the minimum value, helping retrieve that min value at all times
 
 ###########################################################################################################
 
@@ -36,7 +39,7 @@ class Walker(Agent):
     quick_verbose = False
 
     def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
-                 able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True, navigation_mode=1,
+                 able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True, navigation_mode=2,
                  score=0, inventory={}, items_picked_up=0):
         super().__init__(pos, model)
 
@@ -54,6 +57,7 @@ class Walker(Agent):
         self.score = score
         self.inventory = inventory
         self.items_picked_up = items_picked_up
+        # self.passable_nodes = []
 
         self.closed_box_list = closed_box_list
         self.closed_box_list = self.model.all_boxes  # this used to be set to the full box list, but now agent = blind
@@ -233,9 +237,6 @@ class Walker(Agent):
         elif len(potential_obstacle) == 0:
             self.obstacle_present = False
             return False
-
-    def check_neighbourhood(self):
-        return
 
     def points_between(self, p1, p2):
         if p1[0] <= p2[0]:
@@ -977,10 +978,225 @@ class Walker(Agent):
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
     def deliberative_nav(self):
-        return
+        # self.get_nodes()  # sets the global 'self.passable_nodes' to the list of non-obstacle map points
+        came_from, cost_so_far = self.astar_search(self.pos, self.goal)
+        path = self.reconstruct_path(came_from, self.pos, self.goal)
 
-    def breadth_first_search(self):
-        return
+        # now we need a navigation system to take this path and use it
+        # we also need to time this process so that we can have feedback on it
+
+        # for i in range(len(path)):
+        #     next_step = path[i]
+        #     self.model.grid.move_agent(self, next_step)
+
+        self.use_path(path)
+        self.goal_reached = True
+
+
+        # generate a list of possible next steps (children) toward the goal from current pos
+        # store in ordered list (priority queue), based on distance to goal, closest first
+        # select closest child to the goal
+        # repeat until goal reached or no more children.
+        #  --- two important factors: how you measure distance to goal, and how to generate children
+
+    def get_nodes(self):  # the more reliable version!
+        all_nodes = self.model.grid_list
+        passable_nodes = []
+        map_choice = self.model.map_choice
+
+        for item in range(len(all_nodes)):
+            value = all_nodes[item]
+            if map_choice == "one":
+                forbidden_nodes = self.model.map_one_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "two":
+                forbidden_nodes = self.model.map_two_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "three":
+                forbidden_nodes = self.model.map_three_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "four":
+                forbidden_nodes = self.model.map_four_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "five":
+                forbidden_nodes = self.model.map_five_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+
+        return passable_nodes
+
+    # convert grid to graph using nodes
+    # def get_nodes(self):  # return nodes possible to navigate (not including obstacles)
+    #     all_nodes = self.model.grid_list
+    #     passable_nodes = []
+    #     if self.model.map_choice == "one":
+    #         for item in range(len(self.model.map_one_obstacles) - 1):
+    #             value = self.model.map_one_obstacles[item]
+    #             print("item: ", item)
+    #             print("get_nodes value: ", value)
+    #             if value in all_nodes:
+    #                 all_nodes.remove(value)
+    #                 print("Removed Value")
+    #
+    #     elif self.model.map_choice == "two":
+    #         for item in range(len(self.model.map_two_obstacles) - 1):
+    #             value = self.model.map_one_obstacles[item]
+    #             print("item: ", item)
+    #             print("get_nodes value: ", value)
+    #             if value in all_nodes:
+    #                 all_nodes.remove(value)
+    #                 print("Removed Value")
+    #
+    #     elif self.model.map_choice == "three":
+    #         for item in range(len(self.model.map_three_obstacles) - 1):
+    #             value = self.model.map_one_obstacles[item]
+    #             print("item: ", item)
+    #             print("get_nodes value: ", value)
+    #             if value in all_nodes:
+    #                 all_nodes.remove(value)
+    #                 print("Removed Value")
+    #
+    #     elif self.model.map_choice == "four":
+    #         for item in range(len(self.model.map_four_obstacles) - 1):
+    #             value = self.model.map_one_obstacles[item]
+    #             print("item: ", item)
+    #             print("get_nodes value: ", value)
+    #             if value in all_nodes:
+    #                 all_nodes.remove(value)
+    #                 print("Removed Value")
+    #
+    #     elif self.model.map_choice == "five":
+    #         for item in range(len(self.model.map_five_obstacles) - 1):
+    #             value = self.model.map_one_obstacles[item]
+    #             print("item: ", item)
+    #             print("get_nodes value: ", value)
+    #             if value in all_nodes:
+    #                 all_nodes.remove(value)
+    #                 print("Removed Value")
+    #
+    #     # passable_nodes = all_nodes
+    #     return passable_nodes
+
+    def passable(self, id):
+        passable_nodes = self.get_nodes()
+        if id in passable_nodes:
+            return True
+        else:
+            return False
+
+    def in_bounds(self, id):
+        (x, y) = id
+        return 0 <= x < self.model.width and 0 <= y < self.model.height
+
+    def get_neighbours(self, id):
+        (x, y) = id
+        results = [(x+1, y), (x, y-1), (x-1, y), (x, y+1)]
+        print("Neighbours of", id, ": ", results)
+        if (x + y) % 2 == 0: results.reverse() # aesthetics
+        passable_results =[]
+
+        for x in range(len(results)):
+            value = results[x]
+            print("Value:", value)
+            if self.passable(value):
+                print("Value is Passable")
+                if self.in_bounds(value):
+                    print("Value is in Bounds")
+                    passable_results.append(value)
+                    print("Neighbour Added.")
+
+        # results = filter(self.passable, results)  # need to find a way to check if the neighbours are passable or not
+        print("Passable Neighbours: ", passable_results)
+        return passable_results
+
+    def get_distance(self, current, target, euclid=False):
+        dist = 0
+        px, py = current
+        qx, qy = target
+        euclidean_distance = math.sqrt(math.pow((qx - px), 2) + (math.pow((qy - py), 2)))
+
+        if current[0] <= target[0]:
+            xs = range(current[0] + 1, target[0]) or [current[0]]
+            ys = range(current[1] + 1, target[1]) or [current[1]]
+            grid_sq_distance = [(x, y) for x in xs for y in ys]
+
+        elif current[0] > target[0]:
+            swapped_p1 = target
+            swapped_p2 = current
+            xs = range(swapped_p1[0] + 1, swapped_p2[0]) or [swapped_p1[0]]
+            ys = range(swapped_p1[1] + 1, swapped_p2[1]) or [swapped_p1[1]]
+            grid_sq_distance = [(x, y) for x in xs for y in ys]
+
+        if euclid:
+            return euclidean_distance
+        elif not euclid:
+            return len(grid_sq_distance)
+
+    def heuristic(self, a, b):
+        (x1, y1) = a
+        (x2, y2) = b
+        return abs(x1 - x2) + abs(y1 - y2)
+
+    def get_cost(self, a, b):
+        distance = self.get_distance(a, b, euclid=False)
+        return 3*abs(distance)
+
+    def astar_search(self, start, goal):  # doesn't actually use node list as we check for passability in neighbour generator
+        frontier = PriorityQueue()
+        print("Established Frontier Q")
+        frontier.put(start, 0)
+        print("Put start location")
+        came_from = {}
+        print("Opened Came From")
+        cost_so_far = {}
+        print("Opened Cost So Far")
+        came_from[start] = None
+        cost_so_far[start] = 0
+
+        while not frontier.empty():
+            print("Frontier isn't empty")
+            current = frontier.get()
+            print("Current:", current)
+            if current == goal:
+                break
+
+            for next in self.get_neighbours(current):
+                print("Neighbours of current are:", self.get_neighbours(current))
+                new_cost = cost_so_far[current] + self.get_cost(current, next)
+                if next not in cost_so_far or new_cost < cost_so_far [next]:
+                    cost_so_far[next] = new_cost
+                    priority = new_cost + self.heuristic(goal, next)
+                    frontier.put(next, priority)
+                    came_from[next] = current
+
+        print("Came From List: ", came_from)
+        print("Cost So Far: ", cost_so_far)
+        return came_from, cost_so_far
+
+    def reconstruct_path(self, came_from, start, goal):
+        current = goal
+        path = []
+
+        while current != start:
+            path.append(current)
+            current = came_from[current]
+        path.append(start)  # optional
+        path.reverse()  # optional
+        print("Start Point:", self.pos, "Goal Point: ", self.goal)
+        print("Reconstructed Path: ", path)
+        return path
+
+    def use_path(self, path):
+        for i in range(len(path)):
+            next_step = path[i]
+            self.model.grid.move_agent(self, next_step)
+
+
+
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -1026,6 +1242,15 @@ class Walker(Agent):
                 self.stepCount += 1
                 if self.goal_reached == False:
                     self.deliberative_nav()
+
+                if self.goal_reached == True :
+                    self.calculate_box_distances_from_current_pos()
+                    self.set_goal()
+                    print("Current Inventory: ", self.inventory)
+                    print("Current Score: ", self.score)
+                    print("Step Count: ", self.stepCount)
+                    # print("Setting new goal.")
+                    self.goal_reached = False
 
 
 
