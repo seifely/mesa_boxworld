@@ -57,7 +57,7 @@ class Walker(Agent):
         self.score = score
         self.inventory = inventory
         self.items_picked_up = items_picked_up
-        self.passable_nodes = []
+        # self.passable_nodes = []
 
         self.closed_box_list = closed_box_list
         self.closed_box_list = self.model.all_boxes  # this used to be set to the full box list, but now agent = blind
@@ -978,7 +978,20 @@ class Walker(Agent):
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
     def deliberative_nav(self):
-        self.astar_search(self.pos, self.goal)
+        # self.get_nodes()  # sets the global 'self.passable_nodes' to the list of non-obstacle map points
+        came_from, cost_so_far = self.astar_search(self.pos, self.goal)
+        path = self.reconstruct_path(came_from, self.pos, self.goal)
+
+        # now we need a navigation system to take this path and use it
+        # we also need to time this process so that we can have feedback on it
+
+        # for i in range(len(path)):
+        #     next_step = path[i]
+        #     self.model.grid.move_agent(self, next_step)
+
+        self.use_path(path)
+        self.goal_reached = True
+
 
         # generate a list of possible next steps (children) toward the goal from current pos
         # store in ordered list (priority queue), based on distance to goal, closest first
@@ -986,60 +999,91 @@ class Walker(Agent):
         # repeat until goal reached or no more children.
         #  --- two important factors: how you measure distance to goal, and how to generate children
 
-    # convert grid to graph using nodes
-    def get_nodes(self):  # return nodes possible to navigate (not including obstacles)
+    def get_nodes(self):  # the more reliable version!
         all_nodes = self.model.grid_list
+        passable_nodes = []
+        map_choice = self.model.map_choice
 
-        if self.model.map_choice == "one":
-            for item in range(len(self.model.map_one_obstacles) - 1):
-                value = self.model.map_one_obstacles[item]
-                print("item: ", item)
-                print("get_nodes value: ", value)
-                if value in all_nodes:
-                    all_nodes.remove(value)
-                    print("Removed Value")
+        for item in range(len(all_nodes)):
+            value = all_nodes[item]
+            if map_choice == "one":
+                forbidden_nodes = self.model.map_one_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "two":
+                forbidden_nodes = self.model.map_two_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "three":
+                forbidden_nodes = self.model.map_three_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "four":
+                forbidden_nodes = self.model.map_four_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "five":
+                forbidden_nodes = self.model.map_five_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
 
+        return passable_nodes
 
-        elif self.model.map_choice == "two":
-            for item in range(len(self.model.map_two_obstacles) - 1):
-                value = self.model.map_one_obstacles[item]
-                print("item: ", item)
-                print("get_nodes value: ", value)
-                if value in all_nodes:
-                    all_nodes.remove(value)
-                    print("Removed Value")
-
-        elif self.model.map_choice == "three":
-            for item in range(len(self.model.map_three_obstacles) - 1):
-                value = self.model.map_one_obstacles[item]
-                print("item: ", item)
-                print("get_nodes value: ", value)
-                if value in all_nodes:
-                    all_nodes.remove(value)
-                    print("Removed Value")
-
-        elif self.model.map_choice == "four":
-            for item in range(len(self.model.map_four_obstacles) - 1):
-                value = self.model.map_one_obstacles[item]
-                print("item: ", item)
-                print("get_nodes value: ", value)
-                if value in all_nodes:
-                    all_nodes.remove(value)
-                    print("Removed Value")
-
-        elif self.model.map_choice == "five":
-            for item in range(len(self.model.map_five_obstacles) - 1):
-                value = self.model.map_one_obstacles[item]
-                print("item: ", item)
-                print("get_nodes value: ", value)
-                if value in all_nodes:
-                    all_nodes.remove(value)
-                    print("Removed Value")
-
-        self.passable_nodes = all_nodes
+    # convert grid to graph using nodes
+    # def get_nodes(self):  # return nodes possible to navigate (not including obstacles)
+    #     all_nodes = self.model.grid_list
+    #     passable_nodes = []
+    #     if self.model.map_choice == "one":
+    #         for item in range(len(self.model.map_one_obstacles) - 1):
+    #             value = self.model.map_one_obstacles[item]
+    #             print("item: ", item)
+    #             print("get_nodes value: ", value)
+    #             if value in all_nodes:
+    #                 all_nodes.remove(value)
+    #                 print("Removed Value")
+    #
+    #     elif self.model.map_choice == "two":
+    #         for item in range(len(self.model.map_two_obstacles) - 1):
+    #             value = self.model.map_one_obstacles[item]
+    #             print("item: ", item)
+    #             print("get_nodes value: ", value)
+    #             if value in all_nodes:
+    #                 all_nodes.remove(value)
+    #                 print("Removed Value")
+    #
+    #     elif self.model.map_choice == "three":
+    #         for item in range(len(self.model.map_three_obstacles) - 1):
+    #             value = self.model.map_one_obstacles[item]
+    #             print("item: ", item)
+    #             print("get_nodes value: ", value)
+    #             if value in all_nodes:
+    #                 all_nodes.remove(value)
+    #                 print("Removed Value")
+    #
+    #     elif self.model.map_choice == "four":
+    #         for item in range(len(self.model.map_four_obstacles) - 1):
+    #             value = self.model.map_one_obstacles[item]
+    #             print("item: ", item)
+    #             print("get_nodes value: ", value)
+    #             if value in all_nodes:
+    #                 all_nodes.remove(value)
+    #                 print("Removed Value")
+    #
+    #     elif self.model.map_choice == "five":
+    #         for item in range(len(self.model.map_five_obstacles) - 1):
+    #             value = self.model.map_one_obstacles[item]
+    #             print("item: ", item)
+    #             print("get_nodes value: ", value)
+    #             if value in all_nodes:
+    #                 all_nodes.remove(value)
+    #                 print("Removed Value")
+    #
+    #     # passable_nodes = all_nodes
+    #     return passable_nodes
 
     def passable(self, id):
-        if id in self.passable_nodes:
+        passable_nodes = self.get_nodes()
+        if id in passable_nodes:
             return True
         else:
             return False
@@ -1068,18 +1112,6 @@ class Walker(Agent):
         # results = filter(self.passable, results)  # need to find a way to check if the neighbours are passable or not
         print("Passable Neighbours: ", passable_results)
         return passable_results
-
-    # def get_neighbours(self, node):  # neighbours are other nodes connected by an edge to parent node
-    #     dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]]
-    #     result = []
-    #     for dir in dirs:
-    #         if self.passable([node[0] + dir[0], node[1] + dir[1]]):
-    #             result.append([node[0] + dir[0], node[1] + dir[1]])
-    #             print("Neighbours of", node, ": ", result)
-    #         if not self.passable([node[0] + dir[0], node[1] + dir[1]]):
-    #             print("That node can't be added as a neighbour")
-    #     print("Neighbours got!")
-    #     return result
 
     def get_distance(self, current, target, euclid=False):
         dist = 0
@@ -1145,8 +1177,24 @@ class Walker(Agent):
         print("Cost So Far: ", cost_so_far)
         return came_from, cost_so_far
 
-    def construct_path(self, came_from, start, goal):
-        return
+    def reconstruct_path(self, came_from, start, goal):
+        current = goal
+        path = []
+
+        while current != start:
+            path.append(current)
+            current = came_from[current]
+        path.append(start)  # optional
+        path.reverse()  # optional
+        print("Start Point:", self.pos, "Goal Point: ", self.goal)
+        print("Reconstructed Path: ", path)
+        return path
+
+    def use_path(self, path):
+        for i in range(len(path)):
+            next_step = path[i]
+            self.model.grid.move_agent(self, next_step)
+
 
 
 
@@ -1194,6 +1242,15 @@ class Walker(Agent):
                 self.stepCount += 1
                 if self.goal_reached == False:
                     self.deliberative_nav()
+
+                if self.goal_reached == True :
+                    self.calculate_box_distances_from_current_pos()
+                    self.set_goal()
+                    print("Current Inventory: ", self.inventory)
+                    print("Current Score: ", self.score)
+                    print("Step Count: ", self.stepCount)
+                    # print("Setting new goal.")
+                    self.goal_reached = False
 
 
 
