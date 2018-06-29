@@ -28,9 +28,9 @@ class Walker(Agent):
     steps_memory = []  # not currently used
     obstacle_present = False
     normal_navigation = True
-    navigation_mode = 1
+    navigation_mode = 2
     score = 0
-    items_picked_up=0
+    items_picked_up = 0
     inventory = {}
 
     # for debugging
@@ -949,27 +949,27 @@ class Walker(Agent):
         current_item_coords = self.pos
 
         if len(pink_item) > 0:  # if there is a box here
-            item_to_consume = random.choice(current_item_coords)
+            item_to_consume = random.choice(pink_item)
             item_colour = "pink"
-
+            print("Item to consume: ", item_to_consume)
             self.model.grid._remove_agent(self.pos, item_to_consume)
             self.score += 2
             self.items_picked_up += 1
             self.inventory[self.items_picked_up] = item_colour
 
         elif len(yellow_item) > 0:  # if there is a box here
-            item_to_consume = random.choice(current_item_coords)
+            item_to_consume = random.choice(yellow_item)
             item_colour = "yellow"
-
+            print("Item to consume: ", item_to_consume)
             self.model.grid._remove_agent(self.pos, item_to_consume)
             self.score -= 1
             self.items_picked_up += 1
             self.inventory[self.items_picked_up] = item_colour
 
         elif len(blue_item) > 0:
-            item_to_consume = random.choice(current_item_coords)
+            item_to_consume = random.choice(blue_item)
             item_colour = "blue"
-
+            print("Item to consume: ", item_to_consume)
             self.model.grid._remove_agent(self.pos, item_to_consume)
             self.score += 1
             self.items_picked_up += 1
@@ -989,8 +989,7 @@ class Walker(Agent):
         #     next_step = path[i]
         #     self.model.grid.move_agent(self, next_step)
 
-        self.use_path(path)
-        self.goal_reached = True
+        return path
 
 
         # generate a list of possible next steps (children) toward the goal from current pos
@@ -1191,7 +1190,7 @@ class Walker(Agent):
         return path
 
     def use_path(self, path):
-        for i in range(len(path)): 
+        for i in range(len(path)):
             next_step = path[i]
             self.model.grid.move_agent(self, next_step)
 
@@ -1241,7 +1240,11 @@ class Walker(Agent):
             else:
                 self.stepCount += 1
                 if self.goal_reached == False:
-                    self.deliberative_nav()
+                    path = self.deliberative_nav()
+                    self.use_path(path)
+                    self.open_box()
+                    self.pickup_item()
+                    self.goal_reached = True
 
                 if self.goal_reached == True :
                     self.calculate_box_distances_from_current_pos()
