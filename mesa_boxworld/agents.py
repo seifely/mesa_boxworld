@@ -1,5 +1,6 @@
 import random
 import math
+import time
 
 from mesa import Agent
 from queue import PriorityQueue
@@ -39,8 +40,8 @@ class Walker(Agent):
     quick_verbose = False
 
     def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
-                 able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True, navigation_mode=2,
-                 score=0, inventory={}, items_picked_up=0):
+                 able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True,
+                 score=0, inventory={}, items_picked_up=0, navigation_mode=2):
         super().__init__(pos, model)
 
         self.moore = moore
@@ -58,6 +59,8 @@ class Walker(Agent):
         self.inventory = inventory
         self.items_picked_up = items_picked_up
         # self.passable_nodes = []
+        self.delib_verbose = False
+        self.completed = False
 
         self.closed_box_list = closed_box_list
         self.closed_box_list = self.model.all_boxes  # this used to be set to the full box list, but now agent = blind
@@ -102,23 +105,33 @@ class Walker(Agent):
     def set_goal(self):
 
         distances = self.calculate_box_distances_from_current_pos()
-        furthest_box = max(distances.keys(), key=(lambda k: distances[k]))
-        closest_box = min(distances.keys(), key=(lambda k: distances[k]))
-        if self.distance_verbose == True:
+        # furthest_box = max(distances.keys(), key=(lambda k: distances[k]))
+        if self.closed_box_list:
+            print("min function arg:", distances.keys())
+            closest_box = min(distances.keys(), key=(lambda k: distances[k]))
+            if len(self.closed_box_list) == 0:
+                closest_box = self.closed_box_list[0]
+            # if self.distance_verbose == True:
             print("Closest Box is: ", closest_box)
 
-        box_goal = closest_box
-        if self.distance_verbose == True:
+            box_goal = closest_box
+            # if self.distance_verbose == True:
             print("Goal Box is: ", box_goal)
 
-        goal_coords = self.model.all_boxes[box_goal]
-        if self.distance_verbose == True:
+            goal_coords = self.model.all_boxes[box_goal]
+            # if self.distance_verbose == True:
             print("Goal coordinates are:", goal_coords)
 
-        self.goal = goal_coords  # sets the global variable 'goal' to the result of boxgoal
-        self.goal_reached = False
-        if self.distance_verbose == True:
+            self.goal = goal_coords  # sets the global variable 'goal' to the result of boxgoal
+            self.goal_reached = False
+            # if self.distance_verbose == True:
             print("Goal is: ", self.goal)
+        if not self.closed_box_list:
+            self.goal = self.goal
+            print("There's nowhere left to go! I win!")
+
+
+
 
     def reactive_nav(self):
 
@@ -951,7 +964,7 @@ class Walker(Agent):
         if len(pink_item) > 0:  # if there is a box here
             item_to_consume = random.choice(pink_item)
             item_colour = "pink"
-            print("Item to consume: ", item_to_consume)
+            # print("Item to consume: ", item_to_consume)
             self.model.grid._remove_agent(self.pos, item_to_consume)
             self.score += 2
             self.items_picked_up += 1
@@ -960,7 +973,7 @@ class Walker(Agent):
         elif len(yellow_item) > 0:  # if there is a box here
             item_to_consume = random.choice(yellow_item)
             item_colour = "yellow"
-            print("Item to consume: ", item_to_consume)
+            # print("Item to consume: ", item_to_consume)
             self.model.grid._remove_agent(self.pos, item_to_consume)
             self.score -= 1
             self.items_picked_up += 1
@@ -969,7 +982,7 @@ class Walker(Agent):
         elif len(blue_item) > 0:
             item_to_consume = random.choice(blue_item)
             item_colour = "blue"
-            print("Item to consume: ", item_to_consume)
+            # print("Item to consume: ", item_to_consume)
             self.model.grid._remove_agent(self.pos, item_to_consume)
             self.score += 1
             self.items_picked_up += 1
@@ -1094,22 +1107,28 @@ class Walker(Agent):
     def get_neighbours(self, id):
         (x, y) = id
         results = [(x+1, y), (x, y-1), (x-1, y), (x, y+1)]
-        print("Neighbours of", id, ": ", results)
+        if self.delib_verbose:
+            print("Neighbours of", id, ": ", results)
         if (x + y) % 2 == 0: results.reverse() # aesthetics
         passable_results =[]
 
         for x in range(len(results)):
             value = results[x]
-            print("Value:", value)
+            # if self.delib_verbose:
+            #     print("Value:", value)
             if self.passable(value):
-                print("Value is Passable")
+                # if self.delib_verbose:
+                    # print("Value is Passable")
                 if self.in_bounds(value):
-                    print("Value is in Bounds")
+                    # if self.delib_verbose:
+                    #     print("Value is in Bounds")
                     passable_results.append(value)
-                    print("Neighbour Added.")
+                    if self.delib_verbose:
+                        print("Neighbour Added.")
 
         # results = filter(self.passable, results)  # need to find a way to check if the neighbours are passable or not
-        print("Passable Neighbours: ", passable_results)
+        if self.delib_verbose:
+            print("Passable Neighbours: ", passable_results)
         return passable_results
 
     def get_distance(self, current, target, euclid=False):
@@ -1146,25 +1165,32 @@ class Walker(Agent):
 
     def astar_search(self, start, goal):  # doesn't actually use node list as we check for passability in neighbour generator
         frontier = PriorityQueue()
-        print("Established Frontier Q")
+        if self.delib_verbose:
+            print("Established Frontier Q")
         frontier.put(start, 0)
-        print("Put start location")
+        if self.delib_verbose:
+            print("Put start location")
         came_from = {}
-        print("Opened Came From")
+        if self.delib_verbose:
+            print("Opened Came From")
         cost_so_far = {}
-        print("Opened Cost So Far")
+        if self.delib_verbose:
+            print("Opened Cost So Far")
         came_from[start] = None
         cost_so_far[start] = 0
 
         while not frontier.empty():
-            print("Frontier isn't empty")
+            if self.delib_verbose:
+                print("Frontier isn't empty")
             current = frontier.get()
-            print("Current:", current)
+            if self.delib_verbose:
+                print("Current:", current)
             if current == goal:
                 break
 
             for next in self.get_neighbours(current):
-                print("Neighbours of current are:", self.get_neighbours(current))
+                if self.delib_verbose:
+                    print("Neighbours of current are:", self.get_neighbours(current))
                 new_cost = cost_so_far[current] + self.get_cost(current, next)
                 if next not in cost_so_far or new_cost < cost_so_far [next]:
                     cost_so_far[next] = new_cost
@@ -1172,8 +1198,9 @@ class Walker(Agent):
                     frontier.put(next, priority)
                     came_from[next] = current
 
-        print("Came From List: ", came_from)
-        print("Cost So Far: ", cost_so_far)
+        if self.delib_verbose:
+            print("Came From List: ", came_from)
+            print("Cost So Far: ", cost_so_far)
         return came_from, cost_so_far
 
     def reconstruct_path(self, came_from, start, goal):
@@ -1186,7 +1213,13 @@ class Walker(Agent):
         path.append(start)  # optional
         path.reverse()  # optional
         print("Start Point:", self.pos, "Goal Point: ", self.goal)
-        print("Reconstructed Path: ", path)
+        print("Reconstructed Path: ", path, "Length: ", len(path))
+        # want to print the total cost of this path ( what about compared to other paths? )
+        path_cost = 0
+        for each in range(len(path)):
+            coord_cost = self.get_cost(path[each], self.goal)
+            path_cost = path_cost + coord_cost
+        print("Successful Path Cost: ", path_cost)
         return path
 
     def use_path(self, path):
@@ -1240,7 +1273,10 @@ class Walker(Agent):
             else:
                 self.stepCount += 1
                 if self.goal_reached == False:
+                    time_start = time.clock()
                     path = self.deliberative_nav()
+                    time_elapsed = (time.clock() - time_start)
+                    print("Time Elapsed: ", time_elapsed)
                     self.use_path(path)
                     self.open_box()
                     self.pickup_item()
