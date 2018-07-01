@@ -67,6 +67,7 @@ class ThirdTestModel(Model):
         # self.initial_obstacles = initial_obstacles
         # self.obstacle_length = obstacle_length
         self.map_choice = map_choice
+        self.step_count = 0
 
         self.empty_boxes = empty_boxes
         self.full_boxes = full_boxes
@@ -126,6 +127,7 @@ class ThirdTestModel(Model):
         print("Map ", self.map_choice)
 
         # create Boxes:
+
     def make_boxes(self):
         if self.map_choice == "one":
             for i in range(self.initial_boxes):
@@ -359,6 +361,7 @@ class ThirdTestModel(Model):
                    self.schedule.get_type_count(ClosedBox)])
 
             # stopping agents having conflicting simultaneous actions
+        self.step_count += 1
 
     def run_model(self, step_count=200):
 
