@@ -2,6 +2,7 @@ import random
 import math
 import csv
 import time
+# import pandas as pd
 
 from mesa import Agent
 from queue import PriorityQueue
@@ -42,26 +43,27 @@ class Walker(Agent):
 
     def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
                  able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True,
-                 score=0, inventory={}, items_picked_up=0, navigation_mode=1):
+                 score=0, inventory={}, items_picked_up=0, navigation_mode=2):
         super().__init__(pos, model)
 
         self.moore = moore
-        self.pos = pos
-        self.stepCount = stepCount
-        self.goal = goal
         self.next_move = next_move
-        # self.avoidance_goal = avoidance_goal
         self.able_to_move = able_to_move
         self.steps_memory = steps_memory
         self.obstacle_present = obstacle_present
         self.normal_navigation = normal_navigation
         self.navigation_mode = navigation_mode
+
+        self.delib_verbose = False
+        self.completed = False
+        self.plan_acquired = False
+
+        self.pos = pos
+        self.stepCount = stepCount
+        self.goal = goal
         self.score = score
         self.inventory = inventory
         self.items_picked_up = items_picked_up
-        # self.passable_nodes = []
-        self.delib_verbose = False
-        self.completed = False
 
         self.closed_box_list = closed_box_list
         self.closed_box_list = self.model.all_boxes  # this used to be set to the full box list, but now agent = blind
@@ -990,9 +992,9 @@ class Walker(Agent):
 
     def deliberative_nav(self):
         # self.get_nodes()  # sets the global 'self.passable_nodes' to the list of non-obstacle map points
-        came_from, cost_so_far = self.astar_search(self.pos, self.goal)
+        came_from, cost_so_far, planning_step = self.astar_search(self.pos, self.goal)
         path, path_cost = self.reconstruct_path(came_from, self.pos, self.goal)
-
+        print("Planning steps taken: ", planning_step)
         # now we need a navigation system to take this path and use it
         # we also need to time this process so that we can have feedback on it
 
@@ -1000,7 +1002,7 @@ class Walker(Agent):
         #     next_step = path[i]
         #     self.model.grid.move_agent(self, next_step)
 
-        return path, path_cost
+        return path, path_cost, planning_step
 
 
         # generate a list of possible next steps (children) toward the goal from current pos
@@ -1176,8 +1178,10 @@ class Walker(Agent):
             print("Opened Cost So Far")
         came_from[start] = None
         cost_so_far[start] = 0
+        planning_step = 0
 
         while not frontier.empty():
+            planning_step += 1
             if self.delib_verbose:
                 print("Frontier isn't empty")
             current = frontier.get()
@@ -1199,7 +1203,7 @@ class Walker(Agent):
         if self.delib_verbose:
             print("Came From List: ", came_from)
             print("Cost So Far: ", cost_so_far)
-        return came_from, cost_so_far
+        return came_from, cost_so_far, planning_step
 
     def reconstruct_path(self, came_from, start, goal):
         current = goal
@@ -1219,13 +1223,10 @@ class Walker(Agent):
         print("Successful Path Cost: ", path_cost)
         return path, path_cost
 
-    def use_path(self, path):  # this is the one that needs fixing! need to iterate through
+    def use_path(self, path):  # this is the one that needs fixing! need to iterate through!!!!!
         for i in range(len(path)):
             next_step = path[i]
             self.model.grid.move_agent(self, next_step)
-
-
-
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -1243,7 +1244,7 @@ class Walker(Agent):
             else:
                 self.stepCount += 1  # This is not needed as the agent can access the step number through other means??
                 # print("Goal Reached?", self.goal_reached)
-                if self.goal_reached == False :
+                if not self.goal_reached:
                     time_start = time.clock()
                     self.reactive_nav()
                     time_elapsed = (time.clock() - time_start)
@@ -1253,7 +1254,7 @@ class Walker(Agent):
                     # print("Next Step: ", self.next_move)
                     # print("Current Goal:", self.goal)
 
-                if self.goal_reached == True :
+                if self.goal_reached:
                     self.calculate_box_distances_from_current_pos()
                     self.set_goal()
                     print("Current Inventory: ", self.inventory)
@@ -1261,8 +1262,21 @@ class Walker(Agent):
                     print("Step Count: ", self.stepCount)
                     # print("Setting new goal.")
                     self.goal_reached = False
-                    if self.box_open_verbose == True:
+                    if self.box_open_verbose:
                         print("Full Box List: ", self.model.full_boxes)
+
+                # open the csv file
+                ofile = open('test.csv', "a")
+                writer = csv.writer(ofile, delimiter=',')
+
+                step_number = self.stepCount
+                distance_to_goal = self.get_distance(self.pos, self.goal, False)
+                writer.writerow("-----------")
+                writer.writerow([step_number])
+                writer.writerow([self.score])
+                writer.writerow([time_elapsed])
+                writer.writerow([distance_to_goal])
+
         elif self.navigation_mode == 2:
             if self.stepCount == 0: # this should be done once at the start, then again when a box is opened
                 self.calculate_box_distances_from_current_pos()
@@ -1271,17 +1285,21 @@ class Walker(Agent):
                 # EACH STEP SHOULD RECORD THE AGENT'S POSITION AND USE POP FOR MEMORY LIMIT?
             else:
                 self.stepCount += 1
-                if self.goal_reached == False:
-                    time_start = time.clock()
-                    path, path_cost = self.deliberative_nav()
-                    time_elapsed = (time.clock() - time_start)
-                    print("Time Elapsed: ", time_elapsed)
-                    self.use_path(path)
-                    self.open_box()
-                    self.pickup_item()
-                    self.goal_reached = True
+                if not self.goal_reached:
+                    if not self.plan_acquired:
+                        time_start = time.clock()
+                        path, path_cost, planning_step = self.deliberative_nav()
+                        time_elapsed = (time.clock() - time_start)
+                        print("Planning Time Elapsed: ", time_elapsed)
+                        self.plan_acquired = True
 
-                if self.goal_reached == True :
+                    if self.plan_acquired:
+                        self.use_path(path)
+                        self.open_box()
+                        self.pickup_item()
+                        self.goal_reached = True
+
+                if self.goal_reached:
                     self.calculate_box_distances_from_current_pos()
                     self.set_goal()
                     print("Current Inventory: ", self.inventory)
@@ -1289,6 +1307,7 @@ class Walker(Agent):
                     print("Step Count: ", self.stepCount)
                     # print("Setting new goal.")
                     self.goal_reached = False
+                    self.plan_acquired = False
 
                 # open the csv file
                 ofile = open('test.csv', "a")
@@ -1297,15 +1316,14 @@ class Walker(Agent):
                 step_number = self.stepCount
                 path_length = len(path)
                 distance_to_goal = self.get_distance(self.pos, self.goal, False)
-
+                writer.writerow("------------")
                 writer.writerow([step_number])
                 writer.writerow([path_length])
                 writer.writerow([path_cost])
                 writer.writerow([self.score])
                 writer.writerow([time_elapsed])
                 writer.writerow([distance_to_goal])
-
-
+                writer.writerow([planning_step])
 
 
 ############################################################################################################
