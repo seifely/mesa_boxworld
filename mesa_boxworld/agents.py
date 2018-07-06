@@ -1038,6 +1038,10 @@ class Walker(Agent):
                 forbidden_nodes = self.model.map_five_obstacles
                 if value not in forbidden_nodes:
                     passable_nodes.append(value)
+            elif map_choice == "six":
+                forbidden_nodes = self.model.map_six_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
 
         return passable_nodes
 

@@ -53,7 +53,8 @@ class ThirdTestModel(Model):
                  full_boxes={},
                  all_boxes={},
                  obstacles=[],
-                 map_choice=[]):
+                 map_choice=[],
+                 simple=True):
 
         # Model Parameters Init
         self.height = height
@@ -68,6 +69,7 @@ class ThirdTestModel(Model):
         # self.obstacle_length = obstacle_length
         self.map_choice = map_choice
         self.step_count = 0
+        self.simple = simple
 
         self.empty_boxes = empty_boxes
         self.full_boxes = full_boxes
@@ -81,7 +83,7 @@ class ThirdTestModel(Model):
                 self.grid_list.append((x, y))
 
 
-        # Spawn Locations
+        # Spawn Locations - Simple
         self.map_one_boxes = [(5, 7), (6, 20), (8, 5 ), (9, 10), (12, 12), (14, 17), (18, 12), (20, 4), (21, 12), (20, 21)]  # increased by 3
         self.map_one_obstacles = [(6, 19), (5, 19), (7, 19), (8, 19), (10, 14), (10, 13), (10, 12), (10, 11), (10, 10), (10, 9),
                              (15, 20), (15, 19), (15, 18), (15, 17), (15, 16), (15, 15), (15, 14), (19, 17),
@@ -107,6 +109,13 @@ class ThirdTestModel(Model):
                               (16, 19), (16, 18), (16, 17), (16, 16), (16, 15), (16, 14), (18, 17), (19, 17), (20, 17), (21, 17),
                               (20, 6), (21, 6), (22, 6)]  # increased by 3
 
+        # Spawn Locations - Complex
+        self.map_six_boxes = [(2,14), (4,9),(6,7), (7,20), (11,9), (11,19), (17,5), (20,14), (21,10), (23,21)]
+        self.map_six_obstacles = [(1,12), (2,12), (3,12), (4,12), (4,16), (4,15), (4,14), (4,13), (8,12), (8,11), (8,10), (8,9),
+                                  (8,8), (8,7), (8,6), (8,5), (8,4), (8,18), (9,4),(9,12), (10,12), (11,12), (9,22), (9,21), (9,20), (9,19), (9,18),
+                                  (10, 4), (16,8), (17,8), (7,18), (18,8), (19,8), (19,7), (19,6), (19,5), (19,4), (20,22), (20,21), (20,20),
+                                  (20,19), (20,18), (21,18), (22,18)]
+
         # Model Functions
         self.schedule = RandomActivationByType(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
@@ -122,9 +131,14 @@ class ThirdTestModel(Model):
 
         # pick a map
     def map_picker(self):
-        available_maps = ["one", "two", "three", "four", "five"]
-        self.map_choice = random.choice(available_maps)
-        print("Map ", self.map_choice)
+        if self.simple:
+            available_maps = ["one", "two", "three", "four", "five"]
+            self.map_choice = random.choice(available_maps)
+            print("Map ", self.map_choice)
+        elif not self.simple:
+            available_maps = ["six",] # "seven", "eight", "nine", "ten"
+            self.map_choice = random.choice(available_maps)
+            print("Map ", self.map_choice)
 
         # create Boxes:
 
@@ -176,6 +190,17 @@ class ThirdTestModel(Model):
         elif self.map_choice == "five":
             for i in range(self.initial_boxes):
                 x, y = self.map_five_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "six":
+            for i in range(self.initial_boxes):
+                x, y = self.map_six_boxes[i]
                 closedBox = ClosedBox((x, y), self, True)
                 self.grid.place_agent(closedBox, (x, y))
                 self.schedule.add(closedBox)
@@ -267,6 +292,14 @@ class ThirdTestModel(Model):
         elif self.map_choice == "five":
             for i in range(len(self.map_five_obstacles)):
                 x, y = self.map_five_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "six":
+            for i in range(len(self.map_six_obstacles)):
+                x, y = self.map_six_obstacles[i]
                 obstacle = Obstacle((x, y), self)
                 self.grid.place_agent(obstacle, (x, y))
                 self.schedule.add(obstacle)
