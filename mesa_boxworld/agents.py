@@ -69,6 +69,12 @@ class Walker(Agent):
         self.closed_box_list = self.model.all_boxes  # this used to be set to the full box list, but now agent = blind
         self.open_box_list = open_box_list
 
+        self.planned_path = []
+        self.planned_path_cost = []
+        self.current_step_time = 0
+        self.overall_time_elapsed = 0
+        self.planning_steps_taken = 0
+
         # AGENT NOTE: IT ALWAYS TRAVELS ALONG ITS Y AXIS BEFORE ITS X AXIS
 
     def random_move(self):
@@ -1227,10 +1233,10 @@ class Walker(Agent):
         print("Successful Path Cost: ", path_cost)
         return path, path_cost
 
-    def use_path(self, path):  # this is the one that needs fixing! need to iterate through!!!!!
-        for i in range(len(path)):
-            next_step = path[i]
-            self.model.grid.move_agent(self, next_step)
+    # def use_path(self, path):  # this is the one that needs fixing! need to iterate through!!!!!
+    #     for i in range(len(path)):
+    #         next_step = path[i]
+    #         self.model.grid.move_agent(self, next_step)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -1278,7 +1284,7 @@ class Walker(Agent):
                 writer.writerow("-----------")
                 writer.writerow([step_number])
                 writer.writerow([self.score])
-                writer.writerow([time_elapsed])
+                # writer.writerow([time_elapsed])
                 writer.writerow([distance_to_goal])
 
         elif self.navigation_mode == 2:
@@ -1293,15 +1299,24 @@ class Walker(Agent):
                     if not self.plan_acquired:
                         time_start = time.clock()
                         path, path_cost, planning_step = self.deliberative_nav()
+                        self.planned_path = path
+                        self.planned_path_cost = path_cost
+                        self.planning_steps_taken = planning_step
                         time_elapsed = (time.clock() - time_start)
+                        self.current_step_time = time_elapsed
                         print("Planning Time Elapsed: ", time_elapsed)
                         self.plan_acquired = True
 
                     if self.plan_acquired:
-                        self.use_path(path)
+                        next_step = self.planned_path.pop(0)
+                        # self.use_path(path)
+                        # for i in range(len(path)):
+                        # next_step = path[i]
+                        self.model.grid.move_agent(self, next_step)
                         self.open_box()
                         self.pickup_item()
-                        self.goal_reached = True
+                        if self.pos == self.goal:
+                            self.goal_reached = True
 
                 if self.goal_reached:
                     self.calculate_box_distances_from_current_pos()
@@ -1318,16 +1333,17 @@ class Walker(Agent):
                 writer = csv.writer(ofile, delimiter=',')
 
                 step_number = self.stepCount
-                path_length = len(path)
+                path_length = len(self.planned_path)
                 distance_to_goal = self.get_distance(self.pos, self.goal, False)
+
                 writer.writerow("------------")
                 writer.writerow([step_number])
                 writer.writerow([path_length])
-                writer.writerow([path_cost])
+                writer.writerow([self.planned_path_cost])
                 writer.writerow([self.score])
-                writer.writerow([time_elapsed])
+                writer.writerow([self.current_step_time])
                 writer.writerow([distance_to_goal])
-                writer.writerow([planning_step])
+                writer.writerow([self.planning_steps_taken])
 
 
 ############################################################################################################
