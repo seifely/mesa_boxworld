@@ -1,9 +1,9 @@
 
 import random
+import time
 
 from mesa import Model
 from mesa.space import MultiGrid
-# from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 
 from mesa_boxworld.agents import Walker, ClosedBox, blueItem, yellowItem, pinkItem, Obstacle
