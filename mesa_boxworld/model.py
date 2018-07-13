@@ -71,6 +71,8 @@ class ThirdTestModel(Model):
         self.step_count = 0
         self.simple = simple
 
+        self.start_timer = 0
+
         self.empty_boxes = empty_boxes
         self.full_boxes = full_boxes
         self.all_boxes = all_boxes
@@ -89,32 +91,32 @@ class ThirdTestModel(Model):
                              (15, 20), (15, 19), (15, 18), (15, 17), (15, 16), (15, 15), (15, 14), (19, 17),
                              (20, 17), (21, 17), (22, 17), (19, 6), (20, 6), (21, 6)]  # increased by 3
 
-        self.map_two_boxes = [(4, 5), (5, 14), (7, 19), (11, 8), (11, 21), (3, 15), (16, 5), (18, 16), (20, 22), (21, 20)]  # increased by 3
-        self.map_two_obstacles = [(4, 10), (5, 10), (6, 10), (9, 22), (9, 21), (9, 20), (9, 19), (9, 18), (9, 17),
+        self.map_two_boxes = [(4, 5), (5, 14), (7, 19), (11, 8), (11, 19), (3, 15), (16, 5), (18, 16), (20, 22), (21, 20)]  # increased by 3
+        self.map_two_obstacles = [(4, 10), (5, 10), (6, 10), (9, 21), (9, 20), (9, 19), (9, 18), (9, 17),
                              (13, 10), (13, 9), (13, 8), (13, 7), (13, 6), (13, 5), (18, 18), (19, 18), (20, 18),
                              (21, 18)]  # increased by 3
 
-        self.map_three_boxes = [(3, 5), (5, 18), (9, 18), (9, 21), (3, 13), (14, 16), (3, 18), (19, 20), (20, 18), (21, 7)]  # increased by 3
+        self.map_three_boxes = [(3, 5), (5, 18), (9, 18), (9, 21), (3, 13), (14, 16), (3, 18), (19, 22), (20, 18), (21, 7)]  # increased by 3
         self.map_three_obstacles = [(6, 20), (6, 19), (6, 18), (6, 17), (6, 16), (11, 21), (11, 20), (11, 19), (11, 18), (11, 17), (11, 16),
-                               (11, 15), (11, 6), (12, 6), (13, 6), (14, 6), (15, 6), (16, 6), (16, 5), (16, 4), (3, 16), (18, 13),
-                               (19, 13), (20, 20), (19, 13), (20, 13)]  # increased by 3
+                               (11, 15), (16, 6), (16, 5), (16, 7), (16, 8), (16, 4), (3, 16), (2, 16), (18, 13),
+                               (19, 13), (20, 20), (19, 20), (18, 20), (19, 13), (20, 13)]  # increased by 3
 
         self.map_four_boxes = [(3, 14), (6, 13), (7, 17), (9, 19), (14, 22), (15, 4), (16, 7), (20, 11), (20, 21), (21, 15)]  # increased by 3
         self.map_four_obstacles = [(5, 18), (5, 17), (5, 16), (5, 15), (5, 14), (5, 13), (5, 12), (5, 11), (8, 19), (8, 18), (8, 17),
                               (8, 18), (11, 20), (11, 19), (11, 18), (11, 17), (18, 18), (19, 18), (20, 18), (21, 18),
-                              (22, 18), (18, 8), (19, 8), (20, 8), (21, 8)]  # increased by 3
+                              (18, 8), (19, 8), (20, 8), (21, 8)]  # increased by 3
 
-        self.map_five_boxes = [(4, 10), (6, 13), (7, 20), (11, 6), (14, 17), (15, 18), (18, 12), (19, 21), (3, 21), (21, 12)]  # increased by 3
+        self.map_five_boxes = [(4, 10), (6, 13), (7, 20), (11, 6), (14, 16), (15, 18), (18, 12), (19, 21), (3, 21), (21, 12)]  # increased by 3
         self.map_five_obstacles = [(5, 17), (6, 17), (7, 17), (8, 17), (8, 13), (8, 12), (8, 11), (8, 10), (8, 9), (8, 8), (16, 20),
                               (16, 19), (16, 18), (16, 17), (16, 16), (16, 15), (16, 14), (18, 17), (19, 17), (20, 17), (21, 17),
-                              (20, 6), (21, 6), (22, 6)]  # increased by 3
+                              (20, 6), (21, 6), (19, 6)]  # increased by 3
 
         # Spawn Locations - Complex
-        self.map_six_boxes = [(2,14), (4,9),(6,7), (7,20), (11,9), (11,19), (17,5), (20,14), (21,10), (23,21)]
+        self.map_six_boxes = [(2,14), (4,9),(6,7), (7,20), (11,9), (11,19), (17,5), (20,14), (21,10), (22,21)]
         self.map_six_obstacles = [(1,12), (2,12), (3,12), (4,12), (4,16), (4,15), (4,14), (4,13), (8,12), (8,11), (8,10), (8,9),
                                   (8,8), (8,7), (8,6), (8,5), (8,4), (8,18), (9,4),(9,12), (10,12), (11,12), (9,22), (9,21), (9,20), (9,19), (9,18),
-                                  (10, 4), (16,8), (17,8), (7,18), (18,8), (19,8), (19,7), (19,6), (19,5), (19,4), (20,22), (20,21), (20,20),
-                                  (20,19), (20,18), (21,18), (22,18)]
+                                  (10, 4), (16,8), (17,8), (7,18), (18,8), (19,8), (19,7), (19,6), (19,5), (19,4), (19,22), (19,21), (19,20),
+                                  (19,19), (19,18), (20,18), (21,18)]
 
         # Model Functions
         self.schedule = RandomActivationByType(self)
@@ -123,6 +125,7 @@ class ThirdTestModel(Model):
             {"Closed Boxes": lambda m: m.schedule.get_type_count(ClosedBox)})
 
         # No clue why these are up here in particular - these are the actual parts of the model!
+
         self.map_picker()
         self.make_boxes()
         self.make_items()
@@ -130,10 +133,16 @@ class ThirdTestModel(Model):
         self.make_walker_agents()
 
         # pick a map
+
+    def init_timer(self):
+        self.start_timer = time.clock()
+
+
     def map_picker(self):
         if self.simple:
-            available_maps = ["one", "two", "three", "four", "five"]
-            self.map_choice = random.choice(available_maps)
+            # available_maps = ["one", "two", "three", "four", "five"]
+            # self.map_choice = random.choice(available_maps)
+            self.map_choice = "five"
             print("Map ", self.map_choice)
         elif not self.simple:
             available_maps = ["six",] # "seven", "eight", "nine", "ten"
@@ -226,6 +235,7 @@ class ThirdTestModel(Model):
     def make_walker_agents(self):
         for i in range(self.initial_walkers):
             x, y = self.grid.find_empty()
+            print("Start Position: ", (x, y))
             walker = Walker((x, y), self, True)
             self.grid.place_agent(walker, (x, y))
             self.schedule.add(walker)
@@ -384,6 +394,7 @@ class ThirdTestModel(Model):
     #
     #     # self.obstacles.sort()
     #     print("Obstacle list:", self.obstacles)
+
 
     def step(self):
         self.schedule.step()

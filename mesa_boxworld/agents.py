@@ -43,10 +43,14 @@ class Walker(Agent):
 
     def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
                  able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True,
-                 score=0, inventory={}, items_picked_up=0, navigation_mode=2):
+                 score=0, inventory={}, items_picked_up=0, navigation_mode=1):
         super().__init__(pos, model)
 
         # AGENT NOTE: IT ALWAYS TRAVELS ALONG ITS Y AXIS BEFORE ITS X AXIS
+
+        # Bug Notes:
+        # Sidestepping has been reduced to +1, doesn't seem to cause an issue for now
+        # A* needs some work, as it zooms about too much at the moment
 
         self.moore = moore
         self.filename = random.randint(1,1001)
@@ -76,7 +80,7 @@ class Walker(Agent):
         self.planned_path = []
         self.planned_path_cost = []
         self.current_step_time = 0
-        self.overall_time_elapsed = 0
+        # self.overall_time_elapsed = 0
         self.planning_steps_taken = 0
 
         # things we want to track are:
@@ -659,27 +663,39 @@ class Walker(Agent):
 
         if blocked_direction == "north":
             print("Sidestepping")
-            sidestep = (current_x, (current_y + 2))
-            self.model.grid.move_agent(self, sidestep)
-            return True
+            sidestep = (current_x, (current_y + 1))
+            if not self.check_for_obstacles(sidestep):
+                self.model.grid.move_agent(self, sidestep)
+                return True
+            else:
+                print("I can't sidestep, I'm stuck!")  # possibly then random move until a freedom check allows it?
 
         elif blocked_direction == "east":
             print("Sidestepping")
-            sidestep = ((current_x + 2), current_y)
-            self.model.grid.move_agent(self, sidestep)
-            return True
+            sidestep = ((current_x + 1), current_y)
+            if not self.check_for_obstacles(sidestep):
+                self.model.grid.move_agent(self, sidestep)
+                return True
+            else:
+                print("I can't sidestep, I'm stuck!")  # possibly then random move until a freedom check allows it?
 
         elif blocked_direction == "south":
             print("Sidestepping")
-            sidestep = (current_x, (current_y - 2))
-            self.model.grid.move_agent(self, sidestep)
-            return True
+            sidestep = (current_x, (current_y - 1))
+            if not self.check_for_obstacles(sidestep):
+                self.model.grid.move_agent(self, sidestep)
+                return True
+            else:
+                print("I can't sidestep, I'm stuck!")  # possibly then random move until a freedom check allows it?
 
         elif blocked_direction == "west":
             print("Sidestepping")
-            sidestep = ((current_x - 2), current_y)
-            self.model.grid.move_agent(self, sidestep)
-            return True
+            sidestep = ((current_x - 1), current_y)
+            if not self.check_for_obstacles(sidestep):
+                self.model.grid.move_agent(self, sidestep)
+                return True
+            else:
+                print("I can't sidestep, I'm stuck!")  # possibly then random move until a freedom check allows it?
 
     def avoidance_goal_calculator(self, blocked_direction, current_position):
         current_x, current_y = current_position
@@ -752,6 +768,7 @@ class Walker(Agent):
                 self.reactive_nav()
                 time_elapsed = (time.clock() - time_start)
                 self.current_step_time = time_elapsed
+                print("Reactive Time: ", self.current_step_time)
                 self.open_box()
                 self.pickup_item()
                 # print("Current Step:", self.pos)
@@ -769,7 +786,8 @@ class Walker(Agent):
                 if self.box_open_verbose:
                     print("Full Box List: ", self.model.full_boxes)
 
-            self.overall_time_elapsed = time.clock() - start
+            step_time = time.clock() - start
+            print("Step Time: ", step_time)
 
         # self.output_data()
 
@@ -923,37 +941,37 @@ class Walker(Agent):
             return [(x, y) for x in xs for y in ys]  # be aware these will be in reverse order from the point to current
 
     def generic_movement(self, target):
-        print("Generic Goal Set!")
+        # print("Generic Goal Set!")
         goal = target
         current_x, current_y = self.pos
         goal_x, goal_y = goal
 
         if self.pos != goal:
             if current_x > goal_x:
-                print("goal is:", goal)
+                # print("goal is:", goal)
                 self.next_move = ((current_x - 1), current_y)
                 self.check_for_obstacles(self.next_move)
                 self.model.grid.move_agent(self, self.next_move)
 
             elif current_x < goal_x:
-                print("goal is:", goal)
+                # print("goal is:", goal)
                 self.next_move = ((current_x + 1), current_y)
                 self.model.grid.move_agent(self, self.next_move)
 
             if current_y > goal_y:
-                print("goal is:", goal)
+                # print("goal is:", goal)
                 self.next_move = (current_x, (current_y - 1))
                 self.check_for_obstacles(self.next_move)
                 self.model.grid.move_agent(self, self.next_move)
 
             elif current_y < goal_y:
-                print("goal is:", goal)
+                # print("goal is:", goal)
                 self.next_move = (current_x, (current_y + 1))
                 self.check_for_obstacles(self.next_move)
                 self.model.grid.move_agent(self, self.next_move)
 
         if self.pos == goal:
-            print("Generic Goal Reached!")
+            # print("Generic Goal Reached!")
             return True  # not quite sure how to use this yet
 
     def check_for_obstacles(self, cell):  # no longer used, generic obstacle checking
@@ -1210,8 +1228,9 @@ class Walker(Agent):
 
                 if self.plan_acquired:
                     next_step = self.planned_path.pop(0)
-                    self.model.grid.move_agent(self, next_step)
+                    # self.model.grid.move_agent(self, next_step)
                     # print("Took my next step...")
+                    self.generic_movement(next_step)
 
                     self.open_box()
                     self.pickup_item()
@@ -1225,9 +1244,6 @@ class Walker(Agent):
                 # print("Setting new goal.")
                 self.goal_reached = False
                 self.plan_acquired = False
-
-            self.overall_time_elapsed = time.clock() - start
-            print("Total Time Elapsed:", self.overall_time_elapsed)
 
             # self.output_data()
             step_time = time.clock() - start
