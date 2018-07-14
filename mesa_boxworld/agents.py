@@ -1,5 +1,8 @@
 import random
 import math
+import csv
+import time
+# import pandas as pd
 
 from mesa import Agent
 from queue import PriorityQueue
@@ -28,9 +31,9 @@ class Walker(Agent):
     steps_memory = []  # not currently used
     obstacle_present = False
     normal_navigation = True
-    navigation_mode = 1
+    navigation_mode = 2
     score = 0
-    items_picked_up=0
+    items_picked_up = 0
     inventory = {}
 
     # for debugging
@@ -39,31 +42,68 @@ class Walker(Agent):
     quick_verbose = False
 
     def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
-                 able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True, navigation_mode=2,
-                 score=0, inventory={}, items_picked_up=0):
+                 able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True,
+                 score=0, inventory={}, items_picked_up=0, navigation_mode=1):
         super().__init__(pos, model)
 
+        # AGENT NOTE: IT ALWAYS TRAVELS ALONG ITS Y AXIS BEFORE ITS X AXIS
+
+        # Bug Notes:
+        # Sidestepping has been reduced to +1, doesn't seem to cause an issue for now
+        # A* needs some work, as it zooms about too much at the moment
+
         self.moore = moore
-        self.pos = pos
-        self.stepCount = stepCount
-        self.goal = goal
+        self.filename = random.randint(1,1001)
         self.next_move = next_move
-        # self.avoidance_goal = avoidance_goal
         self.able_to_move = able_to_move
         self.steps_memory = steps_memory
         self.obstacle_present = obstacle_present
         self.normal_navigation = normal_navigation
         self.navigation_mode = navigation_mode
+
+        self.delib_verbose = False
+        self.completed = False
+        self.plan_acquired = False
+
+        self.pos = pos
+        self.stepCount = stepCount
+        self.goal = goal
         self.score = score
         self.inventory = inventory
         self.items_picked_up = items_picked_up
-        # self.passable_nodes = []
 
         self.closed_box_list = closed_box_list
         self.closed_box_list = self.model.all_boxes  # this used to be set to the full box list, but now agent = blind
         self.open_box_list = open_box_list
 
-        # AGENT NOTE: IT ALWAYS TRAVELS ALONG ITS Y AXIS BEFORE ITS X AXIS?
+        # --------------------------- Metacognitive Inputs: General ----------------------------
+        self.planned_path = []
+        self.planned_path_cost = []
+        self.current_step_time = 0
+        # self.overall_time_elapsed = 0
+        self.planning_steps_taken = 0
+
+        # things we want to track are:
+        # program run time - is it going on too long? What are the average completion times for the current map?
+        # step length (time) - how long is each step taking? Too long?
+        # how much printing is being done - if performance is poor, are we explaining ourselves enough?
+        # distance to set goal - does this increase at any point? Do we have to move further away to get closer?
+        # proximity of nearby obstacles - roughly how many obstacles are nearby? a lot? none? Any between here and
+            # our goal? (Crowdedness)
+        # current score
+        # amount of memory being used - particularly important if we make large-scale calculations for deliberation
+        # where have we been? - step memory that is restricted to a limited size
+
+        # -------------------------- Metacognitive Transformed Outputs -------------------------
+
+        # time performance - each step as a function of total program time (can't be a fraction as this will get
+        # infinitely small?)
+        # fault monitoring - are we stuck?
+        # number of steps as a ratio to distance to goal (smaller is better)
+        # current score (next version applications!)
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    # REACTIVE NAVIGATION - VARIATION ON BUG0 ALGORITHM
 
     def random_move(self):
         '''
@@ -102,23 +142,30 @@ class Walker(Agent):
     def set_goal(self):
 
         distances = self.calculate_box_distances_from_current_pos()
-        furthest_box = max(distances.keys(), key=(lambda k: distances[k]))
-        closest_box = min(distances.keys(), key=(lambda k: distances[k]))
-        if self.distance_verbose == True:
-            print("Closest Box is: ", closest_box)
+        # furthest_box = max(distances.keys(), key=(lambda k: distances[k]))
+        if self.closed_box_list:
+            # print("min function arg:", distances.keys())
+            closest_box = min(distances.keys(), key=(lambda k: distances[k]))
+            if len(self.closed_box_list) == 0:
+                closest_box = self.closed_box_list[0]
+            # if self.distance_verbose == True:
+            # print("Closest Box is: ", closest_box)
 
-        box_goal = closest_box
-        if self.distance_verbose == True:
+            box_goal = closest_box
+            # if self.distance_verbose == True:
             print("Goal Box is: ", box_goal)
 
-        goal_coords = self.model.all_boxes[box_goal]
-        if self.distance_verbose == True:
+            goal_coords = self.model.all_boxes[box_goal]
+            # if self.distance_verbose == True:
             print("Goal coordinates are:", goal_coords)
 
-        self.goal = goal_coords  # sets the global variable 'goal' to the result of boxgoal
-        self.goal_reached = False
-        if self.distance_verbose == True:
-            print("Goal is: ", self.goal)
+            self.goal = goal_coords  # sets the global variable 'goal' to the result of boxgoal
+            self.goal_reached = False
+            # if self.distance_verbose == True:
+            # print("Goal is: ", self.goal)
+        if not self.closed_box_list:
+            self.goal = self.goal
+            print("There's nowhere left to go! I win!")
 
     def reactive_nav(self):
 
@@ -192,64 +239,6 @@ class Walker(Agent):
         elif not self.normal_navigation:
             print("I'm trying to use simple_move_goal but I'm not allowed to.")
 
-    def generic_movement(self, target):
-        print("Generic Goal Set!")
-        goal = target
-        current_x, current_y = self.pos
-        goal_x, goal_y = goal
-
-        if self.pos != goal:
-            if current_x > goal_x:
-                print("goal is:", goal)
-                self.next_move = ((current_x - 1), current_y)
-                self.check_for_obstacles(self.next_move)
-                self.model.grid.move_agent(self, self.next_move)
-
-            elif current_x < goal_x:
-                print("goal is:", goal)
-                self.next_move = ((current_x + 1), current_y)
-                self.model.grid.move_agent(self, self.next_move)
-
-            if current_y > goal_y:
-                print("goal is:", goal)
-                self.next_move = (current_x, (current_y - 1))
-                self.check_for_obstacles(self.next_move)
-                self.model.grid.move_agent(self, self.next_move)
-
-            elif current_y < goal_y:
-                print("goal is:", goal)
-                self.next_move = (current_x, (current_y + 1))
-                self.check_for_obstacles(self.next_move)
-                self.model.grid.move_agent(self, self.next_move)
-
-        if self.pos == goal:
-            print("Generic Goal Reached!")
-            return True  # not quite sure how to use this yet
-
-    def check_for_obstacles(self, cell):  # no longer used, generic obstacle checking
-        next_cell = self.model.grid.get_cell_list_contents([cell])
-        potential_obstacle = [obj for obj in next_cell
-                              if isinstance(obj, Obstacle)]
-        if len(potential_obstacle) > 0:
-            print("Check for Obstacles = True!")
-            self.obstacle_present = True
-            return True
-        elif len(potential_obstacle) == 0:
-            self.obstacle_present = False
-            return False
-
-    def points_between(self, p1, p2):
-        if p1[0] <= p2[0]:
-            xs = range(p1[0] + 1, p2[0]) or [p1[0]]
-            ys = range(p1[1] + 1, p2[1]) or [p1[1]]
-            return [(x, y) for x in xs for y in ys]
-        elif p1[0] > p2[0]:
-            swapped_p1 = p2
-            swapped_p2 = p1
-            xs = range(swapped_p1[0] + 1, swapped_p2[0]) or [swapped_p1[0]]
-            ys = range(swapped_p1[1] + 1, swapped_p2[1]) or [swapped_p1[1]]
-            return [(x, y) for x in xs for y in ys]  # be aware these will be in reverse order from the point to current
-
     def check_for_freedom(self):
         obstacle_count = 0
         goal = self.goal
@@ -279,95 +268,30 @@ class Walker(Agent):
     def follow_wall(self, blocked_direction):
         print("Following wall, blocked direction: ", blocked_direction)
         current_x, current_y = self.pos
-        obstacle_width = 2  # this might need to be 2
-        # get the neighbourhood around self.pos
 
         if blocked_direction == "north":
-            # n = 6
-            # x, y = current_x, current_y
-            # first_goal = ((x - 6), y)
-            # self.generic_movement(first_goal)
-            # print("Avoidance Move Left")
-            # avoidance_steps = n
-            # second_goal = (current_x, (current_y + obstacle_width))
-            # if self.generic_movement(second_goal):
-            #     print("Avoidance Clearance of Obstacle")
-            # third_goal = ((current_x + avoidance_steps), current_y)
-            # if self.generic_movement(third_goal):
-            #     print("Avoidance Return to Spot")
-            # return
             null_goal = ((current_x - 6), (current_y + 2))
             if self.generic_movement(null_goal):
                 self.normal_navigation = True
             return
 
         elif blocked_direction == "east":
-            # n = 6
-            # x, y = current_x, current_y
-            # first_goal = (x, y + 6)
-            # self.generic_movement(first_goal)
-            # print("Avoidance Move Left")
-            # avoidance_steps = n
-            # second_goal = ((current_x + obstacle_width), current_y)
-            # if self.generic_movement(second_goal):
-            #     print("Avoidance Clearance of Obstacle")
-            # third_goal = (current_x, (current_y - avoidance_steps))
-            # if self.generic_movement(third_goal):
-            #     print("Avoidance Return to Spot")
-            # return
             null_goal = ((current_x + 2), (current_y + 6))
             if self.generic_movement(null_goal):
                 self.normal_navigation = True
             return
 
         elif blocked_direction == "south":
-            # n = 6
-            # x, y = current_x, current_y
-            # first_goal = ((x - 6), y)
-            # self.generic_movement(first_goal)
-            # print("Avoidance Move Left")
-            # avoidance_steps = n
-            # second_goal = (current_x, (current_y - obstacle_width))
-            # if self.generic_movement(second_goal):
-            #     print("Avoidance Clearance of Obstacle")
-            # third_goal = ((current_x - avoidance_steps), current_y)
-            # if self.generic_movement(third_goal):
-            #     print("Avoidance Return to Spot")
-            # return
-
             null_goal = ((current_x + 6), (current_y - 2))
             if self.generic_movement(null_goal):
                 self.normal_navigation = True
             return
 
         elif blocked_direction == "west":
-            # n = 6
-            # x, y = current_x, current_y
-            # first_goal = (x, y - 6)
-            # self.generic_movement(first_goal)
-            # print("Avoidance Move Left")
-            # avoidance_steps = n
-            # second_goal = ((current_x - obstacle_width), current_y)
-            # if self.generic_movement(second_goal):
-            #     print("Avoidance Clearance of Obstacle")
-            # third_goal = (current_x, (current_y + avoidance_steps))
-            # if self.generic_movement(third_goal):
-            #     print("Avoidance Return to Spot")
-            # return
-
             null_goal = (current_x - 2), (current_y - 6)
             if self.generic_movement(null_goal):
                 self.normal_navigation = True
             return
-
-        # self.check_for_freedom()
-        # if self.check_for_freedom():
-        #     print("I moved around it!")
-        #     self.normal_navigation = True
-        # if not self.check_for_freedom():
-        #     print("I fucked up!")
-        #     while not self.check_for_freedom():
-        #         self.random_move()
 
     # def follow_wall(self, blocked_direction):
     #     print("Following wall")
@@ -513,65 +437,6 @@ class Walker(Agent):
     #             print("I fucked up!")
     #             # some kind of recursion
 
-    def directional_blockage_checker(self):
-        current_x, current_y = self.pos
-        north_cell = (current_x, (current_y + 1))
-        north_east_cell = ((current_x + 1), (current_y + 1))
-        east_cell = ((current_x + 1), current_y)
-        south_east_cell = ((current_x + 1), (current_y - 1))
-        south_cell = (current_x, (current_y - 1))
-        south_west_cell = ((current_x - 1), (current_y - 1))
-        west_cell = ((current_x - 1), current_y)
-        north_west_cell = ((current_x - 1), (current_y + 1))
-
-        if self.check_for_obstacles(north_cell):
-            print("North blocked.")
-            return "north"
-        if self.check_for_obstacles(north_east_cell):
-            if not self.check_for_obstacles(north_cell):
-                if not self.check_for_obstacles(north_west_cell):
-                    if not self.check_for_obstacles(west_cell):
-                        print("North East blocked.")
-                        return "north_east"
-        if self.check_for_obstacles(east_cell):
-            print("East blocked.")
-            return "east"
-        if self.check_for_obstacles(south_east_cell):
-            if not self.check_for_obstacles(south_cell):
-                if not self.check_for_obstacles(south_west_cell):
-                    if not self.check_for_obstacles(east_cell):
-                        print("South East blocked.")
-                        return "south_east"
-        if self.check_for_obstacles(south_cell):
-            print("South blocked.")
-            return "south"
-        if self.check_for_obstacles(south_west_cell):
-            if not self.check_for_obstacles(south_cell):
-                if not self.check_for_obstacles(south_east_cell):
-                    if not self.check_for_obstacles(west_cell):
-                        print("South West blocked.")
-                        return "south_east"
-        if self.check_for_obstacles(west_cell):
-            print("West blocked.")
-            return "west"
-        if self.check_for_obstacles(north_west_cell):
-            if not self.check_for_obstacles(north_cell):
-                if not self.check_for_obstacles(north_east_cell):
-                    if not self.check_for_obstacles(east_cell):
-                        print("North West blocked.")
-                        return "north_west"
-
-        else:
-            if not self.check_for_obstacles(north_cell):
-                if not self.check_for_obstacles(north_east_cell):
-                    if not self.check_for_obstacles(north_west_cell):
-                        if not self.check_for_obstacles(south_cell):
-                            if not self.check_for_obstacles(south_east_cell):
-                                if not self.check_for_obstacles(south_west_cell):
-                                    if not self.check_for_obstacles(west_cell):
-                                        if not self.check_for_obstacles(east_cell):
-                                            return "local_free"
-
     # def blocked_north(self):
     #     current_x, current_y = self.pos
     #
@@ -639,11 +504,6 @@ class Walker(Agent):
         #     self.normal_navigation = True
         # return
 
-        # self.check_for_freedom()
-        # if self.check_for_freedom():
-        #     self.normal_navigation = True
-        # return
-
         if blocked_direction == "north":
             null_goal = self.avoidance_goal_calculator("north", self.pos)
             print("Null Goal: ", null_goal)
@@ -661,8 +521,6 @@ class Walker(Agent):
                             self.normal_navigation = True
                     else:
                         return
-                    # blocked = self.directional_blockage_checker()
-                    # self.bug_navigation(blocked)
                 return
             return
 
@@ -682,8 +540,6 @@ class Walker(Agent):
                             self.normal_navigation = True
                     else:
                         return
-                    # blocked = self.directional_blockage_checker()
-                    # self.bug_navigation(blocked)
                 return
             return
 
@@ -703,8 +559,6 @@ class Walker(Agent):
                             self.normal_navigation = True
                     else:
                         return
-                    # blocked = self.directional_blockage_checker()
-                    # self.bug_navigation(blocked)
                 return
             return
 
@@ -724,8 +578,6 @@ class Walker(Agent):
                             self.normal_navigation = True
                     else:
                         return
-                    # blocked = self.directional_blockage_checker()
-                    # self.bug_navigation(blocked)
                 return
             return
 
@@ -745,8 +597,6 @@ class Walker(Agent):
                             self.normal_navigation = True
                     else:
                         return
-                    # blocked = self.directional_blockage_checker()
-                    # self.bug_navigation(blocked)
                 return
             return
 
@@ -766,8 +616,6 @@ class Walker(Agent):
                             self.normal_navigation = True
                     else:
                         return
-                    # blocked = self.directional_blockage_checker()
-                    # self.bug_navigation(blocked)
                 return
             return
 
@@ -787,8 +635,6 @@ class Walker(Agent):
                             self.normal_navigation = True
                     else:
                         return
-                    # blocked = self.directional_blockage_checker()
-                    # self.bug_navigation(blocked)
                 return
             return
 
@@ -809,37 +655,47 @@ class Walker(Agent):
                             self.normal_navigation = True
                     else:
                         return
-                    # blocked = self.directional_blockage_checker()
-                    # self.bug_navigation(blocked)
                 return
             return
 
-    def left_right_sidestep(self, blocked_direction, current_position):
+    def left_right_sidestep(self, blocked_direction, current_position):  # Does this need fixing?
         current_x, current_y = current_position
 
         if blocked_direction == "north":
             print("Sidestepping")
-            sidestep = (current_x, (current_y + 2))
-            self.model.grid.move_agent(self, sidestep)
-            return True
+            sidestep = (current_x, (current_y + 1))
+            if not self.check_for_obstacles(sidestep):
+                self.model.grid.move_agent(self, sidestep)
+                return True
+            else:
+                print("I can't sidestep, I'm stuck!")  # possibly then random move until a freedom check allows it?
 
         elif blocked_direction == "east":
             print("Sidestepping")
-            sidestep = ((current_x + 2), current_y)
-            self.model.grid.move_agent(self, sidestep)
-            return True
+            sidestep = ((current_x + 1), current_y)
+            if not self.check_for_obstacles(sidestep):
+                self.model.grid.move_agent(self, sidestep)
+                return True
+            else:
+                print("I can't sidestep, I'm stuck!")  # possibly then random move until a freedom check allows it?
 
         elif blocked_direction == "south":
             print("Sidestepping")
-            sidestep = (current_x, (current_y - 2))
-            self.model.grid.move_agent(self, sidestep)
-            return True
+            sidestep = (current_x, (current_y - 1))
+            if not self.check_for_obstacles(sidestep):
+                self.model.grid.move_agent(self, sidestep)
+                return True
+            else:
+                print("I can't sidestep, I'm stuck!")  # possibly then random move until a freedom check allows it?
 
         elif blocked_direction == "west":
             print("Sidestepping")
-            sidestep = ((current_x - 2), current_y)
-            self.model.grid.move_agent(self, sidestep)
-            return True
+            sidestep = ((current_x - 1), current_y)
+            if not self.check_for_obstacles(sidestep):
+                self.model.grid.move_agent(self, sidestep)
+                return True
+            else:
+                print("I can't sidestep, I'm stuck!")  # possibly then random move until a freedom check allows it?
 
     def avoidance_goal_calculator(self, blocked_direction, current_position):
         current_x, current_y = current_position
@@ -896,6 +752,48 @@ class Walker(Agent):
                 print("Avoidance Goal Set: ", ((current_x), (current_y - 1)))
                 return ((current_x), (current_y - 1))
 
+    def SYSTEM_ALPHA(self):
+        start = time.clock()
+
+        if self.stepCount == 0:  # this should be done once at the start, then again when a box is opened
+            self.calculate_box_distances_from_current_pos()
+            self.set_goal()
+            self.stepCount += 1
+            # EACH STEP SHOULD RECORD THE AGENT'S POSITION AND USE POP FOR MEMORY LIMIT?
+        else:
+            self.stepCount += 1  # This is not needed as the agent can access the step number through other means??
+            # print("Goal Reached?", self.goal_reached)
+            if not self.goal_reached:
+                time_start = time.clock()
+                self.reactive_nav()
+                time_elapsed = (time.clock() - time_start)
+                self.current_step_time = time_elapsed
+                print("Reactive Time: ", self.current_step_time)
+                self.open_box()
+                self.pickup_item()
+                # print("Current Step:", self.pos)
+                # print("Next Step: ", self.next_move)
+                # print("Current Goal:", self.goal)
+
+            if self.goal_reached:
+                self.calculate_box_distances_from_current_pos()
+                self.set_goal()
+                print("Current Inventory: ", self.inventory)
+                print("Current Score: ", self.score)
+                print("Step Count: ", self.stepCount)
+                # print("Setting new goal.")
+                self.goal_reached = False
+                if self.box_open_verbose:
+                    print("Full Box List: ", self.model.full_boxes)
+
+            step_time = time.clock() - start
+            print("Step Time: ", step_time)
+
+        # self.output_data()
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    # UTILITY FUNCTIONS - GENERAL
+
     def open_box(self):
         # If there is a Box available at the current location, open it.
         x, y = self.pos
@@ -931,9 +829,7 @@ class Walker(Agent):
                 print("Open Box List: ", self.open_box_list)
 
             # delete that key/value pair from the full boxes list  -  THIS IS ONLY NEEDED WHEN THE ITEMS ARE CONSUMED
-            # del self.model.full_boxes[current_full_box_in_list]
-
-            # NEED TO ADD IN ADDING ITEM FOUND PLUS COLOUR TO AN OPEN LIST IN THE AGENT'S KNOWLEDGE/INVENTORY
+            del self.model.full_boxes[current_box_in_list]  # possible bug here
 
     def pickup_item(self):
         x, y = self.pos
@@ -946,52 +842,198 @@ class Walker(Agent):
         yellow_item = [obj for obj in this_cell
                        if isinstance(obj, yellowItem)]
 
-        current_item_coords = self.pos
-
         if len(pink_item) > 0:  # if there is a box here
-            item_to_consume = random.choice(current_item_coords)
+            item_to_consume = random.choice(pink_item)
             item_colour = "pink"
-
+            # print("Item to consume: ", item_to_consume)
             self.model.grid._remove_agent(self.pos, item_to_consume)
             self.score += 2
             self.items_picked_up += 1
             self.inventory[self.items_picked_up] = item_colour
 
         elif len(yellow_item) > 0:  # if there is a box here
-            item_to_consume = random.choice(current_item_coords)
+            item_to_consume = random.choice(yellow_item)
             item_colour = "yellow"
-
+            # print("Item to consume: ", item_to_consume)
             self.model.grid._remove_agent(self.pos, item_to_consume)
             self.score -= 1
             self.items_picked_up += 1
             self.inventory[self.items_picked_up] = item_colour
 
         elif len(blue_item) > 0:
-            item_to_consume = random.choice(current_item_coords)
+            item_to_consume = random.choice(blue_item)
             item_colour = "blue"
-
+            # print("Item to consume: ", item_to_consume)
             self.model.grid._remove_agent(self.pos, item_to_consume)
             self.score += 1
             self.items_picked_up += 1
             self.inventory[self.items_picked_up] = item_colour
 
+    def directional_blockage_checker(self):
+        current_x, current_y = self.pos
+        north_cell = (current_x, (current_y + 1))
+        north_east_cell = ((current_x + 1), (current_y + 1))
+        east_cell = ((current_x + 1), current_y)
+        south_east_cell = ((current_x + 1), (current_y - 1))
+        south_cell = (current_x, (current_y - 1))
+        south_west_cell = ((current_x - 1), (current_y - 1))
+        west_cell = ((current_x - 1), current_y)
+        north_west_cell = ((current_x - 1), (current_y + 1))
+
+        if self.check_for_obstacles(north_cell):
+            print("North blocked.")
+            return "north"
+        if self.check_for_obstacles(north_east_cell):
+            if not self.check_for_obstacles(north_cell):
+                if not self.check_for_obstacles(north_west_cell):
+                    if not self.check_for_obstacles(west_cell):
+                        print("North East blocked.")
+                        return "north_east"
+        if self.check_for_obstacles(east_cell):
+            print("East blocked.")
+            return "east"
+        if self.check_for_obstacles(south_east_cell):
+            if not self.check_for_obstacles(south_cell):
+                if not self.check_for_obstacles(south_west_cell):
+                    if not self.check_for_obstacles(east_cell):
+                        print("South East blocked.")
+                        return "south_east"
+        if self.check_for_obstacles(south_cell):
+            print("South blocked.")
+            return "south"
+        if self.check_for_obstacles(south_west_cell):
+            if not self.check_for_obstacles(south_cell):
+                if not self.check_for_obstacles(south_east_cell):
+                    if not self.check_for_obstacles(west_cell):
+                        print("South West blocked.")
+                        return "south_east"
+        if self.check_for_obstacles(west_cell):
+            print("West blocked.")
+            return "west"
+        if self.check_for_obstacles(north_west_cell):
+            if not self.check_for_obstacles(north_cell):
+                if not self.check_for_obstacles(north_east_cell):
+                    if not self.check_for_obstacles(east_cell):
+                        print("North West blocked.")
+                        return "north_west"
+
+        else:
+            if not self.check_for_obstacles(north_cell):
+                if not self.check_for_obstacles(north_east_cell):
+                    if not self.check_for_obstacles(north_west_cell):
+                        if not self.check_for_obstacles(south_cell):
+                            if not self.check_for_obstacles(south_east_cell):
+                                if not self.check_for_obstacles(south_west_cell):
+                                    if not self.check_for_obstacles(west_cell):
+                                        if not self.check_for_obstacles(east_cell):
+                                            return "local_free"
+
+    def points_between(self, p1, p2):
+        if p1[0] <= p2[0]:
+            xs = range(p1[0] + 1, p2[0]) or [p1[0]]
+            ys = range(p1[1] + 1, p2[1]) or [p1[1]]
+            return [(x, y) for x in xs for y in ys]
+        elif p1[0] > p2[0]:
+            swapped_p1 = p2
+            swapped_p2 = p1
+            xs = range(swapped_p1[0] + 1, swapped_p2[0]) or [swapped_p1[0]]
+            ys = range(swapped_p1[1] + 1, swapped_p2[1]) or [swapped_p1[1]]
+            return [(x, y) for x in xs for y in ys]  # be aware these will be in reverse order from the point to current
+
+    def generic_movement(self, target):
+        # print("Generic Goal Set!")
+        goal = target
+        current_x, current_y = self.pos
+        goal_x, goal_y = goal
+
+        if self.pos != goal:
+            if current_x > goal_x:
+                # print("goal is:", goal)
+                self.next_move = ((current_x - 1), current_y)
+                self.check_for_obstacles(self.next_move)
+                self.model.grid.move_agent(self, self.next_move)
+
+            elif current_x < goal_x:
+                # print("goal is:", goal)
+                self.next_move = ((current_x + 1), current_y)
+                self.model.grid.move_agent(self, self.next_move)
+
+            if current_y > goal_y:
+                # print("goal is:", goal)
+                self.next_move = (current_x, (current_y - 1))
+                self.check_for_obstacles(self.next_move)
+                self.model.grid.move_agent(self, self.next_move)
+
+            elif current_y < goal_y:
+                # print("goal is:", goal)
+                self.next_move = (current_x, (current_y + 1))
+                self.check_for_obstacles(self.next_move)
+                self.model.grid.move_agent(self, self.next_move)
+
+        if self.pos == goal:
+            # print("Generic Goal Reached!")
+            return True  # not quite sure how to use this yet
+
+    def check_for_obstacles(self, cell):  # no longer used, generic obstacle checking
+        next_cell = self.model.grid.get_cell_list_contents([cell])
+        potential_obstacle = [obj for obj in next_cell
+                              if isinstance(obj, Obstacle)]
+        if len(potential_obstacle) > 0:
+            print("Check for Obstacles = True!")
+            self.obstacle_present = True
+            return True
+        elif len(potential_obstacle) == 0:
+            self.obstacle_present = False
+            return False
+
+    def output_data(self):
+
+        if self.navigation_mode == 1:
+
+            # open the csv file
+            ofile = open('%d.csv' % (self.filename), "a")
+            writer = csv.writer(ofile, delimiter=',')
+
+            distance_to_goal = self.get_distance(self.pos, self.goal, False)
+
+            writer.writerow("-----------")
+            writer.writerow([self.stepCount])
+            writer.writerow([self.score])
+            writer.writerow([self.current_step_time])
+            writer.writerow([distance_to_goal])
+            writer.writerow([self.overall_time_elapsed])
+
+        elif self.navigation_mode == 2:
+
+            # open the csv file
+            ofile = open('%d.csv' % (self.filename), "a")
+            writer = csv.writer(ofile, delimiter=',')
+
+            path_length = len(self.planned_path)
+            distance_to_goal = self.get_distance(self.pos, self.goal, False)
+
+            writer.writerow("------------")
+            writer.writerow([self.stepCount])
+            writer.writerow([path_length])
+            writer.writerow([self.planned_path_cost])
+            writer.writerow([self.score])
+            writer.writerow([self.current_step_time])
+            writer.writerow([distance_to_goal])
+            writer.writerow([self.planning_steps_taken])
+            writer.writerow([self.overall_time_elapsed])
+
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    # DELIBERATIVE NAVIGATION - A* ALGORITHM
 
     def deliberative_nav(self):
         # self.get_nodes()  # sets the global 'self.passable_nodes' to the list of non-obstacle map points
-        came_from, cost_so_far = self.astar_search(self.pos, self.goal)
-        path = self.reconstruct_path(came_from, self.pos, self.goal)
-
+        came_from, cost_so_far, planning_step = self.astar_search(self.pos, self.goal)
+        path, path_cost = self.reconstruct_path(came_from, self.pos, self.goal)
+        print("Planning steps taken: ", planning_step)
         # now we need a navigation system to take this path and use it
         # we also need to time this process so that we can have feedback on it
 
-        # for i in range(len(path)):
-        #     next_step = path[i]
-        #     self.model.grid.move_agent(self, next_step)
-
-        self.use_path(path)
-        self.goal_reached = True
-
+        return path, path_cost, planning_step
 
         # generate a list of possible next steps (children) toward the goal from current pos
         # store in ordered list (priority queue), based on distance to goal, closest first
@@ -1026,60 +1068,12 @@ class Walker(Agent):
                 forbidden_nodes = self.model.map_five_obstacles
                 if value not in forbidden_nodes:
                     passable_nodes.append(value)
+            elif map_choice == "six":
+                forbidden_nodes = self.model.map_six_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
 
         return passable_nodes
-
-    # convert grid to graph using nodes
-    # def get_nodes(self):  # return nodes possible to navigate (not including obstacles)
-    #     all_nodes = self.model.grid_list
-    #     passable_nodes = []
-    #     if self.model.map_choice == "one":
-    #         for item in range(len(self.model.map_one_obstacles) - 1):
-    #             value = self.model.map_one_obstacles[item]
-    #             print("item: ", item)
-    #             print("get_nodes value: ", value)
-    #             if value in all_nodes:
-    #                 all_nodes.remove(value)
-    #                 print("Removed Value")
-    #
-    #     elif self.model.map_choice == "two":
-    #         for item in range(len(self.model.map_two_obstacles) - 1):
-    #             value = self.model.map_one_obstacles[item]
-    #             print("item: ", item)
-    #             print("get_nodes value: ", value)
-    #             if value in all_nodes:
-    #                 all_nodes.remove(value)
-    #                 print("Removed Value")
-    #
-    #     elif self.model.map_choice == "three":
-    #         for item in range(len(self.model.map_three_obstacles) - 1):
-    #             value = self.model.map_one_obstacles[item]
-    #             print("item: ", item)
-    #             print("get_nodes value: ", value)
-    #             if value in all_nodes:
-    #                 all_nodes.remove(value)
-    #                 print("Removed Value")
-    #
-    #     elif self.model.map_choice == "four":
-    #         for item in range(len(self.model.map_four_obstacles) - 1):
-    #             value = self.model.map_one_obstacles[item]
-    #             print("item: ", item)
-    #             print("get_nodes value: ", value)
-    #             if value in all_nodes:
-    #                 all_nodes.remove(value)
-    #                 print("Removed Value")
-    #
-    #     elif self.model.map_choice == "five":
-    #         for item in range(len(self.model.map_five_obstacles) - 1):
-    #             value = self.model.map_one_obstacles[item]
-    #             print("item: ", item)
-    #             print("get_nodes value: ", value)
-    #             if value in all_nodes:
-    #                 all_nodes.remove(value)
-    #                 print("Removed Value")
-    #
-    #     # passable_nodes = all_nodes
-    #     return passable_nodes
 
     def passable(self, id):
         passable_nodes = self.get_nodes()
@@ -1095,22 +1089,28 @@ class Walker(Agent):
     def get_neighbours(self, id):
         (x, y) = id
         results = [(x+1, y), (x, y-1), (x-1, y), (x, y+1)]
-        print("Neighbours of", id, ": ", results)
+        if self.delib_verbose:
+            print("Neighbours of", id, ": ", results)
         if (x + y) % 2 == 0: results.reverse() # aesthetics
         passable_results =[]
 
         for x in range(len(results)):
             value = results[x]
-            print("Value:", value)
+            # if self.delib_verbose:
+            #     print("Value:", value)
             if self.passable(value):
-                print("Value is Passable")
+                # if self.delib_verbose:
+                    # print("Value is Passable")
                 if self.in_bounds(value):
-                    print("Value is in Bounds")
+                    # if self.delib_verbose:
+                    #     print("Value is in Bounds")
                     passable_results.append(value)
-                    print("Neighbour Added.")
+                    if self.delib_verbose:
+                        print("Neighbour Added.")
 
         # results = filter(self.passable, results)  # need to find a way to check if the neighbours are passable or not
-        print("Passable Neighbours: ", passable_results)
+        if self.delib_verbose:
+            print("Passable Neighbours: ", passable_results)
         return passable_results
 
     def get_distance(self, current, target, euclid=False):
@@ -1145,27 +1145,36 @@ class Walker(Agent):
         distance = self.get_distance(a, b, euclid=False)
         return 3*abs(distance)
 
-    def astar_search(self, start, goal):  # doesn't actually use node list as we check for passability in neighbour generator
+    def astar_search(self, start, goal):  # doesn't actually use node list as we check for passability in neighbours
         frontier = PriorityQueue()
-        print("Established Frontier Q")
+        if self.delib_verbose:
+            print("Established Frontier Q")
         frontier.put(start, 0)
-        print("Put start location")
+        if self.delib_verbose:
+            print("Put start location")
         came_from = {}
-        print("Opened Came From")
+        if self.delib_verbose:
+            print("Opened Came From")
         cost_so_far = {}
-        print("Opened Cost So Far")
+        if self.delib_verbose:
+            print("Opened Cost So Far")
         came_from[start] = None
         cost_so_far[start] = 0
+        planning_step = 0
 
         while not frontier.empty():
-            print("Frontier isn't empty")
+            planning_step += 1
+            if self.delib_verbose:
+                print("Frontier isn't empty")
             current = frontier.get()
-            print("Current:", current)
+            if self.delib_verbose:
+                print("Current:", current)
             if current == goal:
                 break
 
             for next in self.get_neighbours(current):
-                print("Neighbours of current are:", self.get_neighbours(current))
+                if self.delib_verbose:
+                    print("Neighbours of current are:", self.get_neighbours(current))
                 new_cost = cost_so_far[current] + self.get_cost(current, next)
                 if next not in cost_so_far or new_cost < cost_so_far [next]:
                     cost_so_far[next] = new_cost
@@ -1173,9 +1182,10 @@ class Walker(Agent):
                     frontier.put(next, priority)
                     came_from[next] = current
 
-        print("Came From List: ", came_from)
-        print("Cost So Far: ", cost_so_far)
-        return came_from, cost_so_far
+        if self.delib_verbose:
+            print("Came From List: ", came_from)
+            print("Cost So Far: ", cost_so_far)
+        return came_from, cost_so_far, planning_step
 
     def reconstruct_path(self, came_from, start, goal):
         current = goal
@@ -1187,16 +1197,58 @@ class Walker(Agent):
         path.append(start)  # optional
         path.reverse()  # optional
         print("Start Point:", self.pos, "Goal Point: ", self.goal)
-        print("Reconstructed Path: ", path)
-        return path
+        print("Path Length: ", len(path)) # "Reconstructed Path: ", path,
+        path_cost = 0
+        for each in range(len(path)):
+            coord_cost = self.get_cost(path[each], self.goal)
+            path_cost = path_cost + coord_cost
+        print("Successful Path Cost: ", path_cost)
+        return path, path_cost
 
-    def use_path(self, path):
-        for i in range(len(path)):
-            next_step = path[i]
-            self.model.grid.move_agent(self, next_step)
+    def SYSTEM_BETA(self):
+        start = time.clock()
+        if self.stepCount == 0:
+            self.calculate_box_distances_from_current_pos()
+            self.set_goal()
+            self.stepCount += 1
 
+        else:
+            self.stepCount += 1
+            if not self.goal_reached:
+                if not self.plan_acquired:
+                    time_start = time.clock()
+                    path, path_cost, planning_step = self.deliberative_nav()
+                    self.planned_path = path
+                    self.planned_path_cost = path_cost
+                    self.planning_steps_taken = planning_step
+                    time_elapsed = (time.clock() - time_start)
+                    self.current_step_time = time_elapsed
+                    print("Planning Time Elapsed: ", time_elapsed)
+                    self.plan_acquired = True
 
+                if self.plan_acquired:
+                    next_step = self.planned_path.pop(0)
+                    # self.model.grid.move_agent(self, next_step)
+                    # print("Took my next step...")
+                    self.generic_movement(next_step)
 
+                    self.open_box()
+                    self.pickup_item()
+                    if self.pos == self.goal:
+                        self.goal_reached = True
+
+            if self.goal_reached:
+                self.calculate_box_distances_from_current_pos()
+                self.set_goal()
+                print("Current Inventory: ", self.inventory)
+                # print("Setting new goal.")
+                self.goal_reached = False
+                self.plan_acquired = False
+
+            # self.output_data()
+            step_time = time.clock() - start
+            print("Current Score: ", self.score, "Step Count: ", self.stepCount)
+            print("Step Time:", step_time)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -1205,53 +1257,13 @@ class Walker(Agent):
         A model step. Depending on the Nav Mode being used, either use reactive navigation to reach the closest
         unopened box, or use A* navigation to traverse the map.
         '''
+
+        # Navigation Systems
         if self.navigation_mode == 1:
-            if self.stepCount == 0: # this should be done once at the start, then again when a box is opened
-                self.calculate_box_distances_from_current_pos()
-                self.set_goal()
-                self.stepCount += 1
-                # EACH STEP SHOULD RECORD THE AGENT'S POSITION AND USE POP FOR MEMORY LIMIT?
-            else:
-                self.stepCount += 1  # This is not needed as the agent can access the step number through other means??
-                # print("Goal Reached?", self.goal_reached)
-                if self.goal_reached == False :
-                    self.reactive_nav()
-                    self.open_box()
-                    self.pickup_item()
-                    # print("Current Step:", self.pos)
-                    # print("Next Step: ", self.next_move)
-                    # print("Current Goal:", self.goal)
+            self.SYSTEM_ALPHA()
 
-                if self.goal_reached == True :
-                    self.calculate_box_distances_from_current_pos()
-                    self.set_goal()
-                    print("Current Inventory: ", self.inventory)
-                    print("Current Score: ", self.score)
-                    print("Step Count: ", self.stepCount)
-                    # print("Setting new goal.")
-                    self.goal_reached = False
-                    if self.box_open_verbose == True:
-                        print("Full Box List: ", self.model.full_boxes)
         elif self.navigation_mode == 2:
-            if self.stepCount == 0: # this should be done once at the start, then again when a box is opened
-                self.calculate_box_distances_from_current_pos()
-                self.set_goal()
-                self.stepCount += 1
-                # EACH STEP SHOULD RECORD THE AGENT'S POSITION AND USE POP FOR MEMORY LIMIT?
-            else:
-                self.stepCount += 1
-                if self.goal_reached == False:
-                    self.deliberative_nav()
-
-                if self.goal_reached == True :
-                    self.calculate_box_distances_from_current_pos()
-                    self.set_goal()
-                    print("Current Inventory: ", self.inventory)
-                    print("Current Score: ", self.score)
-                    print("Step Count: ", self.stepCount)
-                    # print("Setting new goal.")
-                    self.goal_reached = False
-
+            self.SYSTEM_BETA()
 
 
 ############################################################################################################

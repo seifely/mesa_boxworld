@@ -5,6 +5,13 @@ from mesa.visualization.UserParam import UserSettableParameter
 from mesa_boxworld.agents import Walker, ClosedBox, OpenedBox, yellowItem, blueItem, pinkItem, Obstacle
 from mesa_boxworld.model import ThirdTestModel
 
+## could change nav mode from here using a slider at the bottom, but then agent would have to read its nav mode
+# from the model file (not a problem but won't help the metacognition, would be for demo purposes only)
+# e.g.
+#   if self.model.nav_mode:
+#       self.navigation = 1
+#   elif not self.nav_move:
+#       self.navigation = 2
 
 def third_test_portrayal(agent):
     if agent is None:
@@ -110,6 +117,7 @@ chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 
 model_params = {#"height": UserSettableParameter('slider', 'Height', 20, 10, 50, 10),
                 #"width": UserSettableParameter('slider', 'Width', 20, 10, 50, 10),
+                "simple": UserSettableParameter('checkbox', 'Low Complexity', True),
                 "initial_walkers": UserSettableParameter('slider', 'Initial Walker Population', 1, 1, 10, 1),
                 # "initial_boxes": UserSettableParameter('slider', 'Initial Box Number', 10, 1, 20, 1),
                 # "initial_items": UserSettableParameter('slider', 'Initial Item Number', 10, 1, 20, 1),
