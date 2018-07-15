@@ -31,7 +31,7 @@ class Walker(Agent):
     steps_memory = []  # not currently used
     obstacle_present = False
     normal_navigation = True
-    navigation_mode = 1
+    navigation_mode = 2
     score = 0
     items_picked_up = 0
     inventory = {}
@@ -43,7 +43,7 @@ class Walker(Agent):
 
     def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
                  able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True,
-                 score=0, inventory={}, items_picked_up=0, navigation_mode=1):
+                 score=0, inventory={}, items_picked_up=0, navigation_mode=2):
         super().__init__(pos, model)
 
         # AGENT NOTE: IT ALWAYS TRAVELS ALONG ITS Y AXIS BEFORE ITS X AXIS
