@@ -120,7 +120,7 @@ class ThirdTestModel(Model):
                                   (10, 4), (16,8), (17,8), (7,18), (18,8), (19,8), (19,7), (19,6), (19,5), (19,4), (19,21), (19,20),
                                   (19,19), (19,18), (20,18), (21,18)]
 
-        self.map_seven_boxes = [(4,19), (1,11), (7,12), (6,2), (12,20), (14,15), (13,9), (16,2), (20,17), (21,5)]
+        self.map_seven_boxes = [(4,19), (1,11), (7,12), (6,0), (12,20), (14,15), (13,9), (16,3), (20,17), (21,5)]
         self.map_seven_obstacles = [(2,20), (2,19), (2,18), (2,17), (2,16), (3,16), (4,16), (5,16), (6,16), (6,20), (6,19),
                                     (6,18), (6,17), (3,13), (3,12), (3,11), (3,10), (3,9), (3,8), (2,8), (11,12), (11,11),
                                     (11,10), (11,9), (11,8), (11,7), (12,12), (13,12), (14,12), (15,12), (16,12), (16,17),
@@ -461,7 +461,7 @@ class ThirdTestModel(Model):
 
         elif self.map_choice == "seven":
             for i in range(len(self.map_seven_obstacles)):
-                x, y = self.map_six_obstacles[i]
+                x, y = self.map_seven_obstacles[i]
                 obstacle = Obstacle((x, y), self)
                 self.grid.place_agent(obstacle, (x, y))
                 self.schedule.add(obstacle)
@@ -469,7 +469,7 @@ class ThirdTestModel(Model):
 
         elif self.map_choice == "eight":
             for i in range(len(self.map_eight_obstacles)):
-                x, y = self.map_six_obstacles[i]
+                x, y = self.map_eight_obstacles[i]
                 obstacle = Obstacle((x, y), self)
                 self.grid.place_agent(obstacle, (x, y))
                 self.schedule.add(obstacle)
@@ -477,7 +477,7 @@ class ThirdTestModel(Model):
 
         elif self.map_choice == "nine":
             for i in range(len(self.map_nine_obstacles)):
-                x, y = self.map_six_obstacles[i]
+                x, y = self.map_nine_obstacles[i]
                 obstacle = Obstacle((x, y), self)
                 self.grid.place_agent(obstacle, (x, y))
                 self.schedule.add(obstacle)
@@ -485,7 +485,7 @@ class ThirdTestModel(Model):
 
         elif self.map_choice == "ten":
             for i in range(len(self.map_ten_obstacles)):
-                x, y = self.map_six_obstacles[i]
+                x, y = self.map_ten_obstacles[i]
                 obstacle = Obstacle((x, y), self)
                 self.grid.place_agent(obstacle, (x, y))
                 self.schedule.add(obstacle)
@@ -493,7 +493,7 @@ class ThirdTestModel(Model):
 
         elif self.map_choice == "eleven":
             for i in range(len(self.map_eleven_obstacles)):
-                x, y = self.map_six_obstacles[i]
+                x, y = self.map_eleven_obstacles[i]
                 obstacle = Obstacle((x, y), self)
                 self.grid.place_agent(obstacle, (x, y))
                 self.schedule.add(obstacle)
@@ -501,7 +501,7 @@ class ThirdTestModel(Model):
 
         elif self.map_choice == "twelve":
             for i in range(len(self.map_twelve_obstacles)):
-                x, y = self.map_six_obstacles[i]
+                x, y = self.map_twelve_obstacles[i]
                 obstacle = Obstacle((x, y), self)
                 self.grid.place_agent(obstacle, (x, y))
                 self.schedule.add(obstacle)
@@ -509,7 +509,7 @@ class ThirdTestModel(Model):
 
         elif self.map_choice == "thirteen":
             for i in range(len(self.map_thirteen_obstacles)):
-                x, y = self.map_six_obstacles[i]
+                x, y = self.map_thirteen_obstacles[i]
                 obstacle = Obstacle((x, y), self)
                 self.grid.place_agent(obstacle, (x, y))
                 self.schedule.add(obstacle)
@@ -517,7 +517,7 @@ class ThirdTestModel(Model):
 
         elif self.map_choice == "fourteen":
             for i in range(len(self.map_fourteen_obstacles)):
-                x, y = self.map_six_obstacles[i]
+                x, y = self.map_fourteen_obstacles[i]
                 obstacle = Obstacle((x, y), self)
                 self.grid.place_agent(obstacle, (x, y))
                 self.schedule.add(obstacle)
@@ -525,7 +525,7 @@ class ThirdTestModel(Model):
 
         elif self.map_choice == "fifteen":
             for i in range(len(self.map_fifteen_obstacles)):
-                x, y = self.map_six_obstacles[i]
+                x, y = self.map_fifteen_obstacles[i]
                 obstacle = Obstacle((x, y), self)
                 self.grid.place_agent(obstacle, (x, y))
                 self.schedule.add(obstacle)

@@ -247,8 +247,8 @@ class Walker(Agent):
         print("Cells between here and my goal are: ", cells_between)
 
         for each in range(len(cells_between)):
-            print("Cell Observed: ", each)
-            print("obstacle_count: ", obstacle_count)
+            # print("Cell Observed: ", each)
+            # print("obstacle_count: ", obstacle_count)
             if self.check_for_obstacles(cells_between[each]):
                 print("Obstacle in LOS found.")
                 obstacle_count = obstacle_count + 1
@@ -647,12 +647,12 @@ class Walker(Agent):
                     if self.left_right_sidestep(blocked_direction, self.pos):
                         print("Normal Navigation turned on.")
                         self.normal_navigation = True
-                elif not self.check_for_freedom():
-
-                    if self.directional_blockage_checker() == "local_free":
+                elif not self.check_for_freedom():  # if there is a blockage between here and the goal
+                    if self.directional_blockage_checker() == "local_free":  # but my local area is free
                         if self.left_right_sidestep(blocked_direction, self.pos):
                             print("But, my local area is free of obstacles! I'll turn on Normal Nav")
-                            self.normal_navigation = True
+                            self.normal_navigation = True  # maybe turn this off, have some more checking before that?
+                            # if self.directional_blockage_checker() == "local_free":
                     else:
                         return
                 return
@@ -940,6 +940,9 @@ class Walker(Agent):
             ys = range(swapped_p1[1] + 1, swapped_p2[1]) or [swapped_p1[1]]
             return [(x, y) for x in xs for y in ys]  # be aware these will be in reverse order from the point to current
 
+        # TO ADD: Some kind of pause function? We want to stop the agent moving if there is a problem
+        # want to stop the agent turning on normal navigation under ALPHA when it encounters difficulties
+
     def generic_movement(self, target):
         # print("Generic Goal Set!")
         goal = target
@@ -974,7 +977,7 @@ class Walker(Agent):
             # print("Generic Goal Reached!")
             return True  # not quite sure how to use this yet
 
-    def check_for_obstacles(self, cell):  # no longer used, generic obstacle checking
+    def check_for_obstacles(self, cell):
         next_cell = self.model.grid.get_cell_list_contents([cell])
         potential_obstacle = [obj for obj in next_cell
                               if isinstance(obj, Obstacle)]
