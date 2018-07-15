@@ -31,7 +31,7 @@ class Walker(Agent):
     steps_memory = []  # not currently used
     obstacle_present = False
     normal_navigation = True
-    navigation_mode = 2
+    navigation_mode = 1
     score = 0
     items_picked_up = 0
     inventory = {}
@@ -43,7 +43,7 @@ class Walker(Agent):
 
     def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
                  able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True,
-                 score=0, inventory={}, items_picked_up=0, navigation_mode=2):
+                 score=0, inventory={}, items_picked_up=0, navigation_mode=1):
         super().__init__(pos, model)
 
         # AGENT NOTE: IT ALWAYS TRAVELS ALONG ITS Y AXIS BEFORE ITS X AXIS
@@ -662,36 +662,36 @@ class Walker(Agent):
         current_x, current_y = current_position
 
         if blocked_direction == "north":
-            print("Sidestepping")
             sidestep = (current_x, (current_y + 1))
             if not self.check_for_obstacles(sidestep):
+                print("Sidestepping")
                 self.model.grid.move_agent(self, sidestep)
                 return True
             else:
                 print("I can't sidestep, I'm stuck!")  # possibly then random move until a freedom check allows it?
 
         elif blocked_direction == "east":
-            print("Sidestepping")
             sidestep = ((current_x + 1), current_y)
             if not self.check_for_obstacles(sidestep):
+                print("Sidestepping")
                 self.model.grid.move_agent(self, sidestep)
                 return True
             else:
                 print("I can't sidestep, I'm stuck!")  # possibly then random move until a freedom check allows it?
 
         elif blocked_direction == "south":
-            print("Sidestepping")
             sidestep = (current_x, (current_y - 1))
             if not self.check_for_obstacles(sidestep):
+                print("Sidestepping")
                 self.model.grid.move_agent(self, sidestep)
                 return True
             else:
                 print("I can't sidestep, I'm stuck!")  # possibly then random move until a freedom check allows it?
 
         elif blocked_direction == "west":
-            print("Sidestepping")
             sidestep = ((current_x - 1), current_y)
             if not self.check_for_obstacles(sidestep):
+                print("Sidestepping")
                 self.model.grid.move_agent(self, sidestep)
                 return True
             else:

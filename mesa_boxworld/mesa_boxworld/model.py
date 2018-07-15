@@ -84,8 +84,10 @@ class ThirdTestModel(Model):
             for y in range(self.height):
                 self.grid_list.append((x, y))
 
-
         # Spawn Locations - Simple
+        # NOTE: Could move all of these to another function to save space and to reduce the size of the make boxes/
+        # obstacles functions, but for now they live here
+
         self.map_one_boxes = [(5, 7), (6, 20), (8, 5 ), (9, 10), (12, 12), (14, 17), (18, 12), (20, 4), (21, 12), (20, 21)]  # increased by 3
         self.map_one_obstacles = [(6, 19), (5, 19), (7, 19), (8, 19), (10, 14), (10, 13), (10, 12), (10, 11), (10, 10), (10, 9),
                              (15, 20), (15, 19), (15, 18), (15, 17), (15, 16), (15, 15), (15, 14), (19, 17),
@@ -114,9 +116,51 @@ class ThirdTestModel(Model):
         # Spawn Locations - Complex
         self.map_six_boxes = [(2,14), (4,9),(6,7), (7,20), (11,9), (11,19), (17,5), (20,14), (21,10), (22,21)]
         self.map_six_obstacles = [(1,12), (2,12), (3,12), (4,12), (4,16), (4,15), (4,14), (4,13), (8,12), (8,11), (8,10), (8,9),
-                                  (8,8), (8,7), (8,6), (8,5), (8,4), (8,18), (9,4),(9,12), (10,12), (11,12), (9,22), (9,21), (9,20), (9,19), (9,18),
-                                  (10, 4), (16,8), (17,8), (7,18), (18,8), (19,8), (19,7), (19,6), (19,5), (19,4), (19,22), (19,21), (19,20),
+                                  (8,8), (8,7), (8,6), (8,5), (8,4), (8,18), (9,4),(9,12), (10,12), (11,12), (9,21), (9,20), (9,19), (9,18),
+                                  (10, 4), (16,8), (17,8), (7,18), (18,8), (19,8), (19,7), (19,6), (19,5), (19,4), (19,21), (19,20),
                                   (19,19), (19,18), (20,18), (21,18)]
+
+        self.map_seven_boxes = [(4,19), (1,11), (7,12), (6,2), (12,20), (14,15), (13,9), (16,2), (20,17), (21,5)]
+        self.map_seven_obstacles = [(2,20), (2,19), (2,18), (2,17), (2,16), (3,16), (4,16), (5,16), (6,16), (6,20), (6,19),
+                                    (6,18), (6,17), (3,13), (3,12), (3,11), (3,10), (3,9), (3,8), (2,8), (11,12), (11,11),
+                                    (11,10), (11,9), (11,8), (11,7), (12,12), (13,12), (14,12), (15,12), (16,12), (16,17),
+                                    (16,16), (16,15), (16,14), (16,13), (19,13), (20,12), (21,13), (22,12), (15,4), (16,4),
+                                    (17,4), (17,3)]
+
+        self.map_eight_boxes = [(2,22), (3,15), (8,19), (7,6), (11,12), (13,17), (17,1), (18,21), (20,12), (20,8)]
+        self.map_eight_obstacles =[(2,19), (3,21), (3,20), (3,19), (4,21), (5,21), (6,18), (7,17), (7,16), (7,15), (8,15),
+                                   (9,15), (10,15), (10,20), (10,19), (10,18), (10,17), (10,16), (12,14), (13,14), (14,14),
+                                   (14,13), (14,12), (14,11), (14,10), (14,9), (14,8), (17,14), (17,13), (17,12), (17,11),
+                                   (17,10), (18,17), (18,16), (18,15), (18,14), (19,17), (20,17), (16,3), (17,3), (18,3)]
+
+        self.map_nine_boxes = [(1,8), (3,5), (6,17), (12,16), (13,7), (14,19), (17,13), (21,18), (23,11), (19,4)]
+        self.map_nine_obstacles = [(2,11), (3,11), (4,11), (4,10), (4,9), (5,9), (5,8), (5,7), (5,6), (5,5), (6,15),
+                                   (7,15), (8,15), (8,17), (8,16), (11,13), (12,13), (13,13), (14,13), (15,13), (15,20),
+                                   (15,19), (15,18), (15,17), (15,16), (15,15), (15,14), (19,20), (19,19), (19,18),
+                                   (19,17), (19,16), (19,15), (20,20), (21,20), (22,20), (20,15), (21,15), (22,15),
+                                   (17,6), (17,5), (17,4), (17,3), (18,6), (19,6), (20,6), (21,6), (21,5), (21,4), (21,3)]
+
+        self.map_ten_boxes = [(1,17), (6,19), (5,15), (3,2), (10,3), (13,18), (15,16), (20,22), (20,11), (15,4)]
+        self.map_ten_obstacles = [(3,17), (3,16), (3,15), (3,14), (4,17), (5,17), (6,17), (7,17), (8,17), (8,20), (8,19),
+                                  (8,18), (2,4), (3,4), (4,4), (5,4), (5,3), (11,20), (11,19), (11,18), (11,17), (11,16),
+                                  (11,15), (12,15), (13,15), (14,15), (14,14), (15,14), (16,14), (16,18), (16,17), (16,16),
+                                  (16,15), (9,4), (9,3), (10,4), (11,4), (18,13), (18,12), (18,11), (18,10), (18,9), (19,13),
+                                  (20,13), (21,13), (22,13)]
+
+        self.map_eleven_boxes = []
+        self.map_eleven_obstacles = []
+
+        self.map_twelve_boxes = []
+        self.map_twelve_obstacles = []
+
+        self.map_thirteen_boxes = []
+        self.map_thirteen_obstacles = []
+
+        self.map_fourteen_boxes = []
+        self.map_fourteen_obstacles = []
+
+        self.map_fifteen_boxes = []
+        self.map_fifteen_obstacles = []
 
         # Model Functions
         self.schedule = RandomActivationByType(self)
@@ -142,10 +186,10 @@ class ThirdTestModel(Model):
         if self.simple:
             available_maps = ["one", "two", "three", "four", "five"]
             self.map_choice = random.choice(available_maps)
-            # self.map_choice = "five"
+            # self.map_choice = "six"
             print("Map ", self.map_choice)
         elif not self.simple:
-            available_maps = ["six",] # "seven", "eight", "nine", "ten"
+            available_maps = ["six", "seven", "eight", "nine", "ten"]  # add eleven to fifteen here
             self.map_choice = random.choice(available_maps)
             print("Map ", self.map_choice)
 
@@ -217,6 +261,106 @@ class ThirdTestModel(Model):
                 self.empty_boxes[i] = (x, y)
                 self.all_boxes[i] = (x, y)
                 # print("Empty Box Created")
+
+        elif self.map_choice == "seven":
+            for i in range(self.initial_boxes):
+                x, y = self.map_seven_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "eight":
+            for i in range(self.initial_boxes):
+                x, y = self.map_eight_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "nine":
+            for i in range(self.initial_boxes):
+                x, y = self.map_nine_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "ten":
+            for i in range(self.initial_boxes):
+                x, y = self.map_ten_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "eleven":
+            for i in range(self.initial_boxes):
+                x, y = self.map_eleven_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "twelve":
+            for i in range(self.initial_boxes):
+                x, y = self.map_twelve_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "thirteen":
+            for i in range(self.initial_boxes):
+                x, y = self.map_thirteen_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "fourteen":
+            for i in range(self.initial_boxes):
+                x, y = self.map_fourteen_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "fifteen":
+            for i in range(self.initial_boxes):
+                x, y = self.map_fifteen_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
 
         # --------------------- BELOW: RANDOM BOX GENERATION -------------------------
         # for i in range(self.initial_boxes):
@@ -309,6 +453,78 @@ class ThirdTestModel(Model):
 
         elif self.map_choice == "six":
             for i in range(len(self.map_six_obstacles)):
+                x, y = self.map_six_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "seven":
+            for i in range(len(self.map_seven_obstacles)):
+                x, y = self.map_six_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "eight":
+            for i in range(len(self.map_eight_obstacles)):
+                x, y = self.map_six_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "nine":
+            for i in range(len(self.map_nine_obstacles)):
+                x, y = self.map_six_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "ten":
+            for i in range(len(self.map_ten_obstacles)):
+                x, y = self.map_six_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "eleven":
+            for i in range(len(self.map_eleven_obstacles)):
+                x, y = self.map_six_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "twelve":
+            for i in range(len(self.map_twelve_obstacles)):
+                x, y = self.map_six_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "thirteen":
+            for i in range(len(self.map_thirteen_obstacles)):
+                x, y = self.map_six_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "fourteen":
+            for i in range(len(self.map_fourteen_obstacles)):
+                x, y = self.map_six_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "fifteen":
+            for i in range(len(self.map_fifteen_obstacles)):
                 x, y = self.map_six_obstacles[i]
                 obstacle = Obstacle((x, y), self)
                 self.grid.place_agent(obstacle, (x, y))
