@@ -14,25 +14,39 @@
       <file leaf-file-name="agents.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="275">
-              <caret line="496" column="41" lean-forward="true" selection-start-line="496" selection-start-column="41" selection-end-line="496" selection-end-column="41" />
+            <state relative-caret-position="201">
+              <caret line="738" column="63" lean-forward="true" selection-start-line="738" selection-start-column="63" selection-end-line="738" selection-end-column="63" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
-                <element signature="e#4131#4450#0" expanded="false" />
-                <element signature="e#4516#5433#0" expanded="false" />
-                <element signature="e#5468#6621#0" expanded="false" />
-                <element signature="e#6660#7330#0" expanded="false" />
-                <element signature="e#7372#9524#0" expanded="false" />
-                <element signature="e#9567#10561#0" expanded="false" />
-                <element signature="e#10617#11582#0" expanded="false" />
-                <element signature="e#11588#11631#0" expanded="false" />
-                <element signature="e#31367#33678#0" expanded="false" />
-                <element signature="e#33716#35373#0" expanded="false" />
-                <element signature="e#35556#37451#0" expanded="false" />
-                <element signature="e#37488#39118#0" expanded="false" />
-                <element signature="e#42943#44224#0" expanded="false" />
-                <element signature="e#44750#46052#0" expanded="false" />
-                <marker date="1531684985572" expanded="false" signature="42144:42684" ph="..." />
+                <element signature="e#4142#7397#0" expanded="false" />
+                <element signature="e#7435#7564#0" expanded="false" />
+                <element signature="e#7603#7686#0" expanded="false" />
+                <element signature="e#7894#8213#0" expanded="false" />
+                <element signature="e#8279#9196#0" expanded="false" />
+                <element signature="e#9231#10384#0" expanded="false" />
+                <element signature="e#10423#11093#0" expanded="false" />
+                <element signature="e#11135#13287#0" expanded="false" />
+                <element signature="e#13354#14289#0" expanded="false" />
+                <element signature="e#14352#14762#0" expanded="false" />
+                <element signature="e#14818#15783#0" expanded="false" />
+                <element signature="e#15789#15832#0" expanded="false" />
+                <element signature="e#33657#33703#0" expanded="false" />
+                <element signature="e#35264#37223#0" expanded="false" />
+                <element signature="e#43042#44693#0" expanded="false" />
+                <element signature="e#44876#46771#0" expanded="false" />
+                <element signature="e#46808#48438#0" expanded="false" />
+                <element signature="e#48492#51425#0" expanded="false" />
+                <element signature="e#52263#53544#0" expanded="false" />
+                <element signature="e#54070#55372#0" expanded="false" />
+                <element signature="e#55574#56477#0" expanded="false" />
+                <element signature="e#56521#57570#0" expanded="false" />
+                <element signature="e#57639#58462#0" expanded="false" />
+                <element signature="e#58503#58579#0" expanded="false" />
+                <element signature="e#58619#58698#0" expanded="false" />
+                <element signature="e#58825#60354#0" expanded="false" />
+                <element signature="e#60420#61025#0" expanded="false" />
+                <element signature="e#61062#62845#0" expanded="false" />
+                <marker date="1531753232142" expanded="false" signature="51464:52004" ph="..." />
               </folding>
             </state>
           </provider>
@@ -41,13 +55,14 @@
       <file leaf-file-name="model.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mesa_boxworld/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="253">
-              <caret line="118" column="66" lean-forward="true" selection-start-line="118" selection-start-column="66" selection-end-line="118" selection-end-column="66" />
+            <state relative-caret-position="374">
+              <caret line="175" column="29" lean-forward="true" selection-start-line="175" selection-start-column="29" selection-end-line="175" selection-end-column="29" />
               <folding>
                 <element signature="e#1#14#0" expanded="true" />
-                <element signature="e#9918#18409#0" expanded="false" />
-                <element signature="e#18453#18714#0" expanded="false" />
-                <element signature="e#18750#19842#0" expanded="false" />
+                <element signature="e#9894#18385#0" expanded="false" />
+                <element signature="e#18429#18690#0" expanded="false" />
+                <element signature="e#18726#19818#0" expanded="false" />
+                <element signature="e#19858#25063#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -67,14 +82,14 @@
       <list>
         <option value="$PROJECT_DIR$/agents.py" />
         <option value="$PROJECT_DIR$/model.py" />
-        <option value="$PROJECT_DIR$/mesa_boxworld/model.py" />
         <option value="$PROJECT_DIR$/mesa_boxworld/agents.py" />
+        <option value="$PROJECT_DIR$/mesa_boxworld/model.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds">
     <option name="x" value="-7" />
-    <option name="width" value="974" />
+    <option name="width" value="950" />
     <option name="height" value="1057" />
   </component>
   <component name="ProjectView">
@@ -92,7 +107,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -109,7 +124,7 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -175,12 +190,13 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
+    <frame x="-7" y="0" width="950" height="1057" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.102783725" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32948583" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33262712" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -201,32 +217,99 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="1" />
+      <option name="time" value="5" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#4142#7397#0" expanded="false" />
+            <element signature="e#7435#7564#0" expanded="false" />
+            <element signature="e#7603#7686#0" expanded="false" />
+            <element signature="e#7894#8213#0" expanded="false" />
+            <element signature="e#8279#9196#0" expanded="false" />
+            <element signature="e#9231#10384#0" expanded="false" />
+            <element signature="e#10423#11093#0" expanded="false" />
+            <element signature="e#11135#13287#0" expanded="false" />
+            <element signature="e#13354#14289#0" expanded="false" />
+            <element signature="e#14352#14762#0" expanded="false" />
+            <element signature="e#14818#15783#0" expanded="false" />
+            <element signature="e#15789#15832#0" expanded="false" />
+            <element signature="e#33657#33703#0" expanded="false" />
+            <element signature="e#35264#37223#0" expanded="false" />
+            <element signature="e#43042#44693#0" expanded="false" />
+            <element signature="e#44876#46771#0" expanded="false" />
+            <element signature="e#46808#48438#0" expanded="false" />
+            <element signature="e#48492#51425#0" expanded="false" />
+            <element signature="e#52263#53544#0" expanded="false" />
+            <element signature="e#54070#55372#0" expanded="false" />
+            <element signature="e#55574#56477#0" expanded="false" />
+            <element signature="e#56521#57570#0" expanded="false" />
+            <element signature="e#57639#58462#0" expanded="false" />
+            <element signature="e#58503#58579#0" expanded="false" />
+            <element signature="e#58619#58698#0" expanded="false" />
+            <element signature="e#58825#60354#0" expanded="false" />
+            <element signature="e#60420#61025#0" expanded="false" />
+            <element signature="e#61062#62845#0" expanded="false" />
+            <marker date="1531753232142" expanded="false" signature="51464:52004" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mesa_boxworld/model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2006">
+          <caret line="118" column="66" lean-forward="true" selection-start-line="118" selection-start-column="66" selection-end-line="118" selection-end-column="66" />
+          <folding>
+            <element signature="e#1#14#0" expanded="true" />
+            <element signature="e#9894#18385#0" expanded="false" />
+            <element signature="e#18429#18690#0" expanded="false" />
+            <element signature="e#18726#19818#0" expanded="false" />
+            <element signature="e#19858#25063#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="561">
           <caret line="33" column="23" lean-forward="false" selection-start-line="33" selection-start-column="23" selection-end-line="33" selection-end-column="23" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
-            <element signature="e#4131#4450#0" expanded="false" />
-            <element signature="e#4516#5433#0" expanded="false" />
-            <element signature="e#5468#6621#0" expanded="false" />
-            <element signature="e#6660#7330#0" expanded="false" />
-            <element signature="e#7372#9524#0" expanded="false" />
-            <element signature="e#9567#10561#0" expanded="false" />
-            <element signature="e#10617#11582#0" expanded="false" />
-            <element signature="e#11588#11631#0" expanded="false" />
-            <element signature="e#31367#33678#0" expanded="false" />
-            <element signature="e#33716#35373#0" expanded="false" />
-            <element signature="e#35556#37451#0" expanded="false" />
-            <element signature="e#37488#39118#0" expanded="false" />
-            <element signature="e#42943#44224#0" expanded="false" />
-            <element signature="e#44750#46052#0" expanded="false" />
-            <marker date="1531684985572" expanded="false" signature="42144:42684" ph="..." />
+            <element signature="e#4142#7397#0" expanded="false" />
+            <element signature="e#7435#7564#0" expanded="false" />
+            <element signature="e#7603#7686#0" expanded="false" />
+            <element signature="e#7894#8213#0" expanded="false" />
+            <element signature="e#8279#9196#0" expanded="false" />
+            <element signature="e#9231#10384#0" expanded="false" />
+            <element signature="e#10423#11093#0" expanded="false" />
+            <element signature="e#11135#13287#0" expanded="false" />
+            <element signature="e#13354#14289#0" expanded="false" />
+            <element signature="e#14352#14762#0" expanded="false" />
+            <element signature="e#14818#15783#0" expanded="false" />
+            <element signature="e#15789#15832#0" expanded="false" />
+            <element signature="e#33657#33703#0" expanded="false" />
+            <element signature="e#35264#37223#0" expanded="false" />
+            <element signature="e#43042#44693#0" expanded="false" />
+            <element signature="e#44876#46771#0" expanded="false" />
+            <element signature="e#46808#48438#0" expanded="false" />
+            <element signature="e#48492#51425#0" expanded="false" />
+            <element signature="e#52263#53544#0" expanded="false" />
+            <element signature="e#54070#55372#0" expanded="false" />
+            <element signature="e#55574#56477#0" expanded="false" />
+            <element signature="e#56521#57570#0" expanded="false" />
+            <element signature="e#57639#58462#0" expanded="false" />
+            <element signature="e#58503#58579#0" expanded="false" />
+            <element signature="e#58619#58698#0" expanded="false" />
+            <element signature="e#58825#60354#0" expanded="false" />
+            <element signature="e#60420#61025#0" expanded="false" />
+            <element signature="e#61062#62845#0" expanded="false" />
+            <marker date="1531753232142" expanded="false" signature="51464:52004" ph="..." />
           </folding>
         </state>
       </provider>
@@ -237,9 +320,10 @@
           <caret line="462" column="33" lean-forward="false" selection-start-line="462" selection-start-column="33" selection-end-line="462" selection-end-column="33" />
           <folding>
             <element signature="e#1#14#0" expanded="true" />
-            <element signature="e#9918#18409#0" expanded="false" />
-            <element signature="e#18453#18714#0" expanded="false" />
-            <element signature="e#18750#19842#0" expanded="false" />
+            <element signature="e#9894#18385#0" expanded="false" />
+            <element signature="e#18429#18690#0" expanded="false" />
+            <element signature="e#18726#19818#0" expanded="false" />
+            <element signature="e#19858#25063#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -250,9 +334,10 @@
           <caret line="126" column="0" lean-forward="false" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
           <folding>
             <element signature="e#1#14#0" expanded="true" />
-            <element signature="e#9918#18409#0" expanded="false" />
-            <element signature="e#18453#18714#0" expanded="false" />
-            <element signature="e#18750#19842#0" expanded="false" />
+            <element signature="e#9894#18385#0" expanded="false" />
+            <element signature="e#18429#18690#0" expanded="false" />
+            <element signature="e#18726#19818#0" expanded="false" />
+            <element signature="e#19858#25063#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -263,59 +348,88 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
-            <element signature="e#4131#4450#0" expanded="false" />
-            <element signature="e#4516#5433#0" expanded="false" />
-            <element signature="e#5468#6621#0" expanded="false" />
-            <element signature="e#6660#7330#0" expanded="false" />
-            <element signature="e#7372#9524#0" expanded="false" />
-            <element signature="e#9567#10561#0" expanded="false" />
-            <element signature="e#10617#11582#0" expanded="false" />
-            <element signature="e#11588#11631#0" expanded="false" />
-            <element signature="e#31367#33678#0" expanded="false" />
-            <element signature="e#33716#35373#0" expanded="false" />
-            <element signature="e#35556#37451#0" expanded="false" />
-            <element signature="e#37488#39118#0" expanded="false" />
-            <element signature="e#42943#44224#0" expanded="false" />
-            <element signature="e#44750#46052#0" expanded="false" />
-            <marker date="1531684985572" expanded="false" signature="42144:42684" ph="..." />
+            <element signature="e#4142#7397#0" expanded="false" />
+            <element signature="e#7435#7564#0" expanded="false" />
+            <element signature="e#7603#7686#0" expanded="false" />
+            <element signature="e#7894#8213#0" expanded="false" />
+            <element signature="e#8279#9196#0" expanded="false" />
+            <element signature="e#9231#10384#0" expanded="false" />
+            <element signature="e#10423#11093#0" expanded="false" />
+            <element signature="e#11135#13287#0" expanded="false" />
+            <element signature="e#13354#14289#0" expanded="false" />
+            <element signature="e#14352#14762#0" expanded="false" />
+            <element signature="e#14818#15783#0" expanded="false" />
+            <element signature="e#15789#15832#0" expanded="false" />
+            <element signature="e#33657#33703#0" expanded="false" />
+            <element signature="e#35264#37223#0" expanded="false" />
+            <element signature="e#43042#44693#0" expanded="false" />
+            <element signature="e#44876#46771#0" expanded="false" />
+            <element signature="e#46808#48438#0" expanded="false" />
+            <element signature="e#48492#51425#0" expanded="false" />
+            <element signature="e#52263#53544#0" expanded="false" />
+            <element signature="e#54070#55372#0" expanded="false" />
+            <element signature="e#55574#56477#0" expanded="false" />
+            <element signature="e#56521#57570#0" expanded="false" />
+            <element signature="e#57639#58462#0" expanded="false" />
+            <element signature="e#58503#58579#0" expanded="false" />
+            <element signature="e#58619#58698#0" expanded="false" />
+            <element signature="e#58825#60354#0" expanded="false" />
+            <element signature="e#60420#61025#0" expanded="false" />
+            <element signature="e#61062#62845#0" expanded="false" />
+            <marker date="1531753232142" expanded="false" signature="51464:52004" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/mesa_boxworld/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="118" column="66" lean-forward="true" selection-start-line="118" selection-start-column="66" selection-end-line="118" selection-end-column="66" />
+        <state relative-caret-position="374">
+          <caret line="175" column="29" lean-forward="true" selection-start-line="175" selection-start-column="29" selection-end-line="175" selection-end-column="29" />
           <folding>
             <element signature="e#1#14#0" expanded="true" />
-            <element signature="e#9918#18409#0" expanded="false" />
-            <element signature="e#18453#18714#0" expanded="false" />
-            <element signature="e#18750#19842#0" expanded="false" />
+            <element signature="e#9894#18385#0" expanded="false" />
+            <element signature="e#18429#18690#0" expanded="false" />
+            <element signature="e#18726#19818#0" expanded="false" />
+            <element signature="e#19858#25063#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="275">
-          <caret line="496" column="41" lean-forward="true" selection-start-line="496" selection-start-column="41" selection-end-line="496" selection-end-column="41" />
+        <state relative-caret-position="201">
+          <caret line="738" column="63" lean-forward="true" selection-start-line="738" selection-start-column="63" selection-end-line="738" selection-end-column="63" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
-            <element signature="e#4131#4450#0" expanded="false" />
-            <element signature="e#4516#5433#0" expanded="false" />
-            <element signature="e#5468#6621#0" expanded="false" />
-            <element signature="e#6660#7330#0" expanded="false" />
-            <element signature="e#7372#9524#0" expanded="false" />
-            <element signature="e#9567#10561#0" expanded="false" />
-            <element signature="e#10617#11582#0" expanded="false" />
-            <element signature="e#11588#11631#0" expanded="false" />
-            <element signature="e#31367#33678#0" expanded="false" />
-            <element signature="e#33716#35373#0" expanded="false" />
-            <element signature="e#35556#37451#0" expanded="false" />
-            <element signature="e#37488#39118#0" expanded="false" />
-            <element signature="e#42943#44224#0" expanded="false" />
-            <element signature="e#44750#46052#0" expanded="false" />
-            <marker date="1531684985572" expanded="false" signature="42144:42684" ph="..." />
+            <element signature="e#4142#7397#0" expanded="false" />
+            <element signature="e#7435#7564#0" expanded="false" />
+            <element signature="e#7603#7686#0" expanded="false" />
+            <element signature="e#7894#8213#0" expanded="false" />
+            <element signature="e#8279#9196#0" expanded="false" />
+            <element signature="e#9231#10384#0" expanded="false" />
+            <element signature="e#10423#11093#0" expanded="false" />
+            <element signature="e#11135#13287#0" expanded="false" />
+            <element signature="e#13354#14289#0" expanded="false" />
+            <element signature="e#14352#14762#0" expanded="false" />
+            <element signature="e#14818#15783#0" expanded="false" />
+            <element signature="e#15789#15832#0" expanded="false" />
+            <element signature="e#33657#33703#0" expanded="false" />
+            <element signature="e#35264#37223#0" expanded="false" />
+            <element signature="e#43042#44693#0" expanded="false" />
+            <element signature="e#44876#46771#0" expanded="false" />
+            <element signature="e#46808#48438#0" expanded="false" />
+            <element signature="e#48492#51425#0" expanded="false" />
+            <element signature="e#52263#53544#0" expanded="false" />
+            <element signature="e#54070#55372#0" expanded="false" />
+            <element signature="e#55574#56477#0" expanded="false" />
+            <element signature="e#56521#57570#0" expanded="false" />
+            <element signature="e#57639#58462#0" expanded="false" />
+            <element signature="e#58503#58579#0" expanded="false" />
+            <element signature="e#58619#58698#0" expanded="false" />
+            <element signature="e#58825#60354#0" expanded="false" />
+            <element signature="e#60420#61025#0" expanded="false" />
+            <element signature="e#61062#62845#0" expanded="false" />
+            <marker date="1531753232142" expanded="false" signature="51464:52004" ph="..." />
           </folding>
         </state>
       </provider>
