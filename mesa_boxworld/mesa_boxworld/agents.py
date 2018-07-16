@@ -67,6 +67,7 @@ class Walker(Agent):
 
         self.pos = pos
         self.stepCount = stepCount
+        self.inter_goal_stepCount = 0
         self.goal = goal
         self.score = score
         self.inventory = inventory
@@ -82,6 +83,9 @@ class Walker(Agent):
         self.current_step_time = 0
         # self.overall_time_elapsed = 0
         self.planning_steps_taken = 0
+        self.stuck = 0
+        self.step_time_memory = []
+        self.planning_step_memory = []
 
         # things we want to track are:
         # program run time - is it going on too long? What are the average completion times for the current map?
@@ -608,148 +612,202 @@ class Walker(Agent):
         if blocked_direction == "north":
             null_goal = self.avoidance_goal_calculator("north", self.pos)
 
-            # null_goal = ((9), (9))
-            if self.generic_movement(null_goal):
-                if self.check_for_freedom(self.goal, self.pos):
-                    if self.left_right_sidestep(blocked_direction, self.pos):
-                        print("Normal Navigation turned on.")
-                        self.normal_navigation = True
-                elif not self.check_for_freedom(self.goal, self.pos):
-                    if self.directional_blockage_checker() == "local_free":
+            if self.passable(null_goal) and self.in_bounds(null_goal):
+                # null_goal = ((9), (9))
+                if self.generic_movement(null_goal):
+                    if self.check_for_freedom(self.goal, self.pos):
                         if self.left_right_sidestep(blocked_direction, self.pos):
-                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            print("Normal Navigation turned on.")
                             self.normal_navigation = True
-                    else:
-                        return
+                    elif not self.check_for_freedom(self.goal, self.pos):
+                        if self.directional_blockage_checker() == "local_free":
+                            if self.left_right_sidestep(blocked_direction, self.pos):
+                                print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                                self.normal_navigation = True
+                            else:
+                                print("I can't sidestep!")
+                        else:
+                            print("My local area is not free.")
+                            return
+                    return
+            else:
+                print("My reactive avoidance goal is impassable. I'm stuck.")
                 return
-            return
 
         elif blocked_direction == "east":
             null_goal = self.avoidance_goal_calculator("east", self.pos)
             # null_goal = ((9), (9))
-            if self.generic_movement(null_goal):
-                if self.check_for_freedom(self.goal, self.pos):
-                    if self.left_right_sidestep(blocked_direction, self.pos):
-                        print("Normal Navigation turned on.")
-                        self.normal_navigation = True
-                elif not self.check_for_freedom(self.goal, self.pos):
-                    if self.directional_blockage_checker() == "local_free":
+
+            if self.passable(null_goal) and self.in_bounds(null_goal):
+                if self.generic_movement(null_goal):
+                    if self.check_for_freedom(self.goal, self.pos):
                         if self.left_right_sidestep(blocked_direction, self.pos):
-                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            print("Normal Navigation turned on.")
                             self.normal_navigation = True
-                    else:
-                        return
+                    elif not self.check_for_freedom(self.goal, self.pos):
+                        if self.directional_blockage_checker() == "local_free":
+                            if self.left_right_sidestep(blocked_direction, self.pos):
+                                print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                                self.normal_navigation = True
+                            else:
+                                print("I can't sidestep!")
+                        else:
+                            print("My local area is not free.")
+                            return
+                    return
+            else:
+                print("My reactive avoidance goal is impassable. I'm stuck.")
                 return
-            return
 
         elif blocked_direction == "south":
             null_goal = self.avoidance_goal_calculator("south", self.pos)
             # null_goal = ((9), (9))
-            if self.generic_movement(null_goal):
-                if self.check_for_freedom(self.goal, self.pos):
-                    if self.left_right_sidestep(blocked_direction, self.pos):
-                        print("Normal Navigation turned on.")
-                        self.normal_navigation = True
-                elif not self.check_for_freedom(self.goal, self.pos):
-                    if self.directional_blockage_checker() == "local_free":
+            if self.passable(null_goal) and self.in_bounds(null_goal):
+                if self.generic_movement(null_goal):
+                    if self.check_for_freedom(self.goal, self.pos):
                         if self.left_right_sidestep(blocked_direction, self.pos):
-                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            print("Normal Navigation turned on.")
                             self.normal_navigation = True
-                    else:
-                        return
+                    elif not self.check_for_freedom(self.goal, self.pos):
+                        if self.directional_blockage_checker() == "local_free":
+                            if self.left_right_sidestep(blocked_direction, self.pos):
+                                print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                                self.normal_navigation = True
+                            else:
+                                print("I can't sidestep!")
+                        else:
+                            print("My local area is not free.")
+                            return
+                    return
+            else:
+                print("My reactive avoidance goal is impassable. I'm stuck.")
                 return
-            return
 
         elif blocked_direction == "west":
             null_goal = self.avoidance_goal_calculator("west", self.pos)
             # null_goal = (9), (9)
-            if self.generic_movement(null_goal):
-                if self.check_for_freedom(self.goal, self.pos):
-                    if self.left_right_sidestep(blocked_direction, self.pos):
-                        print("Normal Navigation turned on.")
-                        self.normal_navigation = True
-                elif not self.check_for_freedom(self.goal, self.pos):
-                    if self.directional_blockage_checker() == "local_free":
+
+            if self.passable(null_goal) and self.in_bounds(null_goal):
+                if self.generic_movement(null_goal):
+                    if self.check_for_freedom(self.goal, self.pos):
                         if self.left_right_sidestep(blocked_direction, self.pos):
-                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            print("Normal Navigation turned on.")
                             self.normal_navigation = True
-                    else:
-                        return
+                    elif not self.check_for_freedom(self.goal, self.pos):
+                        if self.directional_blockage_checker() == "local_free":
+                            if self.left_right_sidestep(blocked_direction, self.pos):
+                                print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                                self.normal_navigation = True
+                            else:
+                                print("I can't sidestep!")
+                        else:
+                            print("My local area is not free.")
+                            return
+                    return
+            else:
+                print("My reactive avoidance goal is impassable. I'm stuck.")
                 return
-            return
 
         elif blocked_direction == "north_west":
             null_goal = self.avoidance_goal_calculator("north_west", self.pos)
             # null_goal = (9), (9)
-            if self.generic_movement(null_goal):
-                if self.check_for_freedom(self.goal, self.pos):
-                    if self.left_right_sidestep(blocked_direction, self.pos):
-                        print("Normal Navigation turned on.")
-                        self.normal_navigation = True
-                elif not self.check_for_freedom(self.goal, self.pos):
-                    if self.directional_blockage_checker() == "local_free":
+
+            if self.passable(null_goal) and self.in_bounds(null_goal):
+                if self.generic_movement(null_goal):
+                    if self.check_for_freedom(self.goal, self.pos):
                         if self.left_right_sidestep(blocked_direction, self.pos):
-                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            print("Normal Navigation turned on.")
                             self.normal_navigation = True
-                    else:
-                        return
+                    elif not self.check_for_freedom(self.goal, self.pos):
+                        if self.directional_blockage_checker() == "local_free":
+                            if self.left_right_sidestep(blocked_direction, self.pos):
+                                print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                                self.normal_navigation = True
+                            else:
+                                print("I can't sidestep!")
+                        else:
+                            print("My local area is not free.")
+                            return
+                    return
+            else:
+                print("My reactive avoidance goal is impassable. I'm stuck.")
                 return
-            return
 
         elif blocked_direction == "north_east":
             null_goal = self.avoidance_goal_calculator("north_east", self.pos)
             # null_goal = (9), (9)
-            if self.generic_movement(null_goal):
-                if self.check_for_freedom(self.goal, self.pos):
-                    if self.left_right_sidestep(blocked_direction, self.pos):
-                        print("Normal Navigation turned on.")
-                        self.normal_navigation = True
-                elif not self.check_for_freedom(self.goal, self.pos):
-                    if self.directional_blockage_checker() == "local_free":
+
+            if self.passable(null_goal) and self.in_bounds(null_goal):
+                if self.generic_movement(null_goal):
+                    if self.check_for_freedom(self.goal, self.pos):
                         if self.left_right_sidestep(blocked_direction, self.pos):
-                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            print("Normal Navigation turned on.")
                             self.normal_navigation = True
-                    else:
-                        return
+                    elif not self.check_for_freedom(self.goal, self.pos):
+                        if self.directional_blockage_checker() == "local_free":
+                            if self.left_right_sidestep(blocked_direction, self.pos):
+                                print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                                self.normal_navigation = True
+                            else:
+                                print("I can't sidestep!")
+                        else:
+                            print("My local area is not free.")
+                            return
+                    return
+            else:
+                print("My reactive avoidance goal is impassable. I'm stuck.")
                 return
-            return
 
         elif blocked_direction == "south_east":
             null_goal = self.avoidance_goal_calculator("south_east", self.pos)
             # null_goal = (9), (9)
-            if self.generic_movement(null_goal):
-                if self.check_for_freedom(self.goal, self.pos):
-                    if self.left_right_sidestep(blocked_direction, self.pos):
-                        print("Normal Navigation turned on.")
-                        self.normal_navigation = True
-                elif not self.check_for_freedom(self.goal, self.pos):
-                    if self.directional_blockage_checker() == "local_free":
+
+            if self.passable(null_goal) and self.in_bounds(null_goal):
+                if self.generic_movement(null_goal):
+                    if self.check_for_freedom(self.goal, self.pos):
                         if self.left_right_sidestep(blocked_direction, self.pos):
-                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                            print("Normal Navigation turned on.")
                             self.normal_navigation = True
-                    else:
-                        return
+                    elif not self.check_for_freedom(self.goal, self.pos):
+                        if self.directional_blockage_checker() == "local_free":
+                            if self.left_right_sidestep(blocked_direction, self.pos):
+                                print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                                self.normal_navigation = True
+                            else:
+                                print("I can't sidestep!")
+                        else:
+                            print("My local area is not free.")
+                            return
+                    return
+            else:
+                print("My reactive avoidance goal is impassable. I'm stuck.")
                 return
-            return
 
         elif blocked_direction == "south_west":
             null_goal = self.avoidance_goal_calculator("south_west", self.pos)
             # null_goal = (9), (9)
-            if self.generic_movement(null_goal):
-                if self.check_for_freedom(self.goal, self.pos):
-                    if self.left_right_sidestep(blocked_direction, self.pos):
-                        print("Normal Navigation turned on.")
-                        self.normal_navigation = True
-                elif not self.check_for_freedom(self.goal, self.pos):  # if there is a blockage between here and the goal
-                    if self.directional_blockage_checker() == "local_free":  # but my local area is free
+
+            if self.passable(null_goal) and self.in_bounds(null_goal):
+                if self.generic_movement(null_goal):
+                    if self.check_for_freedom(self.goal, self.pos):
                         if self.left_right_sidestep(blocked_direction, self.pos):
-                            print("But, my local area is free of obstacles! I'll turn on Normal Nav")
-                            self.normal_navigation = True  # maybe turn this off, have some more checking before that?
-                            # if self.directional_blockage_checker() == "local_free":
-                    else:
-                        return
+                            print("Normal Navigation turned on.")
+                            self.normal_navigation = True
+                    elif not self.check_for_freedom(self.goal, self.pos):  # if there is a blockage between here and the goal
+                        if self.directional_blockage_checker() == "local_free":  # but my local area is free
+                            if self.left_right_sidestep(blocked_direction, self.pos):
+                                print("But, my local area is free of obstacles! I'll turn on Normal Nav")
+                                self.normal_navigation = True  # maybe turn this off, have some more checking before that?
+                                # if self.directional_blockage_checker() == "local_free":
+                            else:
+                                print("I can't sidestep!")
+                        else:
+                            print("My local area is not free.")
+                            return
+                    return
+            else:
+                print("My reactive avoidance goal is impassable. I'm stuck.")
                 return
-            return
 
     # def bug_navigation(self, blocked_direction):
     #     print("Bug Navigation ACTIVATED")
@@ -779,10 +837,6 @@ class Walker(Agent):
     #             # for i in range(4):
     #             #     self.random_move()
 
-
-
-
-
     def left_right_sidestep(self, blocked_direction, current_position):  # Does this need fixing?
         current_x, current_y = current_position
 
@@ -794,7 +848,8 @@ class Walker(Agent):
                 self.model.grid.move_agent(self, sidestep)
                 return True
             else:
-                print("I can't sidestep, I'm stuck.")  # possibly then random move until a freedom check allows it?
+                print("I can't sidestep, I'm stuck.")
+                return False # need some kind of alternative clause
 
         elif blocked_direction == "east":
             sidestep = ((current_x + 1), current_y)
@@ -804,7 +859,8 @@ class Walker(Agent):
                 self.model.grid.move_agent(self, sidestep)
                 return True
             else:
-                print("I can't sidestep, I'm stuck.")  # possibly then random move until a freedom check allows it?
+                print("I can't sidestep, I'm stuck.")
+                return False
 
         elif blocked_direction == "south":
             sidestep = (current_x, (current_y - 1))
@@ -814,7 +870,8 @@ class Walker(Agent):
                 self.model.grid.move_agent(self, sidestep)
                 return True
             else:
-                print("I can't sidestep, I'm stuck.")  # possibly then random move until a freedom check allows it?
+                print("I can't sidestep, I'm stuck.")
+                return False
 
         elif blocked_direction == "west":
             sidestep = ((current_x - 1), current_y)
@@ -824,7 +881,8 @@ class Walker(Agent):
                 self.model.grid.move_agent(self, sidestep)
                 return True
             else:
-                print("I can't sidestep, I'm stuck.")  # possibly then random move until a freedom check allows it?
+                print("I can't sidestep, I'm stuck.")
+                return False
 
     def avoidance_goal_calculator(self, blocked_direction, current_position):
 
@@ -833,102 +891,102 @@ class Walker(Agent):
         if blocked_direction == "north":
             avoidance_goal = ((current_x - 1), (current_y))
             print("Avoidance Goal Set: ", avoidance_goal)
-            if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                return avoidance_goal
-            elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                print("That avoidance goal is impassable. I'm stuck.")
+            # if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+            return avoidance_goal
+            # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+            #     print("That avoidance goal is impassable. I'm stuck.")
 
         elif blocked_direction == "east":
             avoidance_goal = ((current_x), (current_y + 1))
             print("Avoidance Goal Set: ", avoidance_goal)
-            if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                return avoidance_goal
-            elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                print("That avoidance goal is impassable. I'm stuck.")
+            # if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+            return avoidance_goal
+            # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+            #     print("That avoidance goal is impassable. I'm stuck.")
 
         elif blocked_direction == "south":
             avoidance_goal = ((current_x + 1), (current_y))
             print("Avoidance Goal Set: ", avoidance_goal)
-            if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                return avoidance_goal
-            elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                print("That avoidance goal is impassable. I'm stuck.")
+            # if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+            return avoidance_goal
+            # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+            #     print("That avoidance goal is impassable. I'm stuck.")
 
         elif blocked_direction == "west":
             avoidance_goal = ((current_x), (current_y + 1))
             print("Avoidance Goal Set: ", avoidance_goal)
-            if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                return avoidance_goal
-            elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                print("That avoidance goal is impassable. I'm stuck.")
+            # if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+            return avoidance_goal
+            # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+            #     print("That avoidance goal is impassable. I'm stuck.")
 
         elif blocked_direction == "north_west":
             n = random.choice(range(1))
             if n == 1:
                 avoidance_goal = ((current_x - 1), (current_y))
                 print("Avoidance Goal Set: ", avoidance_goal)
-                if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    return avoidance_goal
-                elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    print("That avoidance goal is impassable. I'm stuck.")
+                # if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                return avoidance_goal
+                # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                #     print("That avoidance goal is impassable. I'm stuck.")
             elif n == 0:
                 avoidance_goal = ((current_x), (current_y + 1))
                 print("Avoidance Goal Set: ", avoidance_goal)
-                if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    return avoidance_goal
-                elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    print("That avoidance goal is impassable. I'm stuck.")
+                # if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                return avoidance_goal
+                # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                #     print("That avoidance goal is impassable. I'm stuck.")
 
         elif blocked_direction == "north_east":
             n = random.choice(range(1))
             if n == 1:
                 avoidance_goal = ((current_x + 1), (current_y))
                 print("Avoidance Goal Set: ", avoidance_goal)
-                if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    return avoidance_goal
-                elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    print("That avoidance goal is impassable. I'm stuck.")
+                # if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                return avoidance_goal
+                # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                #     print("That avoidance goal is impassable. I'm stuck.")
             elif n == 0:
                 avoidance_goal = ((current_x), (current_y + 1))
                 print("Avoidance Goal Set: ", avoidance_goal)
-                if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    return avoidance_goal
-                elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    print("That avoidance goal is impassable. I'm stuck.")
+                # if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                return avoidance_goal
+                # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                #     print("That avoidance goal is impassable. I'm stuck.")
 
         elif blocked_direction == "south_east":
             n = random.choice(range(1))
             if n == 1:
                 avoidance_goal = ((current_x + 1), (current_y))
                 print("Avoidance Goal Set: ", avoidance_goal)
-                if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    return avoidance_goal
-                elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    print("That avoidance goal is impassable. I'm stuck.")
+                # if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                return avoidance_goal
+                # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                #     print("That avoidance goal is impassable. I'm stuck.")
             elif n == 0:
                 avoidance_goal = ((current_x), (current_y - 1))
                 print("Avoidance Goal Set: ", avoidance_goal)
-                if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    return avoidance_goal
-                elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    print("That avoidance goal is impassable. I'm stuck.")
+                # if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                return avoidance_goal
+                # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                #     print("That avoidance goal is impassable. I'm stuck.")
 
         elif blocked_direction == "south_west":
             n = random.choice(range(1))
             if n == 1:
                 avoidance_goal = ((current_x - 1), (current_y))
                 print("Avoidance Goal Set: ", avoidance_goal)
-                if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    return avoidance_goal
-                elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    print("That avoidance goal is impassable. I'm stuck.")
+                # if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                return avoidance_goal
+                # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                #     print("That avoidance goal is impassable. I'm stuck.")
             elif n == 0:
                 avoidance_goal = ((current_x), (current_y - 1))
                 print("Avoidance Goal Set: ", avoidance_goal)
-                if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    return avoidance_goal
-                elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
-                    print("That avoidance goal is impassable. I'm stuck.")
+                # if self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                return avoidance_goal
+                # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
+                #     print("That avoidance goal is impassable. I'm stuck.")
 
 
     def SYSTEM_ALPHA(self):
@@ -942,6 +1000,11 @@ class Walker(Agent):
         else:
             self.stepCount += 1  # This is not needed as the agent can access the step number through other means??
             # print("Goal Reached?", self.goal_reached)
+            if self.goal == 0 or []:  # this is a catcher for if the goal has been wiped
+                self.calculate_box_distances_from_current_pos()
+                self.set_goal()
+
+            self.inter_goal_stepCount += 1
             if not self.goal_reached:
                 time_start = time.clock()
                 self.reactive_nav()
@@ -962,6 +1025,7 @@ class Walker(Agent):
                 print("Step Count: ", self.stepCount)
                 # print("Setting new goal.")
                 self.goal_reached = False
+                self.inter_goal_stepCount = 0
                 if self.box_open_verbose:
                     print("Full Box List: ", self.model.full_boxes)
 
@@ -1204,6 +1268,10 @@ class Walker(Agent):
             writer.writerow([self.planning_steps_taken])
             writer.writerow([self.overall_time_elapsed])
 
+
+    def pause(self):
+        return
+
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # DELIBERATIVE NAVIGATION - A* ALGORITHM
 
@@ -1351,6 +1419,11 @@ class Walker(Agent):
 
         else:
             self.stepCount += 1
+            self.inter_goal_stepCount += 1
+            if self.goal == 0 or []:  # this is a catcher for if the goal has been wiped
+                self.calculate_box_distances_from_current_pos()
+                self.set_goal()
+
             if not self.goal_reached:
                 if not self.plan_acquired:
                     time_start = time.clock()
@@ -1378,6 +1451,7 @@ class Walker(Agent):
                 self.calculate_box_distances_from_current_pos()
                 self.set_goal()
                 print("Current Inventory: ", self.inventory)
+                self.inter_goal_stepCount = 0
                 # print("Setting new goal.")
                 self.goal_reached = False
                 self.plan_acquired = False
@@ -1388,12 +1462,36 @@ class Walker(Agent):
             print("Step Time:", step_time)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    # METACOGNITION
+
+    def meta_monitoring(self, path_length, path_cost, running_time, path_memory, step_memory, score, steps_since_last_goal,
+                        distance_to_goal, ):
+
+        return
+
+    # there should be some kind of third function that makes the decision on what the best course of action is?
+
+    def meta_switcher(self, time_performance, planning_performance, stuck_level):
+        switch_threshold = 0
+
+        if stuck_level >= 1:
+            switch_threshold += 1
+
+        if switch_threshold >= 1:
+            if self.navigation_mode == 1:
+                self.navigation_mode = 2
+            elif self.navigation_mode == 2:
+                self.navigation_mode = 1
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
     def step(self):
         '''
         A model step. Depending on the Nav Mode being used, either use reactive navigation to reach the closest
         unopened box, or use A* navigation to traverse the map.
         '''
+        # self.meta_monitoring()
+        self.meta_switcher(0, 0, self.stuck)
 
         # Navigation Systems
         if self.navigation_mode == 1:
