@@ -84,6 +84,7 @@ class Walker(Agent):
         # self.overall_time_elapsed = 0
         self.planning_steps_taken = 0
         self.stuck = 0
+        self.loop = 0
         self.step_time_memory = []
         self.planning_step_memory = []
 
@@ -202,6 +203,7 @@ class Walker(Agent):
         next_move = random.choice(next_moves)
         # Now move:
         self.model.grid.move_agent(self, next_move)
+        self.steps_memory.insert(0, next_move)
 
     def calculate_box_distances_from_current_pos(self):
         '''
@@ -292,6 +294,7 @@ class Walker(Agent):
                         return
                     else:
                         self.model.grid.move_agent(self, self.next_move)
+                        self.steps_memory.insert(0, self.next_move)
 
                 elif current_x < goal_x:
                     self.next_move = ((current_x + 1), current_y)
@@ -301,6 +304,7 @@ class Walker(Agent):
                         return
                     else:
                         self.model.grid.move_agent(self, self.next_move)
+                        self.steps_memory.insert(0, self.next_move)
 
                 if current_y > goal_y:
                     self.next_move = (current_x, (current_y - 1))
@@ -310,6 +314,7 @@ class Walker(Agent):
                         return
                     else:
                         self.model.grid.move_agent(self, self.next_move)
+                        self.steps_memory.insert(0, self.next_move)
 
                 elif current_y < goal_y:
                     self.next_move = (current_x, (current_y + 1))
@@ -319,6 +324,7 @@ class Walker(Agent):
                         return
                     else:
                         self.model.grid.move_agent(self, self.next_move)
+                        self.steps_memory.insert(0, self.next_move)
 
             elif self.pos == self.goal:
                 self.goal_reached = True
@@ -626,12 +632,14 @@ class Walker(Agent):
                                 self.normal_navigation = True
                             else:
                                 print("I can't sidestep!")
+                                self.stuck += 1
                         else:
                             print("My local area is not free.")
                             return
                     return
             else:
                 print("My reactive avoidance goal is impassable. I'm stuck.")
+                self.stuck += 1
                 return
 
         elif blocked_direction == "east":
@@ -651,12 +659,14 @@ class Walker(Agent):
                                 self.normal_navigation = True
                             else:
                                 print("I can't sidestep!")
+                                self.stuck += 1
                         else:
                             print("My local area is not free.")
                             return
                     return
             else:
                 print("My reactive avoidance goal is impassable. I'm stuck.")
+                self.stuck += 1
                 return
 
         elif blocked_direction == "south":
@@ -675,12 +685,14 @@ class Walker(Agent):
                                 self.normal_navigation = True
                             else:
                                 print("I can't sidestep!")
+                                self.stuck += 1
                         else:
                             print("My local area is not free.")
                             return
                     return
             else:
                 print("My reactive avoidance goal is impassable. I'm stuck.")
+                self.stuck += 1
                 return
 
         elif blocked_direction == "west":
@@ -700,12 +712,14 @@ class Walker(Agent):
                                 self.normal_navigation = True
                             else:
                                 print("I can't sidestep!")
+                                self.stuck += 1
                         else:
                             print("My local area is not free.")
                             return
                     return
             else:
                 print("My reactive avoidance goal is impassable. I'm stuck.")
+                self.stuck += 1
                 return
 
         elif blocked_direction == "north_west":
@@ -725,12 +739,14 @@ class Walker(Agent):
                                 self.normal_navigation = True
                             else:
                                 print("I can't sidestep!")
+                                self.stuck += 1
                         else:
                             print("My local area is not free.")
                             return
                     return
             else:
                 print("My reactive avoidance goal is impassable. I'm stuck.")
+                self.stuck += 1
                 return
 
         elif blocked_direction == "north_east":
@@ -750,12 +766,14 @@ class Walker(Agent):
                                 self.normal_navigation = True
                             else:
                                 print("I can't sidestep!")
+                                self.stuck += 1
                         else:
                             print("My local area is not free.")
                             return
                     return
             else:
                 print("My reactive avoidance goal is impassable. I'm stuck.")
+                self.stuck += 1
                 return
 
         elif blocked_direction == "south_east":
@@ -775,12 +793,14 @@ class Walker(Agent):
                                 self.normal_navigation = True
                             else:
                                 print("I can't sidestep!")
+                                self.stuck += 1
                         else:
                             print("My local area is not free.")
                             return
                     return
             else:
                 print("My reactive avoidance goal is impassable. I'm stuck.")
+                self.stuck += 1
                 return
 
         elif blocked_direction == "south_west":
@@ -793,20 +813,22 @@ class Walker(Agent):
                         if self.left_right_sidestep(blocked_direction, self.pos):
                             print("Normal Navigation turned on.")
                             self.normal_navigation = True
-                    elif not self.check_for_freedom(self.goal, self.pos):  # if there is a blockage between here and the goal
+                    elif not self.check_for_freedom(self.goal, self.pos):  # if there is blockage between here and goal
                         if self.directional_blockage_checker() == "local_free":  # but my local area is free
                             if self.left_right_sidestep(blocked_direction, self.pos):
                                 print("But, my local area is free of obstacles! I'll turn on Normal Nav")
-                                self.normal_navigation = True  # maybe turn this off, have some more checking before that?
+                                self.normal_navigation = True  # maybe turn this off, have some more checking before that??????????????????????
                                 # if self.directional_blockage_checker() == "local_free":
                             else:
                                 print("I can't sidestep!")
+                                self.stuck += 1
                         else:
                             print("My local area is not free.")
                             return
                     return
             else:
                 print("My reactive avoidance goal is impassable. I'm stuck.")
+                self.stuck += 1
                 return
 
     # def bug_navigation(self, blocked_direction):
@@ -846,6 +868,7 @@ class Walker(Agent):
             # if not self.check_for_obstacles(sidestep):
                 print("Sidestepping")
                 self.model.grid.move_agent(self, sidestep)
+                self.steps_memory.insert(0, sidestep)
                 return True
             else:
                 print("I can't sidestep, I'm stuck.")
@@ -857,6 +880,7 @@ class Walker(Agent):
             # if not self.check_for_obstacles(sidestep):
                 print("Sidestepping")
                 self.model.grid.move_agent(self, sidestep)
+                self.steps_memory.insert(0, sidestep)
                 return True
             else:
                 print("I can't sidestep, I'm stuck.")
@@ -868,6 +892,7 @@ class Walker(Agent):
             # if not self.check_for_obstacles(sidestep):
                 print("Sidestepping")
                 self.model.grid.move_agent(self, sidestep)
+                self.steps_memory.insert(0, sidestep)
                 return True
             else:
                 print("I can't sidestep, I'm stuck.")
@@ -879,6 +904,7 @@ class Walker(Agent):
             # if not self.check_for_obstacles(sidestep):
                 print("Sidestepping")
                 self.model.grid.move_agent(self, sidestep)
+                self.steps_memory.insert(0, sidestep)
                 return True
             else:
                 print("I can't sidestep, I'm stuck.")
@@ -1183,9 +1209,6 @@ class Walker(Agent):
             ys = range(swapped_p1[1] + 1, swapped_p2[1]) or [swapped_p1[1]]
             return [(x, y) for x in xs for y in ys]  # be aware these will be in reverse order from the point to current
 
-        # TO ADD: Some kind of pause function? We want to stop the agent moving if there is a problem
-        # want to stop the agent turning on normal navigation under ALPHA when it encounters difficulties
-
     def generic_movement(self, target):
         # print("Generic Goal Set!")
         goal = target
@@ -1198,23 +1221,27 @@ class Walker(Agent):
                 self.next_move = ((current_x - 1), current_y)
                 self.check_for_obstacles(self.next_move)
                 self.model.grid.move_agent(self, self.next_move)
+                self.steps_memory.insert(0, self.next_move)
 
             elif current_x < goal_x:
                 # print("goal is:", goal)
                 self.next_move = ((current_x + 1), current_y)
                 self.model.grid.move_agent(self, self.next_move)
+                self.steps_memory.insert(0, self.next_move)
 
             if current_y > goal_y:
                 # print("goal is:", goal)
                 self.next_move = (current_x, (current_y - 1))
                 self.check_for_obstacles(self.next_move)
                 self.model.grid.move_agent(self, self.next_move)
+                self.steps_memory.insert(0, self.next_move)
 
             elif current_y < goal_y:
                 # print("goal is:", goal)
                 self.next_move = (current_x, (current_y + 1))
                 self.check_for_obstacles(self.next_move)
                 self.model.grid.move_agent(self, self.next_move)
+                self.steps_memory.insert(0, self.next_move)
 
         if self.pos == goal:
             # print("Generic Goal Reached!")
@@ -1268,8 +1295,10 @@ class Walker(Agent):
             writer.writerow([self.planning_steps_taken])
             writer.writerow([self.overall_time_elapsed])
 
+            # TO ADD: Some kind of pause function? We want to stop the agent moving if there is a problem
+            # want to stop the agent turning on normal navigation under ALPHA when it encounters difficulties
 
-    def pause(self):
+    def pause(self):  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! This should be employed to clear self.next_move, stop it from going on a mission off the map
         return
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -1439,6 +1468,7 @@ class Walker(Agent):
                 if self.plan_acquired:
                     next_step = self.planned_path.pop(0)
                     # self.model.grid.move_agent(self, next_step)
+                    # self.steps_memory.insert(0, next_step)
                     # print("Took my next step...")
                     self.generic_movement(next_step)
 
@@ -1464,24 +1494,65 @@ class Walker(Agent):
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # METACOGNITION
 
-    def meta_monitoring(self, path_length, path_cost, running_time, path_memory, step_memory, score, steps_since_last_goal,
+    def meta_monitoring(self, path_length, path_cost, running_time, step_memory, score, steps_since_last_goal,
                         distance_to_goal, ):
+
+        # loop checking is for checking if we have gotten stuck in a movement loop thanks to reactive behaviour.
+        # ideally, it checks for if any value comes up twice in a short space - the shortest check we can do is if
+        # x o x has occurred as a movement (e.g. (2,3) -> (2,4) -> (2,3))
+        #   this may happen reasonably as a part of inefficient progress, so increment the stuck value slowly, as we
+        #   need to employ caution.
+        if len(step_memory) >= 3:
+            if step_memory[0] == step_memory[2]:
+                self.loop += 0.25
+                print("I may be looping.")
+        if len(step_memory) >= 4:
+            if step_memory[0] == step_memory[3]:
+                self.loop += 0.25
+                print("I may be looping.")
+        if len(step_memory) >= 5:
+            if step_memory[0] == step_memory[4]:
+                # this will do for now, as long as the agent retraces steps in lines rather than going in CIRCLES
+                # a circular catcher is harder as we have no idea the size of circle
+                self.loop += 0.25
+                print("I may be looping.")
+
+        if len(step_memory) >= 7:
+            if step_memory[0] == step_memory[6]:
+                self.loop += 0.25  # this should catch circular loops (I think?)
+                print("I may be looping.")
+        if len(step_memory) >= 9:
+            if step_memory[0] == step_memory[8]:
+                self.loop += 0.25  # this should catch circular loops (I think?)
+                print("I may be looping.")
 
         return
 
     # there should be some kind of third function that makes the decision on what the best course of action is?
 
-    def meta_switcher(self, time_performance, planning_performance, stuck_level):
+    def meta_actor(self, time_performance, planning_performance, stuck_level, loop_check,):
         switch_threshold = 0
 
-        if stuck_level >= 1:
+        if stuck_level >= 1:  # NEED TO IMPLEMENT AN INCREASE IN STUCK LEVEL WHEN IT IS STUCK FOR THIS TO ACTUALLY WORK
+            switch_threshold += 1
+
+        if loop_check >= 1:
             switch_threshold += 1
 
         if switch_threshold >= 1:
             if self.navigation_mode == 1:
+                print("Switching ALPHA to BETA")
                 self.navigation_mode = 2
+                self.stuck = 0
+                self.loop = 0
             elif self.navigation_mode == 2:
+                print("Switching BETA to ALPHA")
                 self.navigation_mode = 1
+                self.stuck = 0
+                self.loop = 0
+
+        # can change threshold values? So if switching is occuring VERY OFTEN, make the loop and stuck checkers more cautious
+        # need to implement a cost for switching
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -1490,8 +1561,9 @@ class Walker(Agent):
         A model step. Depending on the Nav Mode being used, either use reactive navigation to reach the closest
         unopened box, or use A* navigation to traverse the map.
         '''
-        # self.meta_monitoring()
-        self.meta_switcher(0, 0, self.stuck)
+        if self.stepCount != 0:
+            self.meta_monitoring(0, 0, 0, self.steps_memory, self.score, self.inter_goal_stepCount, self.get_distance(self.pos, self.goal, False))
+            self.meta_actor(0, 0, self.stuck, self.loop)
 
         # Navigation Systems
         if self.navigation_mode == 1:
