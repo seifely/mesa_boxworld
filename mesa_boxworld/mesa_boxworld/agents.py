@@ -1504,31 +1504,31 @@ class Walker(Agent):
         #   need to employ caution.
         if len(step_memory) >= 3:
             if step_memory[0] == step_memory[2]:
-                self.loop += 0.25
-                print("I may be looping.")
+                self.loop += 0.125  # this value is set cautiously to prevent unnecessary switching whilst in A*
+                print("I may be looping. Loop Value now at: ", self.loop)
         if len(step_memory) >= 4:
             if step_memory[0] == step_memory[3]:
-                self.loop += 0.25
-                print("I may be looping.")
+                self.loop += 0.125
+                print("I may be looping. Loop Value now at: ", self.loop)
         if len(step_memory) >= 5:
             if step_memory[0] == step_memory[4]:
                 # this will do for now, as long as the agent retraces steps in lines rather than going in CIRCLES
                 # a circular catcher is harder as we have no idea the size of circle
-                self.loop += 0.25
-                print("I may be looping.")
+                self.loop += 0.125
+                print("I may be looping. Loop Value now at: ", self.loop)
 
         if len(step_memory) >= 7:
             if step_memory[0] == step_memory[6]:
-                self.loop += 0.25  # this should catch circular loops (I think?)
-                print("I may be looping.")
+                self.loop += 0.125  # this should catch circular loops (I think?)
+                print("I may be looping. Loop Value now at: ", self.loop)
         if len(step_memory) >= 9:
             if step_memory[0] == step_memory[8]:
-                self.loop += 0.25  # this should catch circular loops (I think?)
-                print("I may be looping.")
+                self.loop += 0.125  # this should catch circular loops (I think?)
+                print("I may be looping. Loop Value now at: ", self.loop)
 
         return
 
-    # there should be some kind of third function that makes the decision on what the best course of action is?
+    # should there be some kind of third function that makes the decision on what the best course of action is?
 
     def meta_actor(self, time_performance, planning_performance, stuck_level, loop_check,):
         switch_threshold = 0
@@ -1545,11 +1545,15 @@ class Walker(Agent):
                 self.navigation_mode = 2
                 self.stuck = 0
                 self.loop = 0
+                self.steps_memory = []
+                self.steps_memory.insert(0, self.pos)
             elif self.navigation_mode == 2:
                 print("Switching BETA to ALPHA")
                 self.navigation_mode = 1
                 self.stuck = 0
                 self.loop = 0
+                self.steps_memory = []
+                self.steps_memory.insert(0, self.pos)
 
         # can change threshold values? So if switching is occuring VERY OFTEN, make the loop and stuck checkers more cautious
         # need to implement a cost for switching
@@ -1564,6 +1568,8 @@ class Walker(Agent):
         if self.stepCount != 0:
             self.meta_monitoring(0, 0, 0, self.steps_memory, self.score, self.inter_goal_stepCount, self.get_distance(self.pos, self.goal, False))
             self.meta_actor(0, 0, self.stuck, self.loop)
+
+        print("Step Memory:", self.steps_memory)
 
         # Navigation Systems
         if self.navigation_mode == 1:
