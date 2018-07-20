@@ -93,9 +93,7 @@ class Walker(Agent):
         # step length (time) - how long is each step taking? Too long?
         # how much printing is being done - if performance is poor, are we explaining ourselves enough?
         # distance to set goal - does this increase at any point? Do we have to move further away to get closer?
-        # proximity of nearby obstacles - roughly how many obstacles are nearby? a lot? none? Any between here and
-            # our goal? (Crowdedness)
-        # current score
+        # is goal blocked
         # amount of memory being used - particularly important if we make large-scale calculations for deliberation
         # where have we been? - step memory that is restricted to a limited size
 
@@ -1432,13 +1430,15 @@ class Walker(Agent):
     # DELIBERATIVE NAVIGATION - A* ALGORITHM
 
     def deliberative_nav(self):
+        starter = time.clock()
         # self.get_nodes()  # sets the global 'self.passable_nodes' to the list of non-obstacle map points
         came_from, cost_so_far, planning_step = self.astar_search(self.pos, self.goal)
         path, path_cost = self.reconstruct_path(came_from, self.pos, self.goal)
         print("Planning steps taken: ", planning_step)
         # now we need a navigation system to take this path and use it
         # we also need to time this process so that we can have feedback on it
-
+        timer = time.clock - starter
+        print("Planning Time Taken: ", timer)
         return path, path_cost, planning_step
 
         # generate a list of possible next steps (children) toward the goal from current pos
@@ -1582,14 +1582,12 @@ class Walker(Agent):
 
             if not self.goal_reached:
                 if not self.plan_acquired:
-                    time_start = time.clock()
                     path, path_cost, planning_step = self.deliberative_nav()
                     self.planned_path = path
                     self.planned_path_cost = path_cost
                     self.planning_steps_taken = planning_step
-                    time_elapsed = (time.clock() - time_start)
-                    self.current_step_time = time_elapsed
-                    print("Planning Time Elapsed: ", time_elapsed)
+                    # self.current_step_time = time_elapsed
+                    # print("Planning Time Elapsed: ", time_elapsed)
                     self.plan_acquired = True
 
                 if self.plan_acquired:
@@ -1615,23 +1613,15 @@ class Walker(Agent):
 
             # self.output_data()
             step_time = time.clock() - start
+            self.current_step_time = step_time
+            self.step_time_memory.append(step_time)
             print("Current Score: ", self.score, "Step Count: ", self.stepCount)
             print("Step Time:", step_time)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    # METACOGNITION
+    # META COGNITION
 
-    def meta_monitoring(self, path_length, path_cost, running_time, step_memory, score, steps_since_last_goal,
-                        distance_to_goal, ):
-
-        crowdedness = self.crowdedness(3)
-        complexity, branch_complexity = self.complexity_judge()
-
-        # loop checking is for checking if we have gotten stuck in a movement loop thanks to reactive behaviour.
-        # ideally, it checks for if any value comes up twice in a short space - the shortest check we can do is if
-        # x o x has occurred as a movement (e.g. (2,3) -> (2,4) -> (2,3))
-        #   this may happen reasonably as a part of inefficient progress, so increment the stuck value slowly, as we
-        #   need to employ caution.
+    def loop_monitor(self, step_memory):
         if len(step_memory) >= 3:
             if step_memory[0] == step_memory[2]:
                 self.loop += 0.125  # this value is set cautiously to prevent unnecessary switching whilst in A*
@@ -1656,7 +1646,25 @@ class Walker(Agent):
                 self.loop += 0.125  # this should catch circular loops (I think?)
                 print("I may be looping. Loop Value now at: ", self.loop)
 
-        return
+
+    def meta_monitoring(self, path_length, path_cost, running_time, step_memory, score, steps_since_last_goal,
+                        distance_to_goal, ):
+        crowdedness = self.crowdedness(3)
+        complexity, branch_complexity = self.complexity_judge()
+
+        average_step_time = sum(self.step_time_memory)/len(self.step_time_memory)
+        # need to store these to a new list, check the list for increasing values or decreases from the previous step?
+        total_time = sum(self.step_time_memory)
+
+        # loop checking is for checking if we have gotten stuck in a movement loop thanks to reactive behaviour.
+        # ideally, it checks for if any value comes up twice in a short space - the shortest check we can do is if
+        # x o x has occurred as a movement (e.g. (2,3) -> (2,4) -> (2,3))
+        #   this may happen reasonably as a part of inefficient progress, so increment the stuck value slowly, as we
+        #   need to employ caution.
+
+        self.loop_monitor(step_memory)
+
+        return average_step_time, total_time,
 
     # should there be some kind of third function that makes the decision on what the best course of action is?
 
