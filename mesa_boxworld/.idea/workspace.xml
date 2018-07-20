@@ -14,8 +14,8 @@
       <file leaf-file-name="agents.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="209">
-              <caret line="1352" column="116" lean-forward="false" selection-start-line="1352" selection-start-column="116" selection-end-line="1352" selection-end-column="116" />
+            <state relative-caret-position="345">
+              <caret line="1402" column="0" lean-forward="true" selection-start-line="1402" selection-start-column="0" selection-end-line="1402" selection-end-column="0" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
                 <element signature="e#4299#7554#0" expanded="false" />
@@ -737,8 +737,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="1352" column="116" lean-forward="false" selection-start-line="1352" selection-start-column="116" selection-end-line="1352" selection-end-column="116" />
+        <state relative-caret-position="345">
+          <caret line="1402" column="0" lean-forward="true" selection-start-line="1402" selection-start-column="0" selection-end-line="1402" selection-end-column="0" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
             <element signature="e#4299#7554#0" expanded="false" />

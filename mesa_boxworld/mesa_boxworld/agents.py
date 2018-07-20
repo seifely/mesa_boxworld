@@ -1398,19 +1398,19 @@ class Walker(Agent):
             return complexity_value
 
         elif self.model.map_choice == "twelve":
-            complexity_value = 13
+            complexity_value = 22
             return complexity_value
 
         elif self.model.map_choice == "thirteen":
-            complexity_value = 13
+            complexity_value = 29
             return complexity_value
 
         elif self.model.map_choice == "fourteen":
-            complexity_value = 13
+            complexity_value = 45
             return complexity_value
 
-        elif self.model.map_choice == "fifteem":
-            complexity_value = 13
+        elif self.model.map_choice == "fifteen":
+            complexity_value = 35
             return complexity_value
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
