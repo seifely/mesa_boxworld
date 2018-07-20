@@ -1355,63 +1355,78 @@ class Walker(Agent):
 
         if self.model.map_choice == "one":
             complexity_value = 5
-            return complexity_value
+            modal_branch_per_obs = 1
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "two":
             complexity_value = 4
-            return complexity_value
+            modal_branch_per_obs = 1
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "three":
             complexity_value = 6
-            return complexity_value
+            modal_branch_per_obs = 1
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "four":
             complexity_value = 5
-            return complexity_value
+            modal_branch_per_obs = 1
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "five":
             complexity_value = 5
-            return complexity_value
+            modal_branch_per_obs = 1
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "six":
             complexity_value = 11
-            return complexity_value
+            modal_branch_per_obs = 2
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "seven":
             complexity_value = 14
-            return complexity_value
+            modal_branch_per_obs = 3
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "eight":
             complexity_value = 13
-            return complexity_value
+            modal_branch_per_obs = 3
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "nine":
             complexity_value = 13
-            return complexity_value
+            modal_branch_per_obs = 3
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "ten":
             complexity_value = 13
-            return complexity_value
+            modal_branch_per_obs = 2
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "eleven":
             complexity_value = 23
-            return complexity_value
+            modal_branch_per_obs = 6
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "twelve":
             complexity_value = 22
-            return complexity_value
+            modal_branch_per_obs = 5
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "thirteen":
             complexity_value = 29
-            return complexity_value
+            modal_branch_per_obs = 6
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "fourteen":
             complexity_value = 45
-            return complexity_value
+            modal_branch_per_obs = 6
+            return complexity_value, modal_branch_per_obs
 
         elif self.model.map_choice == "fifteen":
             complexity_value = 35
-            return complexity_value
+            modal_branch_per_obs = 5
+            return complexity_value, modal_branch_per_obs
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # DELIBERATIVE NAVIGATION - A* ALGORITHM
@@ -1610,6 +1625,7 @@ class Walker(Agent):
                         distance_to_goal, ):
 
         crowdedness = self.crowdedness(3)
+        complexity, branch_complexity = self.complexity_judge()
 
         # loop checking is for checking if we have gotten stuck in a movement loop thanks to reactive behaviour.
         # ideally, it checks for if any value comes up twice in a short space - the shortest check we can do is if
