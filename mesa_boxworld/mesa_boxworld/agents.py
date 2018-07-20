@@ -1301,6 +1301,118 @@ class Walker(Agent):
     def pause(self):  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! This should be employed to clear self.next_move, stop it from going on a mission off the map
         return
 
+    def crowdedness(self, radius):
+        x, y = self.pos
+        crowdedness = 0
+
+        if radius == 1:
+            check_space = [(x, (y +1)), ((x+1), (y+1)), ((x+1), y), ((x+1), (y-1)), (x, (y-1)), ((x-1), (y-1)), ((x-1), y),
+                           ((x - 1), (y + 1))]
+
+            for x in range(len(check_space)):
+                if not self.passable(check_space[x]):
+                    crowdedness += 1
+
+            return crowdedness
+
+        if radius == 2:
+            check_space = [(x, (y +1)), ((x+1), (y+1)), ((x+1), y), ((x+1), (y-1)), (x, (y-1)), ((x-1), (y-1)), ((x-1), y),
+                           ((x - 1), (y + 1)), (x, (y+2)), ((x+1), (y+2)), ((x+2), (y+2)), ((x+2), (y+1)), ((x+1), y),
+                           ((x + 2), (y - 1)), ((x+2), (y-2)), ((x+1), (y-2)), (x, (y-2)), ((x-1), (y-2)), ((x-2), (y-2)),
+                           ((x - 2), (y - 1)), ((x-2), y), ((x-1),(y+1)), ((x-2), (y+2)), ((x-1), (y+2))]
+
+            for x in range(len(check_space)):
+                if not self.passable(check_space[x]):
+                    crowdedness += 1
+
+            return crowdedness
+
+        if radius == 3:
+            check_space = [(x, (y +1)), ((x+1), (y+1)), ((x+1), y), ((x+1), (y-1)), (x, (y-1)), ((x-1), (y-1)), ((x-1), y),
+                           ((x - 1), (y + 1)), (x, (y+2)), ((x+1), (y+2)), ((x+2), (y+2)), ((x+2), (y+1)), ((x+1), y),
+                           ((x + 2), (y - 1)), ((x+2), (y-2)), ((x+1), (y-2)), (x, (y-2)), ((x-1), (y-2)), ((x-2), (y-2)),
+                           ((x - 2), (y - 1)), ((x-2), y), ((x-1),(y+1)), ((x-2), (y+2)), ((x-1), (y+2)), (x, (y+3)),
+                           ((x + 1), (y + 3)), ((x+2), (y+3)), ((x+2), (y+3)), ((x+3), (y+2)), ((x+3), (y+1)),
+                           ((x + 3), y), ((x+3), (y-1)), ((x+3), (y-2)), ((x+3), (y-3)), ((x+2), (y-3)), ((x+1), (y-3)),
+                           ((x), (y - 3)), ((x-1), (y-3)), ((x-2), (y-3)), ((x-3), (y-3)), ((x-3), (y-2)), ((x-3), (y-1)),
+                           ((x - 3), (y)), ((x-3), (y+1)), ((x-3), (y+2)), ((x-3), (y+3)), ((x-2), (y+3)), ((x-1), (y+3))]
+
+            for x in range(len(check_space)):
+                if not self.passable(check_space[x]):
+                    crowdedness += 1
+
+            return crowdedness
+
+        elif radius != 1 or 2 or 3:
+            print("Radius input error")
+            return
+
+    def complexity_judge(self):
+        # number of branches are going to be represented by the number of duplicate x or y's in the obstacle array?
+        # i could provide this as a flat number for each map (easier), number of branches
+        # OR I could provide it with the PERCENTAGE OF MAP COVERED BY OBSTACLE but that doesn't represent complexity
+        complexity_value = 0
+
+        if self.model.map_choice == "one":
+            complexity_value = 5
+            return complexity_value
+
+        elif self.model.map_choice == "two":
+            complexity_value = 4
+            return complexity_value
+
+        elif self.model.map_choice == "three":
+            complexity_value = 6
+            return complexity_value
+
+        elif self.model.map_choice == "four":
+            complexity_value = 5
+            return complexity_value
+
+        elif self.model.map_choice == "five":
+            complexity_value = 5
+            return complexity_value
+
+        elif self.model.map_choice == "six":
+            complexity_value = 11
+            return complexity_value
+
+        elif self.model.map_choice == "seven":
+            complexity_value = 14
+            return complexity_value
+
+        elif self.model.map_choice == "eight":
+            complexity_value = 13
+            return complexity_value
+
+        elif self.model.map_choice == "nine":
+            complexity_value = 13
+            return complexity_value
+
+        elif self.model.map_choice == "ten":
+            complexity_value = 13
+            return complexity_value
+
+        elif self.model.map_choice == "eleven":
+            complexity_value = 23
+            return complexity_value
+
+        elif self.model.map_choice == "twelve":
+            complexity_value = 13
+            return complexity_value
+
+        elif self.model.map_choice == "thirteen":
+            complexity_value = 13
+            return complexity_value
+
+        elif self.model.map_choice == "fourteen":
+            complexity_value = 13
+            return complexity_value
+
+        elif self.model.map_choice == "fifteem":
+            complexity_value = 13
+            return complexity_value
+
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # DELIBERATIVE NAVIGATION - A* ALGORITHM
 
@@ -1496,6 +1608,8 @@ class Walker(Agent):
 
     def meta_monitoring(self, path_length, path_cost, running_time, step_memory, score, steps_since_last_goal,
                         distance_to_goal, ):
+
+        crowdedness = self.crowdedness(3)
 
         # loop checking is for checking if we have gotten stuck in a movement loop thanks to reactive behaviour.
         # ideally, it checks for if any value comes up twice in a short space - the shortest check we can do is if
