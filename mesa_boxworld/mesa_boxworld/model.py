@@ -226,7 +226,6 @@ class ThirdTestModel(Model):
     def init_timer(self):
         self.start_timer = time.clock()
 
-
     def map_picker(self):
         if self.simple == 1:
             available_maps = ["one", "two", "three", "four", "five"]

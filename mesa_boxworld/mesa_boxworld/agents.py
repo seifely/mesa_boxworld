@@ -2,6 +2,7 @@ import random
 import math
 import csv
 import time
+import sys
 # import pandas as pd
 
 from mesa import Agent
@@ -43,7 +44,7 @@ class Walker(Agent):
 
     def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
                  able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True,
-                 score=0, inventory={}, items_picked_up=0, navigation_mode=1):
+                 score=0, inventory={}, items_picked_up=0, navigation_mode=2):
         super().__init__(pos, model)
 
         # AGENT NOTE: IT ALWAYS TRAVELS ALONG ITS Y AXIS BEFORE ITS X AXIS
@@ -53,7 +54,9 @@ class Walker(Agent):
         # A* needs some work, as it zooms about too much at the moment
 
         self.moore = moore
-        self.filename = random.randint(1,1001)
+        random_n = str(random.randint(1,1001))
+        nav_type = str(navigation_mode)
+        self.filename = "nav" + nav_type + "_map" + self.model.map_choice + "_" + random_n
         self.next_move = next_move
         self.able_to_move = able_to_move
         self.steps_memory = steps_memory
@@ -87,6 +90,7 @@ class Walker(Agent):
         self.loop = 0
         self.step_time_memory = []
         self.planning_step_memory = []
+        self.average_step_time = 0
 
         # things we want to track are:
         # program run time - is it going on too long? What are the average completion times for the current map?
@@ -254,6 +258,7 @@ class Walker(Agent):
         if not self.closed_box_list:
             self.goal = self.goal
             print("There's nowhere left to go! I win!")
+            sys.exit()
 
     def reactive_nav(self):
 
@@ -1055,6 +1060,7 @@ class Walker(Agent):
 
             step_time = time.clock() - start
             print("Step Time: ", step_time)
+            self.step_time_memory.append(step_time)
 
         # self.output_data()
 
@@ -1257,41 +1263,47 @@ class Walker(Agent):
             self.obstacle_present = False
             return False
 
-    def output_data(self):
+    def output_data(self, total_time, crowdedness, map_complexity, branch_complexity):
 
         if self.navigation_mode == 1:
 
             # open the csv file
-            ofile = open('%d.csv' % (self.filename), "a")
-            writer = csv.writer(ofile, delimiter=',')
+            # ofile = open('%d.csv' % (self.filename), "a")
+            with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
+                fieldnames = ['mode', 'total_stepcount', 'number_closed_box', 'total_time', 'average_steptime', 'score', 'goal_dist',
+                              'crowdedness', 'branch_complex', 'map_complex']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-            distance_to_goal = self.get_distance(self.pos, self.goal, False)
+                distance_to_goal = self.get_distance(self.pos, self.goal, False)
+                box_numbers = len(self.closed_box_list)
 
-            writer.writerow("-----------")
-            writer.writerow([self.stepCount])
-            writer.writerow([self.score])
-            writer.writerow([self.current_step_time])
-            writer.writerow([distance_to_goal])
-            writer.writerow([self.overall_time_elapsed])
+                if self.stepCount == 1:
+                    writer.writeheader()
+                writer.writerow({'mode': self.navigation_mode, 'total_stepcount': self.stepCount, 'number_closed_box': box_numbers,
+                                 'total_time': total_time, 'average_steptime': self.average_step_time, 'score': self.score,
+                                 'goal_dist': distance_to_goal, 'crowdedness': crowdedness,
+                                 'branch_complex': branch_complexity, 'map_complex': map_complexity})
+
 
         elif self.navigation_mode == 2:
 
-            # open the csv file
-            ofile = open('%d.csv' % (self.filename), "a")
-            writer = csv.writer(ofile, delimiter=',')
+            with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
+                fieldnames = ['mode', 'total_stepcount', 'number_closed_box', 'total_time', 'average_steptime', 'score', 'goal_dist', 'planning_steps',
+                              'path_cost', 'crowdedness', 'branch_complex', 'map_complex']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-            path_length = len(self.planned_path)
-            distance_to_goal = self.get_distance(self.pos, self.goal, False)
+                distance_to_goal = self.get_distance(self.pos, self.goal, False)
+                box_numbers = len(self.closed_box_list)
 
-            writer.writerow("------------")
-            writer.writerow([self.stepCount])
-            writer.writerow([path_length])
-            writer.writerow([self.planned_path_cost])
-            writer.writerow([self.score])
-            writer.writerow([self.current_step_time])
-            writer.writerow([distance_to_goal])
-            writer.writerow([self.planning_steps_taken])
-            writer.writerow([self.overall_time_elapsed])
+                if self.stepCount == 1:
+                    writer.writeheader()
+                writer.writerow({'mode': self.navigation_mode, 'total_stepcount': self.stepCount, 'total_time': total_time,'number_closed_box': box_numbers,
+                                 'average_steptime': self.average_step_time, 'score': self.score, 'goal_dist': distance_to_goal,
+                                 'planning_steps': self.planning_steps_taken, 'path_cost': self.planned_path_cost,
+                                 'crowdedness': crowdedness, 'branch_complex': branch_complexity, 'map_complex': map_complexity})
+
+
+
 
             # TO ADD: Some kind of pause function? We want to stop the agent moving if there is a problem
             # want to stop the agent turning on normal navigation under ALPHA when it encounters difficulties
@@ -1437,8 +1449,10 @@ class Walker(Agent):
         print("Planning steps taken: ", planning_step)
         # now we need a navigation system to take this path and use it
         # we also need to time this process so that we can have feedback on it
-        timer = time.clock - starter
-        print("Planning Time Taken: ", timer)
+
+        plan_time = time.clock() - starter
+        print("Planning Time Taken: ", plan_time)
+
         return path, path_cost, planning_step
 
         # generate a list of possible next steps (children) toward the goal from current pos
@@ -1652,7 +1666,8 @@ class Walker(Agent):
         crowdedness = self.crowdedness(3)
         complexity, branch_complexity = self.complexity_judge()
 
-        average_step_time = sum(self.step_time_memory)/len(self.step_time_memory)
+        if len(self.step_time_memory) > 0:
+            self.average_step_time = sum(self.step_time_memory)/len(self.step_time_memory)
         # need to store these to a new list, check the list for increasing values or decreases from the previous step?
         total_time = sum(self.step_time_memory)
 
@@ -1662,9 +1677,14 @@ class Walker(Agent):
         #   this may happen reasonably as a part of inefficient progress, so increment the stuck value slowly, as we
         #   need to employ caution.
 
-        self.loop_monitor(step_memory)
+        # steps left, time left
 
-        return average_step_time, total_time,
+        # NEED AN 'IF PERFORMANCE DROPS, CHANGE AN X VALUE IN THE SYSTEM TO IMPROVE PERFORMANCE'
+
+
+        self.loop_monitor(step_memory)
+        return self.average_step_time, total_time, crowdedness, complexity, branch_complexity
+        # return
 
     # should there be some kind of third function that makes the decision on what the best course of action is?
 
@@ -1704,8 +1724,13 @@ class Walker(Agent):
         unopened box, or use A* navigation to traverse the map.
         '''
         if self.stepCount != 0:
-            self.meta_monitoring(0, 0, 0, self.steps_memory, self.score, self.inter_goal_stepCount, self.get_distance(self.pos, self.goal, False))
+            av_step, tt_step, crowdedness, map_complex, branch_complex = self.meta_monitoring(0, 0, 0, self.steps_memory,
+                                                                        self.score, self.inter_goal_stepCount,
+                                                                        self.get_distance(self.pos, self.goal, False))
+            print("Average and Total Step Time:", av_step, tt_step)
             self.meta_actor(0, 0, self.stuck, self.loop)
+
+            self.output_data(tt_step, crowdedness, map_complex, branch_complex)
 
         print("Step Memory:", self.steps_memory)
 
@@ -1715,6 +1740,11 @@ class Walker(Agent):
 
         elif self.navigation_mode == 2:
             self.SYSTEM_BETA()
+
+
+
+
+
 
 
 ############################################################################################################
