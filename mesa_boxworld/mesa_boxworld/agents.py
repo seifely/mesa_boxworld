@@ -1019,7 +1019,7 @@ class Walker(Agent):
 
 
     def SYSTEM_ALPHA(self):
-        start = time.clock()
+        # start = time.clock()
 
         if self.stepCount == 0:  # this should be done once at the start, then again when a box is opened
             self.calculate_box_distances_from_current_pos()
@@ -1058,9 +1058,9 @@ class Walker(Agent):
                 if self.box_open_verbose:
                     print("Full Box List: ", self.model.full_boxes)
 
-            step_time = time.clock() - start
-            print("Step Time: ", step_time)
-            self.step_time_memory.append(step_time)
+            # step_time = time.clock() - start
+            # print("Step Time: ", step_time)
+            # self.step_time_memory.append(step_time)
 
         # self.output_data()
 
@@ -1581,7 +1581,7 @@ class Walker(Agent):
         return path, path_cost
 
     def SYSTEM_BETA(self):
-        start = time.clock()
+        # start = time.clock()
         if self.stepCount == 0:
             self.calculate_box_distances_from_current_pos()
             self.set_goal()
@@ -1626,11 +1626,11 @@ class Walker(Agent):
                 self.plan_acquired = False
 
             # self.output_data()
-            step_time = time.clock() - start
-            self.current_step_time = step_time
-            self.step_time_memory.append(step_time)
+            # step_time = time.clock() - start
+            # self.current_step_time = step_time
+            # self.step_time_memory.append(step_time)
             print("Current Score: ", self.score, "Step Count: ", self.stepCount)
-            print("Step Time:", step_time)
+            # print("Step Time:", step_time)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # META COGNITION
@@ -1670,6 +1670,7 @@ class Walker(Agent):
             self.average_step_time = sum(self.step_time_memory)/len(self.step_time_memory)
         # need to store these to a new list, check the list for increasing values or decreases from the previous step?
         total_time = sum(self.step_time_memory)
+        print("Average Step Time:", self.average_step_time, "Total Step Time: ", total_time)
 
         # loop checking is for checking if we have gotten stuck in a movement loop thanks to reactive behaviour.
         # ideally, it checks for if any value comes up twice in a short space - the shortest check we can do is if
@@ -1694,24 +1695,25 @@ class Walker(Agent):
         if stuck_level >= 1:  # NEED TO IMPLEMENT AN INCREASE IN STUCK LEVEL WHEN IT IS STUCK FOR THIS TO ACTUALLY WORK
             switch_threshold += 1
 
-        if loop_check >= 1:
-            switch_threshold += 1
+        # if loop_check >= 1:
+        #     switch_threshold += 1
 
         if switch_threshold >= 1:
-            if self.navigation_mode == 1:
-                print("Switching ALPHA to BETA")
-                self.navigation_mode = 2
-                self.stuck = 0
-                self.loop = 0
-                self.steps_memory = []
-                self.steps_memory.insert(0, self.pos)
-            elif self.navigation_mode == 2:
-                print("Switching BETA to ALPHA")
-                self.navigation_mode = 1
-                self.stuck = 0
-                self.loop = 0
-                self.steps_memory = []
-                self.steps_memory.insert(0, self.pos)
+            sys.exit()
+            # if self.navigation_mode == 1:
+            #     print("Switching ALPHA to BETA")
+            #     self.navigation_mode = 2
+            #     self.stuck = 0
+            #     self.loop = 0
+            #     self.steps_memory = []
+            #     self.steps_memory.insert(0, self.pos)
+            # elif self.navigation_mode == 2:
+            #     print("Switching BETA to ALPHA")
+            #     self.navigation_mode = 1
+            #     self.stuck = 0
+            #     self.loop = 0
+            #     self.steps_memory = []
+            #     self.steps_memory.insert(0, self.pos)
 
         # can change threshold values? So if switching is occuring VERY OFTEN, make the loop and stuck checkers more cautious
         # need to implement a cost for switching
@@ -1723,11 +1725,13 @@ class Walker(Agent):
         A model step. Depending on the Nav Mode being used, either use reactive navigation to reach the closest
         unopened box, or use A* navigation to traverse the map.
         '''
+        start = time.clock()
+
         if self.stepCount != 0:
             av_step, tt_step, crowdedness, map_complex, branch_complex = self.meta_monitoring(0, 0, 0, self.steps_memory,
                                                                         self.score, self.inter_goal_stepCount,
                                                                         self.get_distance(self.pos, self.goal, False))
-            print("Average and Total Step Time:", av_step, tt_step)
+            # print("Average and Total Step Time:", av_step, tt_step)
             self.meta_actor(0, 0, self.stuck, self.loop)
 
             self.output_data(tt_step, crowdedness, map_complex, branch_complex)
@@ -1741,10 +1745,8 @@ class Walker(Agent):
         elif self.navigation_mode == 2:
             self.SYSTEM_BETA()
 
-
-
-
-
+        step_time = time.clock() - start
+        self.step_time_memory.append(step_time)  # this results in step time memory being step t-1?
 
 
 ############################################################################################################
