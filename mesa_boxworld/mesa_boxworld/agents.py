@@ -84,7 +84,7 @@ class Walker(Agent):
         self.planned_path = []
         self.planned_path_cost = []
         self.current_step_time = 0
-        # self.overall_time_elapsed = 0
+        self.tt_step = 0
         self.planning_steps_taken = 0
         self.stuck = 0
         self.loop = 0
@@ -1732,8 +1732,9 @@ class Walker(Agent):
                                                                         self.score, self.inter_goal_stepCount,
                                                                         self.get_distance(self.pos, self.goal, False))
             # print("Average and Total Step Time:", av_step, tt_step)
-            self.meta_actor(0, 0, self.stuck, self.loop)
-
+            self.meta_actor(0, 0, self.stuck, self.loop)  # this could take in 'time remaining' -
+            # e.g. if we are in last ten seconds and there are still boxes, switch to reactive
+            self.tt_step = tt_step
             self.output_data(tt_step, crowdedness, map_complex, branch_complex)
 
         print("Step Memory:", self.steps_memory)
@@ -1746,10 +1747,14 @@ class Walker(Agent):
             self.SYSTEM_BETA()
 
         step_time = time.clock() - start
+        time_remaining = self.model.time_limit - self.tt_step  # could use this as
         self.step_time_memory.append(step_time)  # this results in step time memory being step t-1?
+        if self.tt_step > self.model.time_limit:
+            print("Time's up!")
+            sys.exit()
 
 
-############################################################################################################
+    ############################################################################################################
 
 
 class ClosedBox(Agent):

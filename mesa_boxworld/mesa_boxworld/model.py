@@ -34,6 +34,7 @@ class ThirdTestModel(Model):
     all_boxes = {}
     obstacles = []
     map_choice = []
+    timed_mode = True
 
     verbose = False  # Print-monitoring
 
@@ -54,7 +55,8 @@ class ThirdTestModel(Model):
                  all_boxes={},
                  obstacles=[],
                  map_choice=[],
-                 simple=1):
+                 simple=1,
+                 timed_mode=True):
 
         # Model Parameters Init
         self.height = height
@@ -77,6 +79,15 @@ class ThirdTestModel(Model):
         self.full_boxes = full_boxes
         self.all_boxes = all_boxes
         self.obstacles = obstacles
+        self.timed_mode = timed_mode
+
+        if timed_mode:
+            if self.simple == 1:
+                self.time_limit = 20
+            elif self.simple == 2:
+                self.time_limit = 40
+            elif self.simple == 3:
+                self.time_limit = 80
 
         # Grid
         self.grid_list = []
