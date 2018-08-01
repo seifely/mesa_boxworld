@@ -83,11 +83,11 @@ class ThirdTestModel(Model):
 
         if timed_mode:
             if self.simple == 1:
-                self.time_limit = 15
+                self.time_limit = 10
             elif self.simple == 2:
                 self.time_limit = 30
             elif self.simple == 3:
-                self.time_limit = 60
+                self.time_limit = 90
 
         # Grid
         self.grid_list = []
@@ -247,12 +247,13 @@ class ThirdTestModel(Model):
         elif self.simple == 2:
             # available_maps = ["six", "seven", "eight", "nine", "ten"]  # add eleven to fifteen here
             # self.map_choice = random.choice(available_maps)
-            self.map_choice = "eleven"
+            self.map_choice = "six"
             print("Map ", self.map_choice)
 
         elif self.simple == 3:
-            available_maps = ["eleven", "twelve", "thirteen", "fourteen", "fifteen"]
-            self.map_choice = random.choice(available_maps)
+            # available_maps = ["eleven", "twelve", "thirteen", "fourteen", "fifteen"]
+            # self.map_choice = random.choice(available_maps)
+            self.map_choice = "fifteen"
             print("Map ", self.map_choice)
         # create Boxes:
 
