@@ -239,21 +239,21 @@ class ThirdTestModel(Model):
 
     def map_picker(self):
         if self.simple == 1:
-            # available_maps = ["one", "two", "three", "four", "five"]
-            # self.map_choice = random.choice(available_maps)
-            self.map_choice = "five"
+            available_maps = ["one", "two", "three", "four", "five"]
+            self.map_choice = random.choice(available_maps)
+            # self.map_choice = "five"
             print("Map ", self.map_choice)
 
         elif self.simple == 2:
-            # available_maps = ["six", "seven", "eight", "nine", "ten"]  # add eleven to fifteen here
-            # self.map_choice = random.choice(available_maps)
-            self.map_choice = "six"
+            available_maps = ["six", "seven", "eight", "nine", "ten"]  # add eleven to fifteen here
+            self.map_choice = random.choice(available_maps)
+            # self.map_choice = "six"
             print("Map ", self.map_choice)
 
         elif self.simple == 3:
-            # available_maps = ["eleven", "twelve", "thirteen", "fourteen", "fifteen"]
-            # self.map_choice = random.choice(available_maps)
-            self.map_choice = "fifteen"
+            available_maps = ["eleven", "twelve", "thirteen", "fourteen", "fifteen"]
+            self.map_choice = random.choice(available_maps)
+            # self.map_choice = "fifteen"
             print("Map ", self.map_choice)
         # create Boxes:
 

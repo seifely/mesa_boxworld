@@ -88,9 +88,12 @@ class Walker(Agent):
         self.planning_steps_taken = 0
         self.stuck = 0
         self.loop = 0
+        self.stress = 0
         self.step_time_memory = []
         self.planning_step_memory = []
         self.average_step_time = 0
+        self.goal_distance = 0
+        self.switch_cost = 0
 
         # things we want to track are:
         # program run time - is it going on too long? What are the average completion times for the current map?
@@ -1025,6 +1028,7 @@ class Walker(Agent):
             self.calculate_box_distances_from_current_pos()
             self.set_goal()
             self.stepCount += 1
+            self.goal_distance = self.get_distance(self.pos, self.goal, False)
             # EACH STEP SHOULD RECORD THE AGENT'S POSITION AND USE POP FOR MEMORY LIMIT?
         else:
             self.stepCount += 1  # This is not needed as the agent can access the step number through other means??
@@ -1049,6 +1053,7 @@ class Walker(Agent):
             if self.goal_reached:
                 self.calculate_box_distances_from_current_pos()
                 self.set_goal()
+                self.goal_distance = self.get_distance(self.pos, self.goal, False)
                 print("Current Inventory: ", self.inventory)
                 print("Current Score: ", self.score)
                 print("Step Count: ", self.stepCount)
@@ -1130,6 +1135,7 @@ class Walker(Agent):
             # print("Item to consume: ", item_to_consume)
             self.model.grid._remove_agent(self.pos, item_to_consume)
             self.score -= 1
+            self.stress += 10
             self.items_picked_up += 1
             self.inventory[self.items_picked_up] = item_colour
 
@@ -1586,6 +1592,7 @@ class Walker(Agent):
             self.calculate_box_distances_from_current_pos()
             self.set_goal()
             self.stepCount += 1
+            self.goal_distance = self.get_distance(self.pos, self.goal, False)
 
         else:
             self.stepCount += 1
@@ -1619,6 +1626,7 @@ class Walker(Agent):
             if self.goal_reached:
                 self.calculate_box_distances_from_current_pos()
                 self.set_goal()
+                self.goal_distance = self.get_distance(self.pos, self.goal, False)
                 print("Current Inventory: ", self.inventory)
                 self.inter_goal_stepCount = 0
                 # print("Setting new goal.")
@@ -1633,7 +1641,7 @@ class Walker(Agent):
             # print("Step Time:", step_time)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    # META COGNITION
+    # META COGNITION A
 
     def loop_monitor(self, step_memory):
         if len(step_memory) >= 3:
@@ -1680,6 +1688,27 @@ class Walker(Agent):
 
         # steps left, time left
 
+        if steps_since_last_goal != 0 and distance_to_goal != 0:
+            progress_ratio = steps_since_last_goal/distance_to_goal
+
+            print("Progress Ratio: ", progress_ratio)
+            progress_queue = []
+            if len(progress_queue) < 2:
+                progress_queue.append(progress_ratio)
+
+            elif len(progress_queue) >= 2:
+                progress_queue.pop(0)
+                progress_queue.append(progress_ratio)
+
+            if len(progress_queue) >= 2:
+                if progress_queue.index(0) < progress_queue.index(1):  # if the previous step's ratio is lower than our current ratio, doing better
+                    print("Progress Queue: ", progress_queue)
+                    return
+
+                elif progress_queue.index(0) > progress_queue.index(1):  # if the previous step's ratio is higher than ours, doing worse
+                    print("Progress Queue: ", progress_queue)
+                    return
+
         # NEED AN 'IF PERFORMANCE DROPS, CHANGE AN X VALUE IN THE SYSTEM TO IMPROVE PERFORMANCE'
 
 
@@ -1689,7 +1718,7 @@ class Walker(Agent):
 
     # should there be some kind of third function that makes the decision on what the best course of action is?
 
-    def meta_actor(self, time_performance, planning_performance, stuck_level, loop_check,):
+    def meta_actor(self, time_performance, planning_performance, stuck_level, loop_check,):  # this needs to be done better
         switch_threshold = 0
 
         if stuck_level >= 1:  # NEED TO IMPLEMENT AN INCREASE IN STUCK LEVEL WHEN IT IS STUCK FOR THIS TO ACTUALLY WORK
@@ -1698,25 +1727,43 @@ class Walker(Agent):
         # if loop_check >= 1:
         #     switch_threshold += 1
 
-        if switch_threshold >= 1:
-            sys.exit()
-            # if self.navigation_mode == 1:
-            #     print("Switching ALPHA to BETA")
-            #     self.navigation_mode = 2
-            #     self.stuck = 0
-            #     self.loop = 0
-            #     self.steps_memory = []
-            #     self.steps_memory.insert(0, self.pos)
-            # elif self.navigation_mode == 2:
-            #     print("Switching BETA to ALPHA")
-            #     self.navigation_mode = 1
-            #     self.stuck = 0
-            #     self.loop = 0
-            #     self.steps_memory = []
-            #     self.steps_memory.insert(0, self.pos)
+        # if switch_threshold >= 1:
+        #     sys.exit()
+            # self.switch()
+            # self.switch_cost += 50
 
-        # can change threshold values? So if switching is occuring VERY OFTEN, make the loop and stuck checkers more cautious
+        # can change threshold values? So if switching is occurring VERY OFTEN, make the loop and stuck checkers more cautious
         # need to implement a cost for switching
+
+
+
+    def switch(self):
+        if self.navigation_mode == 1:
+            print("Switching ALPHA to BETA")
+            self.navigation_mode = 2
+            self.stuck = 0
+            self.loop = 0
+            self.steps_memory = []
+            self.steps_memory.insert(0, self.pos)
+        elif self.navigation_mode == 2:
+            print("Switching BETA to ALPHA")
+            self.navigation_mode = 1
+            self.stuck = 0
+            self.loop = 0
+            self.steps_memory = []
+            self.steps_memory.insert(0, self.pos)
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    # META COGNITION B
+
+    # this needs to be a system that checks the reliability of the other system
+    # type 1 falls down when we train on a subset and then fail to generalise
+    # bayesian trustworthiness based on some kind of memory?
+
+    # can override the meta actors in META A if it does not trust the response based on a lookup table
+    # calculate some kind of distance from current (new) scenario to learned scenarios, and the greater the distance
+    # the less trustworthy the response should be?
+
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -1728,16 +1775,18 @@ class Walker(Agent):
         start = time.clock()
 
         if self.stepCount != 0:
+            print("Inter goal step:", self.inter_goal_stepCount)
+            print("Goal distance: ", self.goal_distance)
             av_step, tt_step, crowdedness, map_complex, branch_complex = self.meta_monitoring(0, 0, 0, self.steps_memory,
                                                                         self.score, self.inter_goal_stepCount,
-                                                                        self.get_distance(self.pos, self.goal, False))
+                                                                        self.goal_distance)
             # print("Average and Total Step Time:", av_step, tt_step)
             self.meta_actor(0, 0, self.stuck, self.loop)  # this could take in 'time remaining' -
             # e.g. if we are in last ten seconds and there are still boxes, switch to reactive
             self.tt_step = tt_step
-            self.output_data(tt_step, crowdedness, map_complex, branch_complex)
+            # self.output_data(tt_step, crowdedness, map_complex, branch_complex)
 
-        print("Step Memory:", self.steps_memory)
+        # print("Step Memory:", self.steps_memory)
 
         # Navigation Systems
         if self.navigation_mode == 1:
@@ -1751,7 +1800,13 @@ class Walker(Agent):
         self.step_time_memory.append(step_time)  # this results in step time memory being step t-1?
         if self.tt_step > self.model.time_limit:
             print("Time's up!")
+
+            # do I record the run data here as an internal variable?
             sys.exit()
+
+        # depending on what stress levels are, set resources available: how far we can check back (for looping),
+        # change switching costs/thresholds (so we under or overvalue switching), less access to information such as
+        #
 
 
     ############################################################################################################
