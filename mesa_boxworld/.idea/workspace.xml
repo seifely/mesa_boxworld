@@ -14,7 +14,7 @@
       <file leaf-file-name="agents.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1593">
+            <state relative-caret-position="5134">
               <caret line="1735" column="94" lean-forward="false" selection-start-line="1735" selection-start-column="94" selection-end-line="1735" selection-end-column="94" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
@@ -68,8 +68,8 @@
       <file leaf-file-name="model.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mesa_boxworld/model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="455">
-              <caret line="255" column="34" lean-forward="false" selection-start-line="255" selection-start-column="34" selection-end-line="255" selection-end-column="34" />
+            <state relative-caret-position="157">
+              <caret line="244" column="42" lean-forward="false" selection-start-line="244" selection-start-column="42" selection-end-line="244" selection-end-column="42" />
               <folding>
                 <element signature="e#1#14#0" expanded="true" />
                 <element signature="e#16485#24976#0" expanded="false" />
@@ -85,7 +85,7 @@
       <file leaf-file-name="server.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mesa_boxworld/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
+            <state relative-caret-position="425">
               <caret line="30" column="43" lean-forward="false" selection-start-line="30" selection-start-column="43" selection-end-line="30" selection-end-column="43" />
               <folding>
                 <element signature="e#0#65#0" expanded="true" />
@@ -125,7 +125,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="849" />
     <option name="width" value="1078" />
     <option name="height" value="1057" />
@@ -228,19 +228,19 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1066" extended-state="7" />
+    <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12447917" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3336831" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32948583" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3336831" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -279,6 +279,83 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="29495">
+          <caret line="1735" column="94" lean-forward="false" selection-start-line="1735" selection-start-column="94" selection-end-line="1735" selection-end-column="94" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#4310#7565#0" expanded="false" />
+            <element signature="e#7603#7732#0" expanded="false" />
+            <element signature="e#7771#7854#0" expanded="false" />
+            <element signature="e#8062#8428#0" expanded="false" />
+            <element signature="e#8494#9411#0" expanded="false" />
+            <element signature="e#9446#10622#0" expanded="false" />
+            <element signature="e#10661#11331#0" expanded="false" />
+            <element signature="e#11373#13797#0" expanded="false" />
+            <element signature="e#13864#14799#0" expanded="false" />
+            <element signature="e#14862#15272#0" expanded="false" />
+            <element signature="e#15328#16293#0" expanded="false" />
+            <element signature="e#16299#16342#0" expanded="false" />
+            <element signature="e#25935#37870#0" expanded="false" />
+            <element signature="e#37876#37922#0" expanded="false" />
+            <element signature="e#39479#41561#0" expanded="false" />
+            <element signature="e#41650#47365#0" expanded="false" />
+            <element signature="e#47404#49390#0" expanded="false" />
+            <element signature="e#49573#51468#0" expanded="false" />
+            <element signature="e#51505#53135#0" expanded="false" />
+            <element signature="e#53189#56122#0" expanded="false" />
+            <element signature="e#56170#56701#0" expanded="false" />
+            <element signature="e#56751#58272#0" expanded="false" />
+            <element signature="e#58323#58760#0" expanded="false" />
+            <element signature="e#58858#61429#0" expanded="false" />
+            <element signature="e#61694#64019#0" expanded="false" />
+            <element signature="e#67253#68281#0" expanded="false" />
+            <element signature="e#68325#69374#0" expanded="false" />
+            <element signature="e#69443#70266#0" expanded="false" />
+            <element signature="e#70307#70383#0" expanded="false" />
+            <element signature="e#70423#70502#0" expanded="false" />
+            <element signature="e#70629#72158#0" expanded="false" />
+            <element signature="e#72224#72829#0" expanded="false" />
+            <element signature="e#72866#74989#0" expanded="false" />
+            <element signature="e#75176#76499#0" expanded="false" />
+            <element signature="e#76666#77897#0" expanded="false" />
+            <element signature="e#78112#79190#0" expanded="false" />
+            <element signature="e#81015#81422#0" expanded="false" />
+            <element signature="e#81454#81522#0" expanded="false" />
+            <element signature="e#81659#82034#0" expanded="false" />
+            <element signature="e#82066#82444#0" expanded="false" />
+            <element signature="e#82474#82850#0" expanded="false" />
+            <element signature="e#82989#83205#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mesa_boxworld/server.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="30" column="43" lean-forward="false" selection-start-line="30" selection-start-column="43" selection-end-line="30" selection-end-column="43" />
+          <folding>
+            <element signature="e#0#65#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mesa_boxworld/model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4148">
+          <caret line="244" column="42" lean-forward="true" selection-start-line="244" selection-start-column="42" selection-end-line="244" selection-end-column="42" />
+          <folding>
+            <element signature="e#1#14#0" expanded="true" />
+            <element signature="e#16485#24976#0" expanded="false" />
+            <element signature="e#25020#25281#0" expanded="false" />
+            <element signature="e#25317#26409#0" expanded="false" />
+            <element signature="e#26449#31654#0" expanded="false" />
+            <element signature="e#31660#31763#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1278,49 +1355,14 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/nav1_mapfour_110.csv" />
-    <entry file="file://$PROJECT_DIR$/nav2_mapone_829.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nav2_mapone_779.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nav2_mapone_203.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nav2_mapone_125.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nav2_mapone_130.csv">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
-          <caret line="69" column="0" lean-forward="true" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/nav2_mapone_829.csv" />
+    <entry file="file://$PROJECT_DIR$/nav2_mapone_779.csv" />
+    <entry file="file://$PROJECT_DIR$/nav2_mapone_203.csv" />
+    <entry file="file://$PROJECT_DIR$/nav2_mapone_125.csv" />
+    <entry file="file://$PROJECT_DIR$/nav2_mapone_130.csv" />
     <entry file="file://$PROJECT_DIR$/mesa_boxworld/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
+        <state relative-caret-position="425">
           <caret line="30" column="43" lean-forward="false" selection-start-line="30" selection-start-column="43" selection-end-line="30" selection-end-column="43" />
           <folding>
             <element signature="e#0#65#0" expanded="true" />
@@ -1330,7 +1372,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mesa_boxworld/agents.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1593">
+        <state relative-caret-position="5134">
           <caret line="1735" column="94" lean-forward="false" selection-start-line="1735" selection-start-column="94" selection-end-line="1735" selection-end-column="94" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
@@ -1382,8 +1424,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mesa_boxworld/model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="455">
-          <caret line="255" column="34" lean-forward="false" selection-start-line="255" selection-start-column="34" selection-end-line="255" selection-end-column="34" />
+        <state relative-caret-position="157">
+          <caret line="244" column="42" lean-forward="false" selection-start-line="244" selection-start-column="42" selection-end-line="244" selection-end-column="42" />
           <folding>
             <element signature="e#1#14#0" expanded="true" />
             <element signature="e#16485#24976#0" expanded="false" />
