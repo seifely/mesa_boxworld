@@ -218,6 +218,10 @@ class ThirdTestModel(Model):
                                       (20,9), (21,9), (22,9), (23,9), (22,8), (22,7), (22,6), (18,9), (18,8), (18,7),
                                       (19, 7), (20, 7), (20,6), (20,5), (20,4)]
 
+        self.map_complexity_data = [[5, 5, 1, 1], [5, 5, 1, 1], [6, 6, 1, 1], [5, 5, 1, 1], [5, 5, 1, 1],
+                                    [5, 11, 2, 2.2], [5, 14, 3, 2.8], [5, 13, 3, 2.6], [5, 13, 3, 2.6], [5, 13, 2, 2.6],
+                                    [4, 25, 6, 6.5], [4, 22, 5, 5.5], [5, 30, 7, 6], [8, 37, 3, 4.62], [8, 36, 5, 5.42]]
+
         # Model Functions
         self.schedule = RandomActivationByType(self)
         self.grid = MultiGrid(self.height, self.width, torus=True)
@@ -241,7 +245,7 @@ class ThirdTestModel(Model):
         if self.simple == 1:
             available_maps = ["one", "two", "three", "four", "five"]
             self.map_choice = random.choice(available_maps)
-            # self.map_choice = "five"
+            # self.map_choice = "fifteen"
             print("Map ", self.map_choice)
 
         elif self.simple == 2:

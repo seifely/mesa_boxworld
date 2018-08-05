@@ -3,6 +3,7 @@ import math
 import csv
 import time
 import sys
+import numpy as np
 # import pandas as pd
 
 from mesa import Agent
@@ -261,6 +262,7 @@ class Walker(Agent):
         if not self.closed_box_list:
             self.goal = self.goal
             print("There's nowhere left to go! I win!")
+            self.output_learned_data()
             sys.exit()
 
     def reactive_nav(self):
@@ -1314,7 +1316,35 @@ class Walker(Agent):
             # TO ADD: Some kind of pause function? We want to stop the agent moving if there is a problem
             # want to stop the agent turning on normal navigation under ALPHA when it encounters difficulties
 
-    def pause(self):  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! This should be employed to clear self.next_move, stop it from going on a mission off the map
+    def output_learned_data(self):
+        box_score = len(self.open_box_list)
+        n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
+
+        # save it to our numpy file
+        # trial_data = np.matrix([n_obstacles, total_branches, mean_branch_per_obs, self.navigation_mode,
+        #                           box_score])
+        # f = open('learned.csv', 'a')
+        # for iind in range(0):
+        #     a = trial_data
+        #     np.savetxt(f, a)
+        # f.close()
+
+        # state 1 state 2 state 3 action result
+        # save it to an excel file too
+
+        with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
+            fieldnames = ['N of Obstacles', 'N of Branches', 'Mean Branches Per Obstacle', 'Action', 'Result']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            box_score = len(self.open_box_list)
+
+            if self.stepCount == 1:
+                writer.writeheader()
+
+            writer.writerow({'N of Obstacles': n_obstacles, 'N of Branches': total_branches, 'Mean Branches Per Obstacle': mean_branch_per_obs,
+                             'Action': self.navigation_mode, 'Result': box_score})
+
+    def pause(self):  # !! This should be employed to clear self.next_move, stop it from going on a mission off the map
         return
 
     def crowdedness(self, radius):
@@ -1370,79 +1400,64 @@ class Walker(Agent):
         complexity_value = 0
 
         if self.model.map_choice == "one":
-            complexity_value = 5
-            modal_branch_per_obs = 1
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[0]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "two":
-            complexity_value = 4
-            modal_branch_per_obs = 1
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[1]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "three":
-            complexity_value = 6
-            modal_branch_per_obs = 1
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[2]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "four":
-            complexity_value = 5
-            modal_branch_per_obs = 1
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[3]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "five":
-            complexity_value = 5
-            modal_branch_per_obs = 1
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[4]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "six":
-            complexity_value = 11
-            modal_branch_per_obs = 2
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[5]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "seven":
-            complexity_value = 14
-            modal_branch_per_obs = 3
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[6]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "eight":
-            complexity_value = 13
-            modal_branch_per_obs = 3
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[7]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "nine":
-            complexity_value = 13
-            modal_branch_per_obs = 3
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[8]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "ten":
-            complexity_value = 13
-            modal_branch_per_obs = 2
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[9]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "eleven":
-            complexity_value = 23
-            modal_branch_per_obs = 6
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[10]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "twelve":
-            complexity_value = 22
-            modal_branch_per_obs = 5
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[11]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "thirteen":
-            complexity_value = 29
-            modal_branch_per_obs = 6
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[12]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "fourteen":
-            complexity_value = 45
-            modal_branch_per_obs = 6
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[13]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
         elif self.model.map_choice == "fifteen":
-            complexity_value = 35
-            modal_branch_per_obs = 5
-            return complexity_value, modal_branch_per_obs
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[14]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # DELIBERATIVE NAVIGATION - A* ALGORITHM
@@ -1672,7 +1687,7 @@ class Walker(Agent):
     def meta_monitoring(self, path_length, path_cost, running_time, step_memory, score, steps_since_last_goal,
                         distance_to_goal, ):
         crowdedness = self.crowdedness(3)
-        complexity, branch_complexity = self.complexity_judge()
+        n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
 
         if len(self.step_time_memory) > 0:
             self.average_step_time = sum(self.step_time_memory)/len(self.step_time_memory)
@@ -1713,7 +1728,7 @@ class Walker(Agent):
 
 
         self.loop_monitor(step_memory)
-        return self.average_step_time, total_time, crowdedness, complexity, branch_complexity
+        return self.average_step_time, total_time, crowdedness, n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
         # return
 
     # should there be some kind of third function that makes the decision on what the best course of action is?
@@ -1735,8 +1750,6 @@ class Walker(Agent):
         # can change threshold values? So if switching is occurring VERY OFTEN, make the loop and stuck checkers more cautious
         # need to implement a cost for switching
 
-
-
     def switch(self):
         if self.navigation_mode == 1:
             print("Switching ALPHA to BETA")
@@ -1752,6 +1765,11 @@ class Walker(Agent):
             self.loop = 0
             self.steps_memory = []
             self.steps_memory.insert(0, self.pos)
+
+    def update_q(self):
+        # have a numpy matrix stored that we can access and update
+        # matrix iteration goes mat[i][j], where i is row and j is column
+        return
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # META COGNITION B
@@ -1773,11 +1791,11 @@ class Walker(Agent):
         unopened box, or use A* navigation to traverse the map.
         '''
         start = time.clock()
-
+        print("obl: ", len(self.open_box_list))
         if self.stepCount != 0:
-            print("Inter goal step:", self.inter_goal_stepCount)
-            print("Goal distance: ", self.goal_distance)
-            av_step, tt_step, crowdedness, map_complex, branch_complex = self.meta_monitoring(0, 0, 0, self.steps_memory,
+            # print("Inter goal step:", self.inter_goal_stepCount)
+            # print("Goal distance: ", self.goal_distance)
+            av_step, tt_step, crowdedness, n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.meta_monitoring(0, 0, 0, self.steps_memory,
                                                                         self.score, self.inter_goal_stepCount,
                                                                         self.goal_distance)
             # print("Average and Total Step Time:", av_step, tt_step)
@@ -1802,6 +1820,7 @@ class Walker(Agent):
             print("Time's up!")
 
             # do I record the run data here as an internal variable?
+            self.output_learned_data()
             sys.exit()
 
         # depending on what stress levels are, set resources available: how far we can check back (for looping),
