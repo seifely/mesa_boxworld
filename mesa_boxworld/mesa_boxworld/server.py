@@ -2,8 +2,8 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import CanvasGrid, ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 
-from mesa_boxworld.agents import Walker, ClosedBox, OpenedBox, yellowItem, blueItem, pinkItem, Obstacle
-from mesa_boxworld.model import ThirdTestModel
+from mesa_boxworld.mesa_boxworld.agents import Walker, ClosedBox, OpenedBox, yellowItem, blueItem, pinkItem, Obstacle
+from mesa_boxworld.mesa_boxworld.model import ThirdTestModel
 
 ## could change nav mode from here using a slider at the bottom, but then agent would have to read its nav mode
 # from the model file (not a problem but won't help the metacognition, would be for demo purposes only)

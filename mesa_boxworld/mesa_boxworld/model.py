@@ -6,8 +6,8 @@ from mesa import Model
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 
-from mesa_boxworld.agents import Walker, ClosedBox, blueItem, yellowItem, pinkItem, Obstacle
-from mesa_boxworld.schedule import RandomActivationByType
+from mesa_boxworld.mesa_boxworld.agents import Walker, ClosedBox, blueItem, yellowItem, pinkItem, Obstacle
+from mesa_boxworld.mesa_boxworld.schedule import RandomActivationByType
 
 
 class ThirdTestModel(Model):
