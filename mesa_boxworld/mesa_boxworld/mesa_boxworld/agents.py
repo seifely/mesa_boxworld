@@ -3,14 +3,14 @@ import math
 import csv
 import time
 import sys
-import numpy as np
-# import pandas as pd
+
 
 from mesa import Agent
 from queue import PriorityQueue
+import pickle
+
 # priotyQs (also: Heap Q's) are binary trees where every parent node has a value >= any of its children. It keeps
-# track
-# of the minimum value, helping retrieve that min value at all times
+# track # of the minimum value, helping retrieve that min value at all times
 
 ###########################################################################################################
 
@@ -45,7 +45,7 @@ class Walker(Agent):
 
     def __init__(self, pos, model, moore, stepCount=0, goal=[], closed_box_list={}, open_box_list={}, next_move=[],
                  able_to_move=True, steps_memory=[], obstacle_present=False, normal_navigation=True,
-                 score=0, inventory={}, items_picked_up=0, navigation_mode=2):
+                 score=0, inventory={}, items_picked_up=0): # navigation_mode=2
         super().__init__(pos, model)
 
         # AGENT NOTE: IT ALWAYS TRAVELS ALONG ITS Y AXIS BEFORE ITS X AXIS
@@ -53,6 +53,9 @@ class Walker(Agent):
         # Bug Notes:
         # Sidestepping has been reduced to +1, doesn't seem to cause an issue for now
         # A* needs some work, as it zooms about too much at the moment
+
+        # randomly select a nav mode to start in: 1 is Reactive, 2 is Deliberative
+        navigation_mode = random.choice(1, 2)
 
         self.moore = moore
         random_n = str(random.randint(1,1001))
@@ -1766,9 +1769,24 @@ class Walker(Agent):
             self.steps_memory = []
             self.steps_memory.insert(0, self.pos)
 
-    def update_q(self):
+    def update_q(self, score, strategy, state, learning_rate, gamma):
         # have a numpy matrix stored that we can access and update
         # matrix iteration goes mat[i][j], where i is row and j is column
+
+        # if there is no pickle for that map, create one - a zero 2D matrix
+        # if there is a pickle for that map, load it - THIS IS OUR Q TABLE
+        file_name = "map1_q_values"
+        try:
+            fileObject = open(file_name, 'wb')
+        except FileNotFoundError:
+            return
+
+        # find which strategy has been used this time - 1 or 2
+        # see what the score ended up being - out of 10
+        # update the Q value for that strategy according to:
+            # new_q = current_q_for_strat + learning_rate * (reward + gamma * (max
+
+        # append the changed q-value to a csv file, so we can track the change in q-value over time? along with strategy
         return
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
