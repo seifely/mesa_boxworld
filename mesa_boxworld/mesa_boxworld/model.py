@@ -245,7 +245,7 @@ class ThirdTestModel(Model):
         if self.simple == 1:
             # available_maps = ["one", "two", "three", "four", "five"]
             # self.map_choice = random.choice(available_maps)
-            self.map_choice = "one"
+            self.map_choice = "three"
             print("Map ", self.map_choice)
 
         elif self.simple == 2:

@@ -56,7 +56,7 @@ class Walker(Agent):
 
         # randomly select a nav mode to start in: 1 is Reactive, 2 is Deliberative
         # navigation_mode = random.choice([1, 2])
-        navigation_mode = 1
+        navigation_mode = 2
 
         self.moore = moore
         random_n = str(random.randint(1,1001))
@@ -1774,7 +1774,7 @@ class Walker(Agent):
 
     def update_q(self, score, strategy, state, learning_rate, gamma):
 
-        initial_run = True
+        initial_run = False
 
         # have a numpy matrix stored that we can access and update
         # matrix iteration goes mat[i][j], where i is row and j is column
@@ -1782,7 +1782,7 @@ class Walker(Agent):
         # if there is no pickle for that map, create one - a zero 2D matrix
         # if there is a pickle for that map, load it - THIS IS OUR Q TABLE
 
-        file_name = "map1_q_values"
+        file_name = "map3_q_values"
 
         if initial_run:
             new_q = [0, 0]
