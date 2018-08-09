@@ -1805,17 +1805,26 @@ class Walker(Agent):
                     return new_q
 
                 elif not initial_run:
-                    imported_q[0] = (imported_q[0] + score) / 2  # if averaging over the trials
-                    # imported_q[0] = (imported_q[0] + learning_rate) * score
+                    if imported_q[0] == 0:
+                        imported_q[0] = score
 
-                    new_q = imported_q
-                    pickle.dump(new_q, fileWrite)
-                    fileWrite.close()
-                    return new_q
+                        new_q = imported_q
+                        pickle.dump(new_q, fileWrite)
+                        fileWrite.close()
+                        return new_q
+
+                    else:
+                        imported_q[0] = (imported_q[0] + score) / 2  # if averaging over the trials
+                        # imported_q[0] = (imported_q[0] + learning_rate) * score
+
+                        new_q = imported_q
+                        pickle.dump(new_q, fileWrite)
+                        fileWrite.close()
+                        return new_q
 
             if self.navigation_mode == 2:
                 if initial_run:
-                    imported_q[0] = score
+                    imported_q[1] = score
 
                     new_q = imported_q
                     pickle.dump(new_q, fileWrite)
@@ -1823,13 +1832,22 @@ class Walker(Agent):
                     return new_q
 
                 elif not initial_run:
-                    imported_q[1] = (imported_q[1] + score) / 2  # if averaging over the trials
-                    # imported_q[1] = (imported_q[1] + learning_rate) * score
+                    if imported_q[1] == 0:
+                        imported_q[1] = score
 
-                    new_q = imported_q
-                    pickle.dump(new_q, fileWrite)
-                    fileWrite.close()
-                    return new_q
+                        new_q = imported_q
+                        pickle.dump(new_q, fileWrite)
+                        fileWrite.close()
+                        return new_q
+
+                    else:
+                        imported_q[1] = (imported_q[1] + score) / 2  # if averaging over the trials
+                        # imported_q[1] = (imported_q[1] + learning_rate) * score
+
+                        new_q = imported_q
+                        pickle.dump(new_q, fileWrite)
+                        fileWrite.close()
+                        return new_q
 
         elif not initial_run:
             fileRead = open(file_name, 'rb')
@@ -1846,17 +1864,26 @@ class Walker(Agent):
                     return new_q
 
                 elif not initial_run:
-                    imported_q[0] = (imported_q[0] + score) / 2  # if averaging over the trials
-                    # imported_q[0] = (imported_q[0] + learning_rate) * score
+                    if imported_q[0] == 0:
+                        imported_q[0] = score
 
-                    new_q = imported_q
-                    pickle.dump(new_q, fileWrite)
-                    fileWrite.close()
-                    return new_q
+                        new_q = imported_q
+                        pickle.dump(new_q, fileWrite)
+                        fileWrite.close()
+                        return new_q
+
+                    else:
+                        imported_q[0] = (imported_q[0] + score) / 2  # if averaging over the trials
+                        # imported_q[0] = (imported_q[0] + learning_rate) * score
+
+                        new_q = imported_q
+                        pickle.dump(new_q, fileWrite)
+                        fileWrite.close()
+                        return new_q
 
             if self.navigation_mode == 2:
                 if initial_run:
-                    imported_q[0] = score
+                    imported_q[1] = score
 
                     new_q = imported_q
                     pickle.dump(new_q, fileWrite)
@@ -1864,21 +1891,23 @@ class Walker(Agent):
                     return new_q
 
                 elif not initial_run:
-                    imported_q[1] = (imported_q[1] + score) / 2  # if averaging over the trials
-                    # imported_q[1] = (imported_q[1] + learning_rate) * score
+                    if imported_q[1] == 0:
+                        imported_q[1] = score
 
-                    new_q = imported_q
-                    pickle.dump(new_q, fileWrite)
-                    fileWrite.close()
-                    return new_q
+                        new_q = imported_q
+                        pickle.dump(new_q, fileWrite)
+                        fileWrite.close()
+                        return new_q
 
-        # find which strategy has been used this time - 1 or 2
-        # see what the score ended up being - out of 10
-        # update the Q value for that strategy according to:
-            # new_q = current_q_for_strat + learning_rate * (reward + gamma * (max
+                    else:
+                        imported_q[1] = (imported_q[1] + score) / 2  # if averaging over the trials
+                        # imported_q[1] = (imported_q[1] + learning_rate) * score
 
-        # append the changed q-value to a csv file, so we can track the change in q-value over time? along with strategy
-        return
+                        new_q = imported_q
+                        pickle.dump(new_q, fileWrite)
+                        fileWrite.close()
+                        return new_q
+
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # META COGNITION B
