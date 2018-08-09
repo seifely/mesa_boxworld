@@ -265,7 +265,9 @@ class Walker(Agent):
         if not self.closed_box_list:
             self.goal = self.goal
             print("There's nowhere left to go! I win!")
-            self.output_learned_data()
+
+            q_val = self.update_q(len(self.open_box_list), 0, 0, 0, 0)
+            self.output_learned_data(q_val)
             sys.exit()
 
     def reactive_nav(self):
@@ -1319,7 +1321,7 @@ class Walker(Agent):
             # TO ADD: Some kind of pause function? We want to stop the agent moving if there is a problem
             # want to stop the agent turning on normal navigation under ALPHA when it encounters difficulties
 
-    def output_learned_data(self):
+    def output_learned_data(self, q_value):
         box_score = len(self.open_box_list)
         n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
 
@@ -1335,8 +1337,8 @@ class Walker(Agent):
         # state 1 state 2 state 3 action result
         # save it to an excel file too
 
-        with open('{}.csv'.format(self.filename), 'a', newline='') as csvfile:
-            fieldnames = ['N of Obstacles', 'N of Branches', 'Mean Branches Per Obstacle', 'Action', 'Result']
+        with open('{}-training.csv'.format(self.filename), 'a', newline='') as csvfile:
+            fieldnames = ['N of Obstacles', 'N of Branches', 'Mean Branches Per Obstacle', 'Action', 'Result', 'Overall Q']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             box_score = len(self.open_box_list)
@@ -1345,7 +1347,7 @@ class Walker(Agent):
                 writer.writeheader()
 
             writer.writerow({'N of Obstacles': n_obstacles, 'N of Branches': total_branches, 'Mean Branches Per Obstacle': mean_branch_per_obs,
-                             'Action': self.navigation_mode, 'Result': box_score})
+                             'Action': self.navigation_mode, 'Result': box_score, 'Overall Q': q_value})
 
     def pause(self):  # !! This should be employed to clear self.next_move, stop it from going on a mission off the map
         return
@@ -1770,16 +1772,59 @@ class Walker(Agent):
             self.steps_memory.insert(0, self.pos)
 
     def update_q(self, score, strategy, state, learning_rate, gamma):
+
+        initial_run = True
+
         # have a numpy matrix stored that we can access and update
         # matrix iteration goes mat[i][j], where i is row and j is column
 
         # if there is no pickle for that map, create one - a zero 2D matrix
         # if there is a pickle for that map, load it - THIS IS OUR Q TABLE
+
         file_name = "map1_q_values"
-        try:
-            fileObject = open(file_name, 'wb')
-        except FileNotFoundError:
-            return
+
+        if initial_run:
+            new_q = [0, 0]
+            new_file = open(file_name, 'wb')
+            pickle.dump(new_q, new_file)
+
+            # then load this value, and alter the correct one based on strategy used]#
+            fileObject = open(file_name, 'r')
+            imported_q = pickle.load(fileObject)
+
+            if self.navigation_mode == 1:
+                imported_q[0] = (imported_q[0] + score) / 2  # if averaging over the trials
+                # imported_q[0] = (imported_q[0] + learning_rate) * score
+
+                new_q = imported_q
+                pickle.dump(new_q, fileObject)
+
+            if self.navigation_mode == 2:
+                imported_q[1] = (imported_q[1] + score) / 2  # if averaging over the trials
+                # imported_q[1] = (imported_q[1] + learning_rate) * score
+
+                new_q = imported_q
+                pickle.dump(new_q, fileObject)
+
+        elif not initial_run:
+            fileObject = open(file_name, 'r')
+            imported_q = pickle.load(fileObject)
+
+            if self.navigation_mode == 1:
+                imported_q[0] = (imported_q[0] + score) / 2  # if averaging over the trials
+                # imported_q[0] = (imported_q[0] + learning_rate) * score
+
+                new_q = imported_q
+                pickle.dump(new_q, fileObject)
+                return new_q
+
+            if self.navigation_mode == 2:
+                imported_q[1] = (imported_q[1] + score) / 2  # if averaging over the trials
+                # imported_q[1] = (imported_q[1] + learning_rate) * score
+
+                new_q = imported_q
+                pickle.dump(new_q, fileObject)
+                return new_q
 
         # find which strategy has been used this time - 1 or 2
         # see what the score ended up being - out of 10
@@ -1838,7 +1883,8 @@ class Walker(Agent):
             print("Time's up!")
 
             # do I record the run data here as an internal variable?
-            self.output_learned_data()
+            q_val = self.update_q(len(self.open_box_list),0,0,0,0)
+            self.output_learned_data(q_val)
             sys.exit()
 
         # depending on what stress levels are, set resources available: how far we can check back (for looping),
