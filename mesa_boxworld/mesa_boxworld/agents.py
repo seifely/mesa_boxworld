@@ -55,7 +55,8 @@ class Walker(Agent):
         # A* needs some work, as it zooms about too much at the moment
 
         # randomly select a nav mode to start in: 1 is Reactive, 2 is Deliberative
-        navigation_mode = random.choice([1, 2])
+        # navigation_mode = random.choice([1, 2])
+        navigation_mode = 1
 
         self.moore = moore
         random_n = str(random.randint(1,1001))
@@ -1787,44 +1788,89 @@ class Walker(Agent):
             new_q = [0, 0]
             new_file = open(file_name, 'wb')
             pickle.dump(new_q, new_file)
+            new_file.close()
 
             # then load this value, and alter the correct one based on strategy used]#
-            fileObject = open(file_name, 'r')
-            imported_q = pickle.load(fileObject)
+            fileRead = open(file_name, 'rb')
+            imported_q = pickle.load(fileRead)
+            fileWrite = open(file_name, 'wb')
 
             if self.navigation_mode == 1:
-                imported_q[0] = (imported_q[0] + score) / 2  # if averaging over the trials
-                # imported_q[0] = (imported_q[0] + learning_rate) * score
+                if initial_run:
+                    imported_q[0] = score
 
-                new_q = imported_q
-                pickle.dump(new_q, fileObject)
+                    new_q = imported_q
+                    pickle.dump(new_q, fileWrite)
+                    fileWrite.close()
+                    return new_q
+
+                elif not initial_run:
+                    imported_q[0] = (imported_q[0] + score) / 2  # if averaging over the trials
+                    # imported_q[0] = (imported_q[0] + learning_rate) * score
+
+                    new_q = imported_q
+                    pickle.dump(new_q, fileWrite)
+                    fileWrite.close()
+                    return new_q
 
             if self.navigation_mode == 2:
-                imported_q[1] = (imported_q[1] + score) / 2  # if averaging over the trials
-                # imported_q[1] = (imported_q[1] + learning_rate) * score
+                if initial_run:
+                    imported_q[0] = score
 
-                new_q = imported_q
-                pickle.dump(new_q, fileObject)
+                    new_q = imported_q
+                    pickle.dump(new_q, fileWrite)
+                    fileWrite.close()
+                    return new_q
+
+                elif not initial_run:
+                    imported_q[1] = (imported_q[1] + score) / 2  # if averaging over the trials
+                    # imported_q[1] = (imported_q[1] + learning_rate) * score
+
+                    new_q = imported_q
+                    pickle.dump(new_q, fileWrite)
+                    fileWrite.close()
+                    return new_q
 
         elif not initial_run:
-            fileObject = open(file_name, 'r')
-            imported_q = pickle.load(fileObject)
+            fileRead = open(file_name, 'rb')
+            imported_q = pickle.load(fileRead)
+            fileWrite = open(file_name, 'wb')
 
             if self.navigation_mode == 1:
-                imported_q[0] = (imported_q[0] + score) / 2  # if averaging over the trials
-                # imported_q[0] = (imported_q[0] + learning_rate) * score
+                if initial_run:
+                    imported_q[0] = score
 
-                new_q = imported_q
-                pickle.dump(new_q, fileObject)
-                return new_q
+                    new_q = imported_q
+                    pickle.dump(new_q, fileWrite)
+                    fileWrite.close()
+                    return new_q
+
+                elif not initial_run:
+                    imported_q[0] = (imported_q[0] + score) / 2  # if averaging over the trials
+                    # imported_q[0] = (imported_q[0] + learning_rate) * score
+
+                    new_q = imported_q
+                    pickle.dump(new_q, fileWrite)
+                    fileWrite.close()
+                    return new_q
 
             if self.navigation_mode == 2:
-                imported_q[1] = (imported_q[1] + score) / 2  # if averaging over the trials
-                # imported_q[1] = (imported_q[1] + learning_rate) * score
+                if initial_run:
+                    imported_q[0] = score
 
-                new_q = imported_q
-                pickle.dump(new_q, fileObject)
-                return new_q
+                    new_q = imported_q
+                    pickle.dump(new_q, fileWrite)
+                    fileWrite.close()
+                    return new_q
+
+                elif not initial_run:
+                    imported_q[1] = (imported_q[1] + score) / 2  # if averaging over the trials
+                    # imported_q[1] = (imported_q[1] + learning_rate) * score
+
+                    new_q = imported_q
+                    pickle.dump(new_q, fileWrite)
+                    fileWrite.close()
+                    return new_q
 
         # find which strategy has been used this time - 1 or 2
         # see what the score ended up being - out of 10

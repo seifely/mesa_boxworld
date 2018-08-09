@@ -243,9 +243,9 @@ class ThirdTestModel(Model):
 
     def map_picker(self):
         if self.simple == 1:
-            available_maps = ["one", "two", "three", "four", "five"]
-            self.map_choice = random.choice(available_maps)
-            # self.map_choice = "fifteen"
+            # available_maps = ["one", "two", "three", "four", "five"]
+            # self.map_choice = random.choice(available_maps)
+            self.map_choice = "one"
             print("Map ", self.map_choice)
 
         elif self.simple == 2:
