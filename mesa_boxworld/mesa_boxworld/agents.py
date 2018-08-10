@@ -1782,7 +1782,7 @@ class Walker(Agent):
         # if there is no pickle for that map, create one - a zero 2D matrix
         # if there is a pickle for that map, load it - THIS IS OUR Q TABLE
 
-        file_name = "map3_q_values"
+        file_name = "map10_q_values"
 
         if initial_run:
             new_q = [0, 0]
