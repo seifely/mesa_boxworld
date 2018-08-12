@@ -160,10 +160,11 @@ class Walker(Agent):
         # now that we have the 3 dimensions we need to compare, we import our new data
         new_map = [n_obstacles, n_branches, mean_branches]
         training_spatials.append(new_map)
-        D = distance.squareform(distance.pdist(training_spatials)) # this gets the euclidean distance between each row
+        D = distance.squareform(distance.pdist(training_spatials))  # this gets the euclidean distance between each row
         # and each other row in n-dimensional space
         comparative_row = training_spatials[len(training_spatials)]
-        closest = np.argsort(comparative_row, axis=1) # this gives our new map's row with a list of the row indices that are closest
+        closest = np.argsort(comparative_row, axis=1)  # this gives our new map's row with a list of the row indices
+        # that are closest
 
         # initialise k
         k = 3
@@ -183,8 +184,6 @@ class Walker(Agent):
             return 1
         elif scipy.stats.mode(classifications) == 2:
             return 2
-
-
 
     def get_nodes(self):  # the more reliable version!
         all_nodes = self.model.grid_list
@@ -1978,6 +1977,15 @@ class Walker(Agent):
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # META COGNITION B
 
+    def update_performance_memory(self):
+        return
+
+    def check_performance_memory(self):
+        return
+
+    def judge_choice(self):
+        return
+
     # this needs to be a system that checks the reliability of the other system
     # type 1 falls down when we train on a subset and then fail to generalise
     # bayesian trustworthiness based on some kind of memory?
@@ -1994,6 +2002,10 @@ class Walker(Agent):
         A model step. Depending on the Nav Mode being used, either use reactive navigation to reach the closest
         unopened box, or use A* navigation to traverse the map.
         '''
+
+        if self.stepCount == 0:
+            self.use_q()
+
         start = time.clock()
         print("obl: ", len(self.open_box_list))
         if self.stepCount != 0:

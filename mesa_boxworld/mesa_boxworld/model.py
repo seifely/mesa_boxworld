@@ -72,6 +72,7 @@ class ThirdTestModel(Model):
         self.map_choice = map_choice
         self.step_count = 0
         self.simple = simple
+        self.test = True
 
         self.start_timer = 0
 
@@ -218,9 +219,141 @@ class ThirdTestModel(Model):
                                       (20,9), (21,9), (22,9), (23,9), (22,8), (22,7), (22,6), (18,9), (18,8), (18,7),
                                       (19, 7), (20, 7), (20,6), (20,5), (20,4)]
 
+        self.map_test_one_boxes = [(1,4), (3,20), (6,12), (7,10), (9,20), (11,14), (17,10), (18,1), (22,21), (23,5)]
+        self.map_test_one_obstacles = [(5,21), (7,21), (11,21), (20,21), (5,20), (7,20), (11,20), (13,20), (14,20), (15,20),
+                                       (16,20), (17,20), (18,20), (20,20), (5,19), (7,19), (11,19), (21,19), (22,19), (2,18),
+                                       (3,18), (4,18), (7,18), (11,18), (13,18), (14,18), (16,18), (17,18), (18,18), (19,18),
+                                       (15,17), (21,17), (3,16), (4,16), (5,16), (7,16), (8,16), (9,16), (10,16), (11,16), (12,16),
+                                       (15,16), (17,16), (19,16), (21,16), (2,15), (13,15), (15,15), (17,15), (19,15), (21,15),
+                                       (2,14), (5,14), (6,14), (7,14), (8,14), (13,14), (15,14), (17,14), (19,14), (21,14), (2,13),
+                                       (4,13), (9,13), (13,13), (15,13), (17,13), (19,13), (21,13), (2,12), (4,12), (9,12), (11,12),
+                                       (13,12), (15,12), (17,12), (19,12), (21,12), (2,11), (4,11), (9,11), (11,11), (13,11), (15,11),
+                                       (19,11), (21,11), (2,10), (4,10), (9,10), (11,10), (13,10), (15,10), (19,10), (21,10),
+                                       (2,9), (4,9), (9,9), (11,9), (13,9), (15,9), (19,9), (21,9), (2,8), (5,8), (6,8),
+                                       (9,8), (11,8), (13,8), (15,8), (17,8), (19,8), (21,8), (2,7), (9,7), (11,7), (13,7),
+                                       (15,7), (17,7), (19,7), (21,7), (3,6), (4,6), (5,6), (6,6), (7,6), (8,6), (11,6),
+                                       (13,6), (15,6), (21,6), (13,5), (16,5), (17,5), (18,5), (19,5), (21,5), (3,4),
+                                       (4,4), (5,4), (6,4), (7,4), (8,4), (9,4), (10,4), (11,4), (13,4), (21,4), (13,3),
+                                       (15,3), (16,3), (17,3), (18,3), (19,3), (20,3), (22,3)]
+
+        self.map_test_two_boxes = [(1,22), (5,7), (8,16), (8,12), (12,16), (12,12), (14,6), (19,12), (21,22), (23,1)]
+        self.map_test_two_obstacles = [(3,21), (4,21), (5,21), (6,21), (7,21), (8,21), (10,21), (12,21), (13,21), (14,21),
+                                       (15,21), (16,21), (17,21), (18,21), (19,21), (2,20), (10,20), (20,20), (21,20),
+                                       (22,20), (2,19), (10,19), (17,19), (18,19), (19,19), (2,18), (4,18), (7,18),
+                                       (8,18), (9,18), (12,18), (13,18), (14,18), (20,18), (21,18), (22,18), (2,17),
+                                       (4,17), (6,17), (10,17), (15,17), (17,17), (18,17), (19,17), (2,16), (4,16),
+                                       (6,16), (10,16), (15,16), (20,16), (21,16), (22,16), (2,15), (4,15), (10,15),
+                                       (15,15), (17,15), (18,15), (2,14), (4,14), (6,14), (7,14), (8,14), (9,14),
+                                       (15,14), (19,14), (20,14), (22,14), (2,13), (4,13), (10,13), (15,13), (17,13),
+                                       (22,13), (2,12), (4,12), (10,12), (15,12), (17,12), (22,12), (2,11), (5,11),
+                                       (6,11), (10,11), (15,11), (17,11), (22,11), (2,10), (7,10), (8,10), (10,10),
+                                       (13,10), (15,10), (18,10), (20,10), (22,10), (2,9), (10,9), (12,9), (15,9),
+                                       (18,9), (20,9), (22,9), (2,8), (8,8), (10,8), (12,8), (15,8), (18,8), (20,8),
+                                       (22,8), (2,7), (8,7), (10,7), (12,7), (16,7), (18,7), (20,7), (22,7), (2,6),
+                                       (8,6), (10,6), (12,6), (16,6), (18,6), (20,6), (22,6), (3,5), (4,5), (5,5),
+                                       (6,5), (8,5), (10,5), (16,5), (18,5), (20,5), (22,5), (8,4), (10,4), (12,4),
+                                       (13,4), (14,4), (15,4), (18,4), (22,4), (8,3), (10,3), (19,3), (20,3), (21,3)]
+
+        self.map_test_three_boxes = [(2,21), (2,17), (2,7), (2,3), (5,12), (10,18), (14,5), (17,23), (17,16), (21,23)]
+        self.map_test_three_obstacles = [(14,21), (16,21), (17,21), (18,21), (19,21), (20,21), (21,21), (22,21),
+                                         (4,20), (5,20), (6,20), (8,20), (9,20), (10,20), (11,20), (12,20), (14,20), (7,19),
+                                         (14,19), (16,19), (18,19), (21,19), (4,18), (7,18), (12,18), (13,18), (17,18),
+                                         (19,18), (22,18), (5,17), (7,17), (15,17), (20,17), (4,16), (8,16), (9,16),
+                                         (10,16), (11,16), (12,16), (14,16), (21,16), (2,14), (3,14), (4,14), (5,14),
+                                         (6,14), (8,14), (9,14), (10,14), (13,14), (14,14), (15,14), (16,14), (17,14),
+                                         (18,14), (19,14), (20,14), (21,14), (22,14), (7,13), (11,13), (3,12), (7,12),
+                                         (9,12), (11,12), (13,12), (15,12), (16,12), (17,12), (18,12), (19,12), (20,12),
+                                         (21,12), (22,12), (3,11), (9,11), (13,11), (2,10), (4,10), (5,10), (6,10),
+                                         (7,10), (8,10), (10,10), (11,10), (14,10), (15,10), (16,10), (17,10), (18,10), (19,10),
+                                         (20,10), (21,10), (22,10), (5,8), (6,8), (7,8), (9,8), (10,8), (11,8),
+                                         (12,8), (13,8), (14,8), (15,8), (18,8), (21,8), (22,8), (4,7), (16,7),
+                                         (18,7), (20,7), (4,6), (6,6), (7,6), (8,6), (16,6), (18,6), (20,6),
+                                         (4,5), (9,5), (10,5), (11,5), (16,5), (18,5), (21,5), (22,5), (4,4),
+                                         (18,4), (5,3), (6,3), (7,3), (8,3), (9,3), (10,3), (11,3), (12,3),
+                                         (13,3), (14,3), (15,3), (16,3), (17,3), (19,3), (20,3), (21,3), (22,3)]
+
+        self.map_test_four_boxes = [(4,20), (18,18), (8,17), (8,15), (12,13), (21,13), (3,7), (8,7), (21,6), (13,2)]
+        self.map_test_four_obstacles = [(14,18), (15,18), (16,18), (14,17), (16,17), (14,16), (16,16), (10,15), (11,15), (12,15),
+                                        (13,15), (14,15), (16,15), (6,14), (7,14), (8,14), (9,14), (10,14), (16,14), (17,14),
+                                        (18,14), (19,14), (6,12), (7,12), (8,12), (9,12), (10,12), (16,12), (17,12), (18,12),
+                                        (19,12), (10,11), (11,11), (12,11), (13,11), (14,11), (16,11), (14,10), (14,9), (14,8),
+                                        (14,7), (15,7), (16,10), (16,9), (16,8), (16,7)]
+
+        self.map_test_five_boxes = [(19,23), (10,19), (7,17), (15,16), (4,14), (12,10), (10,9), (12,6), (20,4), (16,2)]
+        self.map_test_five_obstacles = [(17,21), (18,21), (19,21), (20,21), (21,21), (3,21), (3,20), (3,19), (3,18), (3,17), (3,16),
+                                        (3,15), (3,14), (12,21), (12,20), (12,19), (13,19), (14,19), (15,19), (6,14), (7,14),
+                                        (8,14), (9,14), (10,14), (11,14), (12,14), (15,12), (16,12), (17,12), (18,12), (19,12),
+                                        (15,11), (16,11), (17,11), (18,11), (19,11), (4,10), (5,10), (6,10), (7,10), (14,10),
+                                        (14,9), (14,8), (14,7), (14,6), (14,5)]
+
+        self.map_test_six_boxes = [(7,20), (11,15), (13,15), (18,15), (20,14), (12,12), (8,10), (11,10), (15,8), (20,6)]
+        self.map_test_six_obstacles = [(4,21), (4,20), (4,19), (4,18), (4,17), (4,16), (4,15), (4,14), (4,13), (4,12), (7,14), (8,14),
+                                       (9,14), (17,21), (17,20), (17,19), (17,18), (17,17), (17,16), (17,15), (17,14), (17,13), (17,12),
+                                       (17,11), (17,10), (17,9), (17,8), (17,7), (17,6), (17,5), (17,4), (6,6), (7,6), (8,6), (9,6),
+                                       (10,6), (11,6), (12,6), (6,5), (7,5), (8,5), (9,5), (10,5), (11,5), (12,5)]
+
+        self.map_test_seven_boxes = [(13,22), (5,19), (13,16), (4,13), (23,13), (9,11), (6,8), (7,4), (10,4), (19,1)]
+        self.map_test_seven_obstacles = [(8,21), (3,20), (20,20), (7,19), (4,18), (6,18), (10,18), (11,18), (14,18), (19,18),
+                                         (4,17), (9,17), (15,17), (18,17), (6,15), (7,15), (15,15), (16,15), (18,15), (3,14),
+                                         (8,14), (12,14), (3,13), (10,13), (12,13), (15,13), (8,12), (15,12), (19,12), (21,12), (5,11),
+                                         (6,10), (9,10), (15,10), (20,10), (8,8), (16,8), (20,8), (9,6), (14,6), (21,6), (12,5), (19,4),
+                                         (15,3), (3,10), (3,9), (3,8), (3,7), (4,7), (5,7), (13,9), (13,8), (13,7), (18,9), (18,8),
+                                         (18,6), (18,5)]
+
+        self.map_test_eight_boxes = [(22,22), (1,21), (16,20), (14,14), (21,13), (5,12),(20,7), (9,6), (14,4), (2,4)]
+        self.map_test_eight_obstacles = [(6,21),(6,20),(6,19),(6,18),(2,8),(3,8),(4,8),(5,8),(5,7),(5,6),(5,5),(5,4),(5,3),(12,17),
+                                         (12,16),(12,15),(15,14),(12,13),(12,12),(12,11),(12,10),(12,9),(12,8),(12,7),(13,12),(14,12),
+                                         (15,12),(16,12),(16,13),(16,14),(16,15),(16,16),(16,17),(16,18),(16,19),(17,12),(18,12),
+                                         (19,12),(21,7),(21,6),(21,5),(21,4),(21,3),(22,3),(23,3)]
+
+        self.map_test_nine_boxes = [(3,20),(3,5),(4,3),(7,16),(13,19),(14,6),(16,16),(19,3),(21,15),(22,21)]
+        self.map_test_nine_obstacles = [(2,21),(2,20),(2,19),(2,18),(2,17),(2,16),(2,15),(3,18),(4,21),(4,20),(4,19),(4,18),(4,17),
+                                        (4,16),(4,15),(6,21),(6,20),(6,19),(6,18),(6,17),(6,16),(6,15),(7,21),(8,21),(7,18),(7,15),
+                                        (8,15),(10,21),(10,20),(10,19),(10,18),(10,17),(10,16),(10,15),(11,15),(12,15),(14,21),
+                                        (14,20),(14,19),(14,18),(14,17),(14,16),(14,15),(15,15),(16,15),(18,20),(18,19),(18,18),
+                                        (18,17),(18,16),(19,21),(20,21),(19,15),(20,15),(21,20),(21,19),(21,18),(21,17),(21,16),
+                                        (2,11),(2,10),(2,9),(2,8),(2,7),(2,6),(2,5),(3,4),(3,3),(4,6),(4,5),(5,4),(5,3),(6,11),(6,10),
+                                        (6,9),(6,8),(6,7),(6,6),(6,5),(8,10),(8,9),(8,8),(8,7),(8,6),(8,5),(8,4),(9,11),(9,3),(10,10),
+                                        (10,9),(10,8),(10,7),(10,6),(10,5),(10,4),(12,10),(12,9),(12,8),(12,7),(12,6),(12,5),(12,4),
+                                        (12,3),(13,11),(14,10),(14,9),(14,8),(14,7),(14,5),(14,4),(14,3),(16,11),(16,10),(16,9),(16,8),
+                                        (16,7),(16,6),(16,5),(16,4),(16,3),(17,3),(18,3),(20,11),(20,10),(20,9),(20,8),(20,7),(20,6),
+                                        (20,5),(20,4),(20,3),(21,11),(21,3),(22,10),(22,9),(22,8),(22,7),(22,6),(22,5),(22,4)]
+
+        self.map_test_ten_boxes = [(3,3),(5,12),(9,19),(12,17),(12,15),(9,8),(15,8),(19,5),(19,18),(22,21)]
+        self.map_test_ten_obstacles = [(2,13),(2,12),(4,20),(4,19),(4,18),(4,17),(4,16),(4,15),(4,14),(4,13),(4,12),(4,11),(4,10),
+                                       (4,9),(4,8),(4,7),(5,19),(6,19),(7,19),(5,10),(6,10),(7,10),(8,10),(9,10),(10,10),(11,10),
+                                       (12,10),(13,10),	(14,10),(15,10),(16,10),(17,10),(18,10),(19,10),(14,9),(14,8),(14,7),
+                                       (14,6),(14,5),(14,4),(14,3),(9,6),(10,6),(11,6),(6,5),(6,4),(9,16),(10,16),(12,21),(13,21),
+                                       (14,21),(15,21),(16,21),(16,20),(16,19),(16,18),(16,17),(16,16),(12,16),(13,16),(14,16),
+                                       (15,16),(19,21),(20,21),(20,15),(21,15),(22,15),(22,14),(22,13),(22,12),(22,11),(22,10),
+                                       (22,9),(22,8),(22,7),(22,6),(22,5)]
+
+        self.map_test_eleven_boxes = [(3,20),(5,16),(8,16),(14,16),(17,16),(19,12),(17,8),(13,6),(8,8),(5,8)]
+        self.map_test_eleven_obstacles = [(2,21),(2,20),(2,19),(2,18),(2,17),(2,16),(2,15),(2,14),(2,13),(2,12),(2,11),(2,10),(2,9),
+                                          (2,8),(2,7),(2,6),(2,5),(2,4),(2,3),(3,21),(4,21),(5,21),(6,21),(7,21),(8,21),(9,21),(10,21),
+                                          (11,21),(12,21),(13,21),(14,21)	,(15,21),(16,21),(17,21),(18,21),(19,21),(20,21),
+                                          (21,21),(22,21),(4,20),(4,19),(4,18),(4,17),(4,16),(4,15),(5,15),(5,14),(5,13),(5,12),
+                                          (6,15),(7,18),(7,17),(7,16),(7,15),(6,18),(8,18),(8,15),(9,15),(10,15),(10,18),(10,17),
+                                          (10,16),(22,19),(22,18),(22,17),(22,16),(22,15),(22,14),(22,13),(22,12),(22,11),(22,10),
+                                          (22,9),(22,8),(22,7),(22,6),(22,5),(22,4),(22,3),(4,3),(5,3),(6,3),(7,3),(8,3),(9,3),(10,3),
+                                          (11,3),(12,3),(13,3),(14,3),(15,3),(16,3),(17,3),(18,3),(19,3),(20,3),(21,3),(4,9),(4,8),
+                                          (4,7),(4,6),(4,5),(4,4),(5,9),(6,9),(7,9),(8,9),(9,9),(10,9),(7,8),(7,7),(6,6),(7,6),(8,6),
+                                          (9,12),(9,11),(9,10),(10,8),(10,7),(10,6),(12,5),(13,5),(12,9),(12,8),(12,7),(12,6),
+                                          (13,7),(14,7),(13,9),(14,9),(15,9),(16,9),(17,9),(18,9),(18,8),(18,7),(17,7),(15,8),(15,7),
+                                          (15,6),(15,5),(16,5),(17,5),(18,5),(19,5),(20,5),(20,19),(20,18),(20,17),(20,16),(20,15),
+                                          (20,14),(20,13),(20,12),(20,11),(20,10),(20,9),(20,8),(20,7),(20,6),(11,11),(12,11),
+                                          (13,11),(14,11),(15,11),(16,11),(17,11),(18,11),(19,11),(11,13),(12,13),(13,13),(14,13),
+                                          (15,13),(16,13),(17,13),(18,13),(19,13),(15,19),(16,19),(17,19),(18,19),(19,19),(15,18),
+                                          (15,17),(15,16),(15,15),(16,15),(17,15),(18,15),(18,17),(18,16),(17,17),(13,17),(14,17),
+                                          (13,15),(14,15)]
+
         self.map_complexity_data = [[5, 5, 1, 1], [5, 5, 1, 1], [6, 6, 1, 1], [5, 5, 1, 1], [5, 5, 1, 1],
                                     [5, 11, 2, 2.2], [5, 14, 3, 2.8], [5, 13, 3, 2.6], [5, 13, 3, 2.6], [5, 13, 2, 2.6],
-                                    [4, 25, 6, 6.5], [4, 22, 5, 5.5], [5, 30, 7, 6], [8, 37, 3, 4.62], [8, 36, 5, 5.42]]
+                                    [4, 25, 6, 6.5], [4, 22, 5, 5.5], [5, 30, 7, 6], [8, 37, 3, 4.62], [8, 36, 5, 5.42],
+
+                                    [13, 27, 2, 2.7], [10, 32, 4, 3.2], [15, 45, 4, 2.75], [2, 12, 6, 6], [6, 9, 2, 1.28],
+                                    [4, 5, 1, 1.25], [35, 42, 1, 1.2], [5, 11, 2, 2.2], [10, 33, 4, 3.3], [8, 17, 1, 2.125],
+                                    [3, 33, 8, 11]]
 
         # Model Functions
         self.schedule = RandomActivationByType(self)
@@ -242,25 +375,45 @@ class ThirdTestModel(Model):
         self.start_timer = time.clock()
 
     def map_picker(self):
-        if self.simple == 1:
-            # available_maps = ["one", "two", "three", "four", "five"]
-            # self.map_choice = random.choice(available_maps)
-            self.map_choice = "five"
-            print("Map ", self.map_choice)
+        if not self.test:
+            if self.simple == 1:
+                # available_maps = ["one", "two", "three", "four", "five"]
+                # self.map_choice = random.choice(available_maps)
+                self.map_choice = "five"
+                print("Map ", self.map_choice)
 
-        elif self.simple == 2:
-            # available_maps = ["six", "seven", "eight", "nine", "ten"]  # add eleven to fifteen here
-            # self.map_choice = random.choice(available_maps)
-            self.map_choice = "ten"
-            print("Map ", self.map_choice)
+            elif self.simple == 2:
+                # available_maps = ["six", "seven", "eight", "nine", "ten"]  # add eleven to fifteen here
+                # self.map_choice = random.choice(available_maps)
+                self.map_choice = "ten"
+                print("Map ", self.map_choice)
 
-        elif self.simple == 3:
-            # available_maps = ["eleven", "twelve", "thirteen", "fourteen", "fifteen"]
-            # self.map_choice = random.choice(available_maps)
-            self.map_choice = "fifteen"
-            print("Map ", self.map_choice)
-        # create Boxes:
+            elif self.simple == 3:
+                # available_maps = ["eleven", "twelve", "thirteen", "fourteen", "fifteen"]
+                # self.map_choice = random.choice(available_maps)
+                self.map_choice = "fifteen"
+                print("Map ", self.map_choice)
 
+        if self.test:
+            if self.simple == 1:
+                # available_maps = ["testfour", "testfive", "testsix", "testfour"]
+                # self.map_choice = random.choice(available_maps)
+                self.map_choice = "testeleven"
+                print("Map ", self.map_choice)
+
+            elif self.simple == 2:
+                # available_maps = ["six", "seven", "eight", "nine", "ten"]
+                # self.map_choice = random.choice(available_maps)
+                self.map_choice = "ten"
+                print("Map ", self.map_choice)
+
+            elif self.simple == 3:
+                # available_maps = ["eleven", "twelve", "thirteen", "fourteen", "fifteen"]
+                # self.map_choice = random.choice(available_maps)
+                self.map_choice = "fifteen"
+                print("Map ", self.map_choice)
+
+    # create Boxes:
     def make_boxes(self):
         if self.map_choice == "one":
             for i in range(self.initial_boxes):
@@ -419,6 +572,127 @@ class ThirdTestModel(Model):
         elif self.map_choice == "fifteen":
             for i in range(self.initial_boxes):
                 x, y = self.map_fifteen_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "testone":
+            for i in range(self.initial_boxes):
+                x, y = self.map_test_one_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "testtwo":
+            for i in range(self.initial_boxes):
+                x, y = self.map_test_two_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "testthree":
+            for i in range(self.initial_boxes):
+                x, y = self.map_test_three_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "testfour":
+            for i in range(self.initial_boxes):
+                x, y = self.map_test_four_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "testfive":
+            for i in range(self.initial_boxes):
+                x, y = self.map_test_five_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "testsix":
+            for i in range(self.initial_boxes):
+                x, y = self.map_test_six_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "testseven":
+            for i in range(self.initial_boxes):
+                x, y = self.map_test_seven_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "testeight":
+            for i in range(self.initial_boxes):
+                x, y = self.map_test_eight_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "testnine":
+            for i in range(self.initial_boxes):
+                x, y = self.map_test_nine_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "testten":
+            for i in range(self.initial_boxes):
+                x, y = self.map_test_ten_boxes[i]
+                closedBox = ClosedBox((x, y), self, True)
+                self.grid.place_agent(closedBox, (x, y))
+                self.schedule.add(closedBox)
+                # --- append this box's xy to unordered list/dict keyed by the tuples of (x,y)
+                self.empty_boxes[i] = (x, y)
+                self.all_boxes[i] = (x, y)
+                # print("Empty Box Created")
+
+        elif self.map_choice == "testeleven":
+            for i in range(self.initial_boxes):
+                x, y = self.map_test_eleven_boxes[i]
                 closedBox = ClosedBox((x, y), self, True)
                 self.grid.place_agent(closedBox, (x, y))
                 self.schedule.add(closedBox)
@@ -592,6 +866,94 @@ class ThirdTestModel(Model):
         elif self.map_choice == "fifteen":
             for i in range(len(self.map_fifteen_obstacles)):
                 x, y = self.map_fifteen_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "testone":
+            for i in range(len(self.map_test_one_obstacles)):
+                x, y = self.map_test_one_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "testtwo":
+            for i in range(len(self.map_test_two_obstacles)):
+                x, y = self.map_test_two_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "testthree":
+            for i in range(len(self.map_test_three_obstacles)):
+                x, y = self.map_test_three_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "testfour":
+            for i in range(len(self.map_test_four_obstacles)):
+                x, y = self.map_test_four_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "testfive":
+            for i in range(len(self.map_test_five_obstacles)):
+                x, y = self.map_test_five_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "testsix":
+            for i in range(len(self.map_test_six_obstacles)):
+                x, y = self.map_test_six_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "testseven":
+            for i in range(len(self.map_test_seven_obstacles)):
+                x, y = self.map_test_seven_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "testeight":
+            for i in range(len(self.map_test_eight_obstacles)):
+                x, y = self.map_test_eight_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "testnine":
+            for i in range(len(self.map_test_nine_obstacles)):
+                x, y = self.map_test_nine_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "testten":
+            for i in range(len(self.map_test_ten_obstacles)):
+                x, y = self.map_test_ten_obstacles[i]
+                obstacle = Obstacle((x, y), self)
+                self.grid.place_agent(obstacle, (x, y))
+                self.schedule.add(obstacle)
+                self.obstacles.append((x, y))
+
+        elif self.map_choice == "testeleven":
+            for i in range(len(self.map_test_eleven_obstacles)):
+                x, y = self.map_test_eleven_obstacles[i]
                 obstacle = Obstacle((x, y), self)
                 self.grid.place_agent(obstacle, (x, y))
                 self.schedule.add(obstacle)
