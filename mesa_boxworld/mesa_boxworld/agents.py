@@ -252,6 +252,50 @@ class Walker(Agent):
                 forbidden_nodes = self.model.map_fifteen_obstacles
                 if value not in forbidden_nodes:
                     passable_nodes.append(value)
+            elif map_choice == "testone":
+                forbidden_nodes = self.model.map_test_one_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testtwo":
+                forbidden_nodes = self.model.map_test_two_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testthree":
+                forbidden_nodes = self.model.map_test_three_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testfour":
+                forbidden_nodes = self.model.map_test_four_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testfive":
+                forbidden_nodes = self.model.map_test_five_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testsix":
+                forbidden_nodes = self.model.map_test_six_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testseven":
+                forbidden_nodes = self.model.map_test_seven_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testeight":
+                forbidden_nodes = self.model.map_test_eight_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testnine":
+                forbidden_nodes = self.model.map_test_nine_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testten":
+                forbidden_nodes = self.model.map_test_ten_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testeleven":
+                forbidden_nodes = self.model.map_test_eleven_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
 
         return passable_nodes
 
@@ -1528,6 +1572,50 @@ class Walker(Agent):
 
         elif self.model.map_choice == "fifteen":
             n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[14]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testone":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[15]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testtwo":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[16]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testthree":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[17]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testfour":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[18]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testfive":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[19]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testsix":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[20]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testseven":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[21]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testeight":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[22]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testnine":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[23]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testten":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[24]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testeleven":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[25]
             return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
