@@ -8,6 +8,9 @@ import sys
 from mesa import Agent
 from queue import PriorityQueue
 import pickle
+from scipy.spatial import distance
+import numpy as np
+import scipy.stats
 
 # priotyQs (also: Heap Q's) are binary trees where every parent node has a value >= any of its children. It keeps
 # track # of the minimum value, helping retrieve that min value at all times
@@ -118,7 +121,70 @@ class Walker(Agent):
         # current score (next version applications!)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        # MAP NODES - UTILITY PURPOSES
+        # MAP NODES & STRAT CHOICE - UTILITY PURPOSES
+
+    def use_q(self, n_obstacles, n_branches, mean_branches):
+        # get current map complexity data across 3 axes - find closest combination in the training data
+        # initialise a k value (make this a global so later functions can change it)
+        # for i to len of training data ( there are 30 q value pairs total )
+        # want closest k across 3 dimensions, so cloest on x y and z axis
+        # set calculated distances in ascending order based on distance
+
+        # import the q_data - we /could/ import this data from the pickle files, but for simplicity we can document it
+        # for viewing below. Headings are (n of obstacles, n of total branches, average branch per obst., q-value
+        # for strategy 1, q value for strategy 2):
+        training_data = ([[5, 5, 1, 10.0, 4.75],
+                          [5, 5, 1, 10.0, 2.687],
+                          [6, 6, 1, 8.0, 4.125],
+                          [5, 5, 1, 10.0, 2.50],
+                          [5, 5, 1, 10.0, 3.625],
+                          [5, 11, 2.2, 4.5, 7.812],
+                          [5, 14, 2.8, 3.375, 7.0],
+                          [5, 13, 2.6, 5.062, 8.0],
+                          [5, 13, 2.6, 7.125, 5.8125],
+                          [5, 13, 2.6, 1.25, 7.562],
+                          [4, 25, 6.5, 1.5, 9.937],
+                          [4, 22, 5.5, 0.625, 10],
+                          [5, 30, 6, 0.625, 9.937],
+                          [8, 37, 4.625, 1.937, 9.937],
+                          [8, 36, 5.42, 0.25, 9.937]])
+
+        # the above data can be imported from the pickle file 'training_data', plus appended to with future training,
+        # using the pickle functions as seen in self.update_q()
+        training_spatials = []
+        # extract the spatial data for inter-map comparison
+        for i in range(len(training_data)):
+            x, y, z = training_data[i][0], training_data[i][1], training_data[i][2]
+            training_spatials.append([x, y, z])
+
+        # now that we have the 3 dimensions we need to compare, we import our new data
+        new_map = [n_obstacles, n_branches, mean_branches]
+        training_spatials.append(new_map)
+        D = distance.squareform(distance.pdist(training_spatials)) # this gets the euclidean distance between each row
+        # and each other row in n-dimensional space
+        comparative_row = training_spatials[len(training_spatials)]
+        closest = np.argsort(comparative_row, axis=1) # this gives our new map's row with a list of the row indices that are closest
+
+        # initialise k
+        k = 3
+        k_nearest_neighbours = (closest[:, 1:k+1])
+
+        # then we select the rows of training_data that are those neighbours
+        classifications = []
+        for n in k_nearest_neighbours:
+            row_n = k_nearest_neighbours[n]
+            first_q, second_q = training_data[row_n]
+            if first_q > second_q:
+                classifications.append(1)
+            if first_q < second_q:
+                classifications.append(2)
+
+        if scipy.stats.mode(classifications) == 1:
+            return 1
+        elif scipy.stats.mode(classifications) == 2:
+            return 2
+
+
 
     def get_nodes(self):  # the more reliable version!
         all_nodes = self.model.grid_list
@@ -267,8 +333,8 @@ class Walker(Agent):
             self.goal = self.goal
             print("There's nowhere left to go! I win!")
 
-            q_val = self.update_q(len(self.open_box_list), 0, 0, 0, 0)
-            self.output_learned_data(q_val)
+            # q_val = self.update_q(len(self.open_box_list), 0, 0, 0, 0)
+            # self.output_learned_data(q_val)
             sys.exit()
 
     def reactive_nav(self):
@@ -1958,8 +2024,8 @@ class Walker(Agent):
             print("Time's up!")
 
             # do I record the run data here as an internal variable?
-            q_val = self.update_q(len(self.open_box_list),0,0,0,0)
-            self.output_learned_data(q_val)
+            # q_val = self.update_q(len(self.open_box_list),0,0,0,0)
+            # self.output_learned_data(q_val)
             sys.exit()
 
         # depending on what stress levels are, set resources available: how far we can check back (for looping),
