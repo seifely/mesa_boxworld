@@ -255,9 +255,9 @@ class ThirdTestModel(Model):
             print("Map ", self.map_choice)
 
         elif self.simple == 3:
-            available_maps = ["eleven", "twelve", "thirteen", "fourteen", "fifteen"]
-            self.map_choice = random.choice(available_maps)
-            # self.map_choice = "fifteen"
+            # available_maps = ["eleven", "twelve", "thirteen", "fourteen", "fifteen"]
+            # self.map_choice = random.choice(available_maps)
+            self.map_choice = "fifteen"
             print("Map ", self.map_choice)
         # create Boxes:
 
