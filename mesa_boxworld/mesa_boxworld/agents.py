@@ -103,6 +103,8 @@ class Walker(Agent):
         self.goal_distance = 0
         self.switch_cost = 0
 
+        self.k = 3
+
         # things we want to track are:
         # program run time - is it going on too long? What are the average completion times for the current map?
         # step length (time) - how long is each step taking? Too long?
@@ -162,27 +164,35 @@ class Walker(Agent):
         training_spatials.append(new_map)
         D = distance.squareform(distance.pdist(training_spatials))  # this gets the euclidean distance between each row
         # and each other row in n-dimensional space
-        comparative_row = training_spatials[len(training_spatials)]
-        closest = np.argsort(comparative_row, axis=1)  # this gives our new map's row with a list of the row indices
+        comparative_row = D[len(D)-1]
+        closest = np.argsort(comparative_row)  # this gives our new map's row with a list of the row indices # don't need , axis=1
+        print("Closest: ", closest)
         # that are closest
 
         # initialise k
-        k = 3
-        k_nearest_neighbours = (closest[:, 1:k+1])
+        # k_nearest_neighbours = (closest[:, 1:self.k+1])
+        k_nearest_neighbours = []
+        for x in range(1, self.k+1):
+            k_nearest_neighbours.append(closest[x])
 
+        print("K nearest: ", k_nearest_neighbours)
         # then we select the rows of training_data that are those neighbours
         classifications = []
-        for n in k_nearest_neighbours:
+        for n in range(len(k_nearest_neighbours)):
             row_n = k_nearest_neighbours[n]
-            first_q, second_q = training_data[row_n]
+            first_q = training_data[row_n][3]
+            second_q = training_data[row_n][4]
             if first_q > second_q:
                 classifications.append(1)
             if first_q < second_q:
                 classifications.append(2)
 
-        if scipy.stats.mode(classifications) == 1:
+        print("Classfications: ", classifications)
+        if scipy.stats.mode(classifications, axis=None)[0] == 1:
+            print("Best strategy choice is REACTIVE.")
             return 1
-        elif scipy.stats.mode(classifications) == 2:
+        elif scipy.stats.mode(classifications, axis=None)[0] == 2:
+            print("Best strategy choice is DELIBERATIVE.")
             return 2
 
     def get_nodes(self):  # the more reliable version!
@@ -1141,7 +1151,7 @@ class Walker(Agent):
     def SYSTEM_ALPHA(self):
         # start = time.clock()
 
-        if self.stepCount == 0:  # this should be done once at the start, then again when a box is opened
+        if self.stepCount == 1:  # this should be done once at the start, then again when a box is opened
             self.calculate_box_distances_from_current_pos()
             self.set_goal()
             self.stepCount += 1
@@ -1762,7 +1772,7 @@ class Walker(Agent):
 
     def SYSTEM_BETA(self):
         # start = time.clock()
-        if self.stepCount == 0:
+        if self.stepCount == 1:
             self.calculate_box_distances_from_current_pos()
             self.set_goal()
             self.stepCount += 1
@@ -2092,10 +2102,12 @@ class Walker(Agent):
         '''
 
         if self.stepCount == 0:
-            self.use_q()
+            n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
+            self.navigation_mode = self.use_q(n_obstacles, total_branches, mean_branch_per_obs)
+            self.stepCount += 1
 
         start = time.clock()
-        print("obl: ", len(self.open_box_list))
+        # print("obl: ", len(self.open_box_list))
         if self.stepCount != 0:
             # print("Inter goal step:", self.inter_goal_stepCount)
             # print("Goal distance: ", self.goal_distance)
@@ -2106,31 +2118,33 @@ class Walker(Agent):
             self.meta_actor(0, 0, self.stuck, self.loop)  # this could take in 'time remaining' -
             # e.g. if we are in last ten seconds and there are still boxes, switch to reactive
             self.tt_step = tt_step
-            # self.output_data(tt_step, crowdedness, map_complex, branch_complex)
+            # self.output_data(tt_step, crowdedness, map_complex, branch_complex
+
+            # Navigation Systems
+            if self.navigation_mode == 1:
+                self.SYSTEM_ALPHA()
+
+            elif self.navigation_mode == 2:
+                self.SYSTEM_BETA()
+
+            step_time = time.clock() - start
+            time_remaining = self.model.time_limit - self.tt_step  # could use this as
+            self.step_time_memory.append(step_time)  # this results in step time memory being step t-1?
+            if self.tt_step > self.model.time_limit:
+                print("Time's up!")
+
+                # do I record the run data here as an internal variable?
+                # q_val = self.update_q(len(self.open_box_list),0,0,0,0)
+                # self.output_learned_data(q_val)
+                sys.exit()
+
+            # depending on what stress levels are, set resources available: how far we can check back (for looping),
+            # change switching costs/thresholds (so we under or overvalue switching), less access to information such as
+            #
 
         # print("Step Memory:", self.steps_memory)
 
-        # Navigation Systems
-        if self.navigation_mode == 1:
-            self.SYSTEM_ALPHA()
 
-        elif self.navigation_mode == 2:
-            self.SYSTEM_BETA()
-
-        step_time = time.clock() - start
-        time_remaining = self.model.time_limit - self.tt_step  # could use this as
-        self.step_time_memory.append(step_time)  # this results in step time memory being step t-1?
-        if self.tt_step > self.model.time_limit:
-            print("Time's up!")
-
-            # do I record the run data here as an internal variable?
-            # q_val = self.update_q(len(self.open_box_list),0,0,0,0)
-            # self.output_learned_data(q_val)
-            sys.exit()
-
-        # depending on what stress levels are, set resources available: how far we can check back (for looping),
-        # change switching costs/thresholds (so we under or overvalue switching), less access to information such as
-        #
 
 
     ############################################################################################################
