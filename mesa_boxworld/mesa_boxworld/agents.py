@@ -56,7 +56,7 @@ class Walker(Agent):
 
         # randomly select a nav mode to start in: 1 is Reactive, 2 is Deliberative
         # navigation_mode = random.choice([1, 2])
-        navigation_mode = 1
+        navigation_mode = 2
 
         self.moore = moore
         random_n = str(random.randint(1,1001))
