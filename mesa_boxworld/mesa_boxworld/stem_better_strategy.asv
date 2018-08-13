@@ -112,7 +112,7 @@ hold on
 scatter(x, correct_choice, 'r');
 
 %%
-x = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15];
+
 Y = [1.3, 8.6
      0.3, 8.1
      1.3, 10
@@ -120,23 +120,6 @@ Y = [1.3, 8.6
      7.6, 1.6
      8.3, 2
      6.6, 10
-     7.3, 3.6
-     1, 6.67
-     2.6, 10
-     0.3, 8.3
-     10, 2
-     5, 4
-     3, 3
-     4, 4.3];
- 
-knn_choice = [2 2 2 2 1 1 2 2 2 2 2 1 2 2 2];
-correct_choice = [2 2 2 1 1 1 2 1 2 2 2 1 1 0 2];
- 
-figure;
+     ];
+figure
 bar(Y)
-xlabel('Test Map Number')
-yyaxis right
-plot(x,knn_choice, 'b');
-hold on
-plot(x, correct_choice, 'r');
-legend('Reactive', 'Deliberative', 'KNN Strategy Choice', 'Best Strategy')

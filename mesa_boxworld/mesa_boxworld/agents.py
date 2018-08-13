@@ -169,6 +169,9 @@ class Walker(Agent):
         print("Closest: ", closest)
         # that are closest
 
+        closest = closest.tolist()
+        closest.remove(15)
+
         # initialise k
         # k_nearest_neighbours = (closest[:, 1:self.k+1])
         k_nearest_neighbours = []
@@ -304,6 +307,22 @@ class Walker(Agent):
                     passable_nodes.append(value)
             elif map_choice == "testeleven":
                 forbidden_nodes = self.model.map_test_eleven_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testtwelve":
+                forbidden_nodes = self.model.map_test_twelve_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testthirteen":
+                forbidden_nodes = self.model.map_test_thirteen_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testfourteen":
+                forbidden_nodes = self.model.map_test_fourteen_obstacles
+                if value not in forbidden_nodes:
+                    passable_nodes.append(value)
+            elif map_choice == "testfifteen":
+                forbidden_nodes = self.model.map_test_fifteen_obstacles
                 if value not in forbidden_nodes:
                     passable_nodes.append(value)
 
@@ -1628,6 +1647,24 @@ class Walker(Agent):
             n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[25]
             return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
+        elif self.model.map_choice == "testtwelve":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[26]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testthirteen":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[27]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testfourteen":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[28]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+        elif self.model.map_choice == "testfifteen":
+            n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[29]
+            return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+
+
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # DELIBERATIVE NAVIGATION - A* ALGORITHM
 
@@ -2102,8 +2139,9 @@ class Walker(Agent):
         '''
 
         if self.stepCount == 0:
-            n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
-            self.navigation_mode = self.use_q(n_obstacles, total_branches, mean_branch_per_obs)
+            # n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
+            # self.navigation_mode = self.use_q(n_obstacles, total_branches, mean_branch_per_obs)
+            self.navigation_mode = 2
             self.stepCount += 1
 
         start = time.clock()
