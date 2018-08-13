@@ -140,3 +140,16 @@ plot(x,knn_choice, 'b');
 hold on
 plot(x, correct_choice, 'r');
 legend('Reactive', 'Deliberative', 'KNN Strategy Choice', 'Best Strategy')
+
+%% Solely KNN Error
+
+x = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15];
+knn_choice = [2 2 2 2 1 1 2 2 2 2 2 1 2 2 2];
+correct_choice = [2 2 2 1 1 1 2 1 2 2 2 1 1 1.5 2];
+
+figure;
+scatter(x, correct_choice, 'r')
+hold on
+scatter(x, knn_choice, 'b')
+legend('Best Strategy By Average', 'KNN Strategy Choice')
+
