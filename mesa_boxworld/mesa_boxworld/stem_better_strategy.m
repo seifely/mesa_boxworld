@@ -153,3 +153,7 @@ hold on
 scatter(x, knn_choice, 'b')
 legend('Best Strategy By Average', 'KNN Strategy Choice')
 
+%% Surface Plot
+
+
+

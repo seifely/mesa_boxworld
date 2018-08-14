@@ -56,7 +56,8 @@ class ThirdTestModel(Model):
                  obstacles=[],
                  map_choice=[],
                  simple=3,
-                 timed_mode=True):
+                 timed_mode=True,
+                 test=False):
 
         # Model Parameters Init
         self.height = height
@@ -72,7 +73,7 @@ class ThirdTestModel(Model):
         self.map_choice = map_choice
         self.step_count = 0
         self.simple = simple
-        self.test = True
+        self.test = test
 
         self.start_timer = 0
 
@@ -405,40 +406,40 @@ class ThirdTestModel(Model):
     def map_picker(self):
         if not self.test:
             if self.simple == 1:
-                # available_maps = ["one", "two", "three", "four", "five"]
-                # self.map_choice = random.choice(available_maps)
-                self.map_choice = "five"
+                available_maps = ["one", "two", "three", "four", "five"]
+                self.map_choice = random.choice(available_maps)
+                # self.map_choice = "five"
                 print("Map ", self.map_choice)
 
             elif self.simple == 2:
-                # available_maps = ["six", "seven", "eight", "nine", "ten"]  # add eleven to fifteen here
-                # self.map_choice = random.choice(available_maps)
-                self.map_choice = "ten"
+                available_maps = ["six", "seven", "eight", "nine", "ten"]  # add eleven to fifteen here
+                self.map_choice = random.choice(available_maps)
+                # self.map_choice = "ten"
                 print("Map ", self.map_choice)
 
             elif self.simple == 3:
-                # available_maps = ["eleven", "twelve", "thirteen", "fourteen", "fifteen"]
-                # self.map_choice = random.choice(available_maps)
-                self.map_choice = "fifteen"
+                available_maps = ["eleven", "twelve", "thirteen", "fourteen", "fifteen"]
+                self.map_choice = random.choice(available_maps)
+                # self.map_choice = "fifteen"
                 print("Map ", self.map_choice)
 
         if self.test:
             if self.simple == 1:
-                # available_maps = ["testfour", "testfive", "testsix", "testtwelve", "testfourteen"]
-                # self.map_choice = random.choice(available_maps)
-                self.map_choice = "testfourteen"
+                available_maps = ["testfour", "testfive", "testsix", "testtwelve", "testfourteen"]
+                self.map_choice = random.choice(available_maps)
+                # self.map_choice = "testfourteen"
                 print("Map ", self.map_choice)
 
             elif self.simple == 2:
-                # available_maps = ["testeight", "testfifteen", "testthirteen"]
-                # self.map_choice = random.choice(available_maps)
-                self.map_choice = "testthirteen"
+                available_maps = ["testeight", "testfifteen", "testthirteen"]
+                self.map_choice = random.choice(available_maps)
+                # self.map_choice = "testthirteen"
                 print("Map ", self.map_choice)
 
             elif self.simple == 3:
-                # available_maps = ["testone", "testtwo", "testthree", "testseven", "testnine", "testten", "testeleven"]
-                # self.map_choice = random.choice(available_maps)
-                self.map_choice = "testeleven"
+                available_maps = ["testone", "testtwo", "testthree", "testseven", "testnine", "testten", "testeleven"]
+                self.map_choice = random.choice(available_maps)
+                # self.map_choice = "testeleven"
                 print("Map ", self.map_choice)
 
     # create Boxes:

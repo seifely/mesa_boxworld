@@ -117,6 +117,7 @@ chart_element = ChartModule([{"Label": "Walkers", "Color": "#AA0000"},
 
 model_params = {#"height": UserSettableParameter('slider', 'Height', 20, 10, 50, 10),
                 #"width": UserSettableParameter('slider', 'Width', 20, 10, 50, 10),
+                "test": UserSettableParameter('checkbox', 'Test Environment Enabled', False),
                 "simple": UserSettableParameter('slider', 'Complexity Level', 1, 1, 3, 1),
                 "initial_walkers": UserSettableParameter('slider', 'Initial Walker Population', 1, 1, 10, 1),
                 # "initial_boxes": UserSettableParameter('slider', 'Initial Box Number', 10, 1, 20, 1),
