@@ -59,7 +59,7 @@ class Walker(Agent):
 
         # randomly select a nav mode to start in: 1 is Reactive, 2 is Deliberative
         # navigation_mode = random.choice([1, 2])
-        navigation_mode = 2
+        navigation_mode = 0
 
         self.moore = moore
         random_n = str(random.randint(1,1001))
@@ -101,102 +101,14 @@ class Walker(Agent):
         self.planning_step_memory = []
         self.average_step_time = 0
         self.goal_distance = 0
-        self.switch_cost = 0
+        self.switch_cost = 10
+        self.switchable = False
 
         self.k = 3
 
-        # things we want to track are:
-        # program run time - is it going on too long? What are the average completion times for the current map?
-        # step length (time) - how long is each step taking? Too long?
-        # how much printing is being done - if performance is poor, are we explaining ourselves enough?
-        # distance to set goal - does this increase at any point? Do we have to move further away to get closer?
-        # is goal blocked
-        # amount of memory being used - particularly important if we make large-scale calculations for deliberation
-        # where have we been? - step memory that is restricted to a limited size
-
-        # -------------------------- Metacognitive Transformed Outputs -------------------------
-
-        # time performance - each step as a function of total program time (can't be a fraction as this will get
-        # infinitely small?)
-        # fault monitoring - are we stuck?
-        # number of steps as a ratio to distance to goal (smaller is better)
-        # current score (next version applications!)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        # MAP NODES & STRAT CHOICE - UTILITY PURPOSES
-
-    def use_q(self, n_obstacles, n_branches, mean_branches):
-        # get current map complexity data across 3 axes - find closest combination in the training data
-        # initialise a k value (make this a global so later functions can change it)
-        # for i to len of training data ( there are 30 q value pairs total )
-        # want closest k across 3 dimensions, so cloest on x y and z axis
-        # set calculated distances in ascending order based on distance
-
-        # import the q_data - we /could/ import this data from the pickle files, but for simplicity we can document it
-        # for viewing below. Headings are (n of obstacles, n of total branches, average branch per obst., q-value
-        # for strategy 1, q value for strategy 2):
-        training_data = ([[5, 5, 1, 10.0, 4.75],
-                          [5, 5, 1, 10.0, 2.687],
-                          [6, 6, 1, 8.0, 4.125],
-                          [5, 5, 1, 10.0, 2.50],
-                          [5, 5, 1, 10.0, 3.625],
-                          [5, 11, 2.2, 4.5, 7.812],
-                          [5, 14, 2.8, 3.375, 7.0],
-                          [5, 13, 2.6, 5.062, 8.0],
-                          [5, 13, 2.6, 7.125, 5.8125],
-                          [5, 13, 2.6, 1.25, 7.562],
-                          [4, 25, 6.5, 1.5, 9.937],
-                          [4, 22, 5.5, 0.625, 10],
-                          [5, 30, 6, 0.625, 9.937],
-                          [8, 37, 4.625, 1.937, 9.937],
-                          [8, 36, 5.42, 0.25, 9.937]])
-
-        # the above data can be imported from the pickle file 'training_data', plus appended to with future training,
-        # using the pickle functions as seen in self.update_q()
-        training_spatials = []
-        # extract the spatial data for inter-map comparison
-        for i in range(len(training_data)):
-            x, y, z = training_data[i][0], training_data[i][1], training_data[i][2]
-            training_spatials.append([x, y, z])
-
-        # now that we have the 3 dimensions we need to compare, we import our new data
-        new_map = [n_obstacles, n_branches, mean_branches]
-        training_spatials.append(new_map)
-        D = distance.squareform(distance.pdist(training_spatials))  # this gets the euclidean distance between each row
-        # and each other row in n-dimensional space
-        comparative_row = D[len(D)-1]
-        closest = np.argsort(comparative_row)  # this gives our new map's row with a list of the row indices # don't need , axis=1
-        print("Closest: ", closest)
-        # that are closest
-
-        closest = closest.tolist()
-        closest.remove(15)
-
-        # initialise k
-        # k_nearest_neighbours = (closest[:, 1:self.k+1])
-        k_nearest_neighbours = []
-        for x in range(1, self.k+1):
-            k_nearest_neighbours.append(closest[x])
-
-        print("K nearest: ", k_nearest_neighbours)
-        # then we select the rows of training_data that are those neighbours
-        classifications = []
-        for n in range(len(k_nearest_neighbours)):
-            row_n = k_nearest_neighbours[n]
-            first_q = training_data[row_n][3]
-            second_q = training_data[row_n][4]
-            if first_q > second_q:
-                classifications.append(1)
-            if first_q < second_q:
-                classifications.append(2)
-
-        print("Classfications: ", classifications)
-        if scipy.stats.mode(classifications, axis=None)[0] == 1:
-            print("Best strategy choice is REACTIVE.")
-            return 1
-        elif scipy.stats.mode(classifications, axis=None)[0] == 2:
-            print("Best strategy choice is DELIBERATIVE.")
-            return 2
+        # MAP NODES
 
     def get_nodes(self):  # the more reliable version!
         all_nodes = self.model.grid_list
@@ -1166,7 +1078,6 @@ class Walker(Agent):
                 # elif not self.passable(avoidance_goal) and self.in_bounds(avoidance_goal):
                 #     print("That avoidance goal is impassable. I'm stuck.")
 
-
     def SYSTEM_ALPHA(self):
         # start = time.clock()
 
@@ -1663,8 +1574,6 @@ class Walker(Agent):
             n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[29]
             return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
-
-
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # DELIBERATIVE NAVIGATION - A* ALGORITHM
 
@@ -1864,113 +1773,7 @@ class Walker(Agent):
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # META COGNITION A
 
-    def loop_monitor(self, step_memory):
-        if len(step_memory) >= 3:
-            if step_memory[0] == step_memory[2]:
-                self.loop += 0.125  # this value is set cautiously to prevent unnecessary switching whilst in A*
-                print("I may be looping. Loop Value now at: ", self.loop)
-        if len(step_memory) >= 4:
-            if step_memory[0] == step_memory[3]:
-                self.loop += 0.125
-                print("I may be looping. Loop Value now at: ", self.loop)
-        if len(step_memory) >= 5:
-            if step_memory[0] == step_memory[4]:
-                # this will do for now, as long as the agent retraces steps in lines rather than going in CIRCLES
-                # a circular catcher is harder as we have no idea the size of circle
-                self.loop += 0.125
-                print("I may be looping. Loop Value now at: ", self.loop)
-
-        if len(step_memory) >= 7:
-            if step_memory[0] == step_memory[6]:
-                self.loop += 0.125  # this should catch circular loops (I think?)
-                print("I may be looping. Loop Value now at: ", self.loop)
-        if len(step_memory) >= 9:
-            if step_memory[0] == step_memory[8]:
-                self.loop += 0.125  # this should catch circular loops (I think?)
-                print("I may be looping. Loop Value now at: ", self.loop)
-
-
-    def meta_monitoring(self, path_length, path_cost, running_time, step_memory, score, steps_since_last_goal,
-                        distance_to_goal, ):
-        crowdedness = self.crowdedness(3)
-        n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
-
-        if len(self.step_time_memory) > 0:
-            self.average_step_time = sum(self.step_time_memory)/len(self.step_time_memory)
-        # need to store these to a new list, check the list for increasing values or decreases from the previous step?
-        total_time = sum(self.step_time_memory)
-        print("Average Step Time:", self.average_step_time, "Total Step Time: ", total_time)
-
-        # loop checking is for checking if we have gotten stuck in a movement loop thanks to reactive behaviour.
-        # ideally, it checks for if any value comes up twice in a short space - the shortest check we can do is if
-        # x o x has occurred as a movement (e.g. (2,3) -> (2,4) -> (2,3))
-        #   this may happen reasonably as a part of inefficient progress, so increment the stuck value slowly, as we
-        #   need to employ caution.
-
-        # steps left, time left
-
-        if steps_since_last_goal != 0 and distance_to_goal != 0:
-            progress_ratio = steps_since_last_goal/distance_to_goal
-
-            print("Progress Ratio: ", progress_ratio)
-            progress_queue = []
-            if len(progress_queue) < 2:
-                progress_queue.append(progress_ratio)
-
-            elif len(progress_queue) >= 2:
-                progress_queue.pop(0)
-                progress_queue.append(progress_ratio)
-
-            if len(progress_queue) >= 2:
-                if progress_queue.index(0) < progress_queue.index(1):  # if the previous step's ratio is lower than our current ratio, doing better
-                    print("Progress Queue: ", progress_queue)
-                    return
-
-                elif progress_queue.index(0) > progress_queue.index(1):  # if the previous step's ratio is higher than ours, doing worse
-                    print("Progress Queue: ", progress_queue)
-                    return
-
-        # NEED AN 'IF PERFORMANCE DROPS, CHANGE AN X VALUE IN THE SYSTEM TO IMPROVE PERFORMANCE'
-
-
-        self.loop_monitor(step_memory)
-        return self.average_step_time, total_time, crowdedness, n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
-        # return
-
     # should there be some kind of third function that makes the decision on what the best course of action is?
-
-    def meta_actor(self, time_performance, planning_performance, stuck_level, loop_check,):  # this needs to be done better
-        switch_threshold = 0
-
-        if stuck_level >= 1:  # NEED TO IMPLEMENT AN INCREASE IN STUCK LEVEL WHEN IT IS STUCK FOR THIS TO ACTUALLY WORK
-            switch_threshold += 1
-
-        # if loop_check >= 1:
-        #     switch_threshold += 1
-
-        # if switch_threshold >= 1:
-        #     sys.exit()
-            # self.switch()
-            # self.switch_cost += 50
-
-        # can change threshold values? So if switching is occurring VERY OFTEN, make the loop and stuck checkers more cautious
-        # need to implement a cost for switching
-
-    def switch(self):
-        if self.navigation_mode == 1:
-            print("Switching ALPHA to BETA")
-            self.navigation_mode = 2
-            self.stuck = 0
-            self.loop = 0
-            self.steps_memory = []
-            self.steps_memory.insert(0, self.pos)
-        elif self.navigation_mode == 2:
-            print("Switching BETA to ALPHA")
-            self.navigation_mode = 1
-            self.stuck = 0
-            self.loop = 0
-            self.steps_memory = []
-            self.steps_memory.insert(0, self.pos)
 
     def update_q(self, score, strategy, state, learning_rate, gamma):
 
@@ -2108,18 +1911,229 @@ class Walker(Agent):
                         fileWrite.close()
                         return new_q
 
+    def use_q(self, n_obstacles, n_branches, mean_branches):
+        # get current map complexity data across 3 axes - find closest combination in the training data
+        # initialise a k value (make this a global so later functions can change it)
+        # for i to len of training data ( there are 30 q value pairs total )
+        # want closest k across 3 dimensions, so cloest on x y and z axis
+        # set calculated distances in ascending order based on distance
+
+        # import the q_data - we /could/ import this data from the pickle files, but for simplicity we can document it
+        # for viewing below. Headings are (n of obstacles, n of total branches, average branch per obst., q-value
+        # for strategy 1, q value for strategy 2):
+        training_data = ([[5, 5, 1, 10.0, 4.75],
+                          [5, 5, 1, 10.0, 2.687],
+                          [6, 6, 1, 8.0, 4.125],
+                          [5, 5, 1, 10.0, 2.50],
+                          [5, 5, 1, 10.0, 3.625],
+                          [5, 11, 2.2, 4.5, 7.812],
+                          [5, 14, 2.8, 3.375, 7.0],
+                          [5, 13, 2.6, 5.062, 8.0],
+                          [5, 13, 2.6, 7.125, 5.8125],
+                          [5, 13, 2.6, 1.25, 7.562],
+                          [4, 25, 6.5, 1.5, 9.937],
+                          [4, 22, 5.5, 0.625, 10],
+                          [5, 30, 6, 0.625, 9.937],
+                          [8, 37, 4.625, 1.937, 9.937],
+                          [8, 36, 5.42, 0.25, 9.937]])
+
+        # the above data can be imported from the pickle file 'training_data', plus appended to with future training,
+        # using the pickle functions as seen in self.update_q()
+        training_spatials = []
+        # extract the spatial data for inter-map comparison
+        for i in range(len(training_data)):
+            x, y, z = training_data[i][0], training_data[i][1], training_data[i][2]
+            training_spatials.append([x, y, z])
+
+        # now that we have the 3 dimensions we need to compare, we import our new data
+        new_map = [n_obstacles, n_branches, mean_branches]
+        training_spatials.append(new_map)
+        D = distance.squareform(distance.pdist(training_spatials))  # this gets the euclidean distance between each row
+        # print("D: ", D)
+        # and each other row in n-dimensional space
+        comparative_row = D[len(D)-1]
+        closest = np.argsort(comparative_row)  # this gives our new map's row with a list of the row indices # don't need , axis=1
+        # that are closest
+
+        closest = closest.tolist()
+        closest.remove(len(closest)-1)
+        print("Closest: ", closest)
+
+        # initialise k
+        # k_nearest_neighbours = (closest[:, 1:self.k+1])
+        k_nearest_neighbours = []
+        closest_dist = []
+        for x in range(0, self.k):
+            k_nearest_neighbours.append(closest[x])
+            closest_dist.append(D[len(D)-1][closest[x]])
+
+        print("Closest Distances: ", closest_dist)
+        print("K nearest: ", k_nearest_neighbours)
+        # then we select the rows of training_data that are those neighbours
+        classifications = []
+        for n in range(len(k_nearest_neighbours)):
+            row_n = k_nearest_neighbours[n]
+            first_q = training_data[row_n][3]
+            second_q = training_data[row_n][4]
+            if first_q > second_q:
+                classifications.append(1)
+            if first_q < second_q:
+                classifications.append(2)
+
+        print("Classfications: ", classifications)
+        if scipy.stats.mode(classifications, axis=None)[0] == 1:
+            print("Best strategy choice is REACTIVE.")
+            return 1, closest_dist
+        elif scipy.stats.mode(classifications, axis=None)[0] == 2:
+            print("Best strategy choice is DELIBERATIVE.")
+            return 2, closest_dist
+
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # META COGNITION B
 
-    def update_performance_memory(self):
-        return
+    def judge_choice(self, suggestion, distances):
 
-    def check_performance_memory(self):
-        return
+        trustworthy_distance_threshold = 15  # 15 is an acceptable limit. 10 is very untrustworthy, 20 too lax
+        trust_decisions = []
+        for i in range(len(distances)):
+            if distances[i] > trustworthy_distance_threshold:
+                trust_decisions.append(1)
+            else:
+                trust_decisions.append(0)
 
-    def judge_choice(self):
-        return
+        if scipy.stats.mode(trust_decisions, axis=None)[0] == 1:
+            if self.model.simple == 3:
+                print("The KNN judgement is unrealiable, but the time limit can afford deliberation.")
+                self.navigation_mode = 2
+            else:
+                print("The KNN judgement is relying on distant data. Using first-principle thinking instead.")
+                self.navigation_mode = 1
+                self.switchable = True
+        # elif q_values in map_memory = ((difference is very small)):
+        #     return
+        else:
+            print("The KNN judgement is acceptable. Navigation mode confirmed.")
+            self.navigation_mode = suggestion
+
+    def loop_monitor(self, step_memory):
+        if self.navigation_mode == 1:
+            if len(step_memory) >= 3:
+                if step_memory[0] == step_memory[2]:
+                    self.loop += 0.125  # this value is set cautiously to prevent unnecessary switching whilst in A*
+                    print("I may be looping. Loop Value now at: ", self.loop)
+            if len(step_memory) >= 4:
+                if step_memory[0] == step_memory[3]:
+                    self.loop += 0.125
+                    print("I may be looping. Loop Value now at: ", self.loop)
+            if len(step_memory) >= 5:
+                if step_memory[0] == step_memory[4]:
+                    # this will do for now, as long as the agent retraces steps in lines rather than going in CIRCLES
+                    # a circular catcher is harder as we have no idea the size of circle
+                    self.loop += 0.125
+                    print("I may be looping. Loop Value now at: ", self.loop)
+
+            if len(step_memory) >= 7:
+                if step_memory[0] == step_memory[6]:
+                    self.loop += 0.125  # this should catch circular loops (I think?)
+                    print("I may be looping. Loop Value now at: ", self.loop)
+            if len(step_memory) >= 9:
+                if step_memory[0] == step_memory[8]:
+                    self.loop += 0.125  # this should catch circular loops (I think?)
+                    print("I may be looping. Loop Value now at: ", self.loop)
+
+    def meta_monitoring(self, path_length, path_cost, running_time, step_memory, score, steps_since_last_goal,
+                        distance_to_goal, ):
+        crowdedness = self.crowdedness(3)
+        n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
+
+        if len(self.step_time_memory) > 0:
+            self.average_step_time = sum(self.step_time_memory) / len(self.step_time_memory)
+        # need to store these to a new list, check the list for increasing values or decreases from the previous step?
+        total_time = sum(self.step_time_memory)
+        print("Average Step Time:", self.average_step_time, "Total Step Time: ", total_time)
+
+        # loop checking is for checking if we have gotten stuck in a movement loop thanks to reactive behaviour.
+        # ideally, it checks for if any value comes up twice in a short space - the shortest check we can do is if
+        # x o x has occurred as a movement (e.g. (2,3) -> (2,4) -> (2,3))
+        #   this may happen reasonably as a part of inefficient progress, so increment the stuck value slowly, as we
+        #   need to employ caution.
+
+        # steps left, time left
+
+        if steps_since_last_goal != 0 and distance_to_goal != 0:
+            progress_ratio = steps_since_last_goal / distance_to_goal
+
+            print("Progress Ratio: ", progress_ratio)
+            progress_queue = []
+            if len(progress_queue) < 2:
+                progress_queue.append(progress_ratio)
+
+            elif len(progress_queue) >= 2:
+                progress_queue.pop(0)
+                progress_queue.append(progress_ratio)
+
+            if len(progress_queue) >= 2:
+                if progress_queue.index(0) < progress_queue.index(
+                        1):  # if the previous step's ratio is lower than our current ratio, doing better
+                    print("Progress Queue: ", progress_queue)
+                    return
+
+                elif progress_queue.index(0) > progress_queue.index(
+                        1):  # if the previous step's ratio is higher than ours, doing worse
+                    print("Progress Queue: ", progress_queue)
+                    return
+
+        # NEED AN 'IF PERFORMANCE DROPS, CHANGE AN X VALUE IN THE SYSTEM TO IMPROVE PERFORMANCE'
+
+        self.loop_monitor(step_memory)
+        return self.average_step_time, total_time, crowdedness, n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+
+    def meta_actor(self, time_performance, planning_performance, stuck_level, loop_check, crowdedness):
+        # this needs to be done better
+        switch_threshold = 0
+        crowdedness_caution = 3
+        time_caution = 0.75
+
+        if self.switchable:
+            if stuck_level >= 1:
+                switch_threshold += 1
+
+            if loop_check >= 1:  # alter the value that increments for loops & switches if not switch/switch too much
+                switch_threshold += 1
+
+            if switch_threshold >= 1:
+                self.switch()
+
+            if self.navigation_mode == 1:
+                if crowdedness > crowdedness_caution:
+                    self.switch()
+
+            if self.navigation_mode == 2:
+                total_time = self.model.time_limit
+                current_time = self.tt_step
+
+                if current_time > (total_time*time_caution) and self.check_for_freedom(self.goal, self.pos) \
+                        and self.closed_box_list > 0:
+                    # may not need the second statement there - could just be time-cautious in general
+                    # basically, if there is time left, we're still deliberating, and there are still boxes to open
+                    self.switch()
+
+    def switch(self):
+        if self.navigation_mode == 1:
+            print("Switching ALPHA to BETA")
+            self.navigation_mode = 2
+            self.stuck = 0
+            self.loop = 0
+            self.steps_memory = []
+            self.steps_memory.insert(0, self.pos)
+        elif self.navigation_mode == 2:
+            print("Switching BETA to ALPHA")
+            self.navigation_mode = 1
+            self.stuck = 0
+            self.loop = 0
+            self.steps_memory = []
+            self.steps_memory.insert(0, self.pos)
 
     # this needs to be a system that checks the reliability of the other system
     # type 1 falls down when we train on a subset and then fail to generalise
@@ -2139,9 +2153,10 @@ class Walker(Agent):
         '''
 
         if self.stepCount == 0:
-            # n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
-            # self.navigation_mode = self.use_q(n_obstacles, total_branches, mean_branch_per_obs)
-            self.navigation_mode = 2
+            n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
+            suggested_nav, distance_vector = self.use_q(n_obstacles, total_branches, mean_branch_per_obs)
+            actual_nav = self.judge_choice(suggested_nav, distance_vector)
+
             self.stepCount += 1
 
         start = time.clock()
@@ -2153,8 +2168,7 @@ class Walker(Agent):
                                                                         self.score, self.inter_goal_stepCount,
                                                                         self.goal_distance)
             # print("Average and Total Step Time:", av_step, tt_step)
-            self.meta_actor(0, 0, self.stuck, self.loop)  # this could take in 'time remaining' -
-            # e.g. if we are in last ten seconds and there are still boxes, switch to reactive
+            self.meta_actor(0, 0, self.stuck, self.loop, crowdedness)
             self.tt_step = tt_step
             # self.output_data(tt_step, crowdedness, map_complex, branch_complex
 
@@ -2171,21 +2185,14 @@ class Walker(Agent):
             if self.tt_step > self.model.time_limit:
                 print("Time's up!")
 
-                # do I record the run data here as an internal variable?
                 # q_val = self.update_q(len(self.open_box_list),0,0,0,0)
                 # self.output_learned_data(q_val)
                 sys.exit()
 
             # depending on what stress levels are, set resources available: how far we can check back (for looping),
             # change switching costs/thresholds (so we under or overvalue switching), less access to information such as
-            #
 
-        # print("Step Memory:", self.steps_memory)
-
-
-
-
-    ############################################################################################################
+############################################################################################################
 
 
 class ClosedBox(Agent):
