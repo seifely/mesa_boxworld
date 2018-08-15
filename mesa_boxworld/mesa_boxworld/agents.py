@@ -103,10 +103,20 @@ class Walker(Agent):
         self.average_step_time = 0
         self.goal_distance = 0
 
-        self.switch_cost = 1
-        self.switch_likelihood = 9
-        self.switch_threshold = 0
+        self.switch_cost = 10
+        self.switch_likelihood = 90
+        self.switch_minimum = 10
         self.switchable = False
+
+        self.switch_threshold = 0
+        self.crowdedness_caution = 5
+        self.time_caution = 0.75
+        self.plan_time_allowance = 6
+        self.loop_increment = 0.125
+        self.shift_impairment = False
+        self.shift_impairment_value = 3
+        self.step_memory_limit = False
+        self.comfort_radius = 1
 
         self.k = 3
 
@@ -1196,7 +1206,7 @@ class Walker(Agent):
             # print("Item to consume: ", item_to_consume)
             self.model.grid._remove_agent(self.pos, item_to_consume)
             self.score -= 1
-            self.stress += 10
+            self.stress += 5
             self.items_picked_up += 1
             self.inventory[self.items_picked_up] = item_colour
 
@@ -1448,9 +1458,31 @@ class Walker(Agent):
 
             return crowdedness
 
-        elif radius != 1 or 2 or 3:
-            print("Radius input error")
+        elif radius == 0:
             return
+        elif radius > 3:  # if radius is higher than 3, check it as if it were 3
+            check_space = [(x, (y + 1)), ((x + 1), (y + 1)), ((x + 1), y), ((x + 1), (y - 1)), (x, (y - 1)),
+                           ((x - 1), (y - 1)), ((x - 1), y),
+                           ((x - 1), (y + 1)), (x, (y + 2)), ((x + 1), (y + 2)), ((x + 2), (y + 2)), ((x + 2), (y + 1)),
+                           ((x + 1), y),
+                           ((x + 2), (y - 1)), ((x + 2), (y - 2)), ((x + 1), (y - 2)), (x, (y - 2)), ((x - 1), (y - 2)),
+                           ((x - 2), (y - 2)),
+                           ((x - 2), (y - 1)), ((x - 2), y), ((x - 1), (y + 1)), ((x - 2), (y + 2)), ((x - 1), (y + 2)),
+                           (x, (y + 3)),
+                           ((x + 1), (y + 3)), ((x + 2), (y + 3)), ((x + 2), (y + 3)), ((x + 3), (y + 2)),
+                           ((x + 3), (y + 1)),
+                           ((x + 3), y), ((x + 3), (y - 1)), ((x + 3), (y - 2)), ((x + 3), (y - 3)), ((x + 2), (y - 3)),
+                           ((x + 1), (y - 3)),
+                           ((x), (y - 3)), ((x - 1), (y - 3)), ((x - 2), (y - 3)), ((x - 3), (y - 3)),
+                           ((x - 3), (y - 2)), ((x - 3), (y - 1)),
+                           ((x - 3), (y)), ((x - 3), (y + 1)), ((x - 3), (y + 2)), ((x - 3), (y + 3)),
+                           ((x - 2), (y + 3)), ((x - 1), (y + 3))]
+
+            for x in range(len(check_space)):
+                if not self.passable(check_space[x]):
+                    crowdedness += 1
+
+            return crowdedness
 
     def complexity_judge(self):
         # number of branches are going to be represented by the number of duplicate x or y's in the obstacle array?
@@ -1745,16 +1777,19 @@ class Walker(Agent):
                     self.plan_acquired = True
 
                 if self.plan_acquired:
-                    next_step = self.planned_path.pop(0)
-                    # self.model.grid.move_agent(self, next_step)
-                    # self.steps_memory.insert(0, next_step)
-                    # print("Took my next step...")
-                    self.generic_movement(next_step)
+                    if not self.planned_path:
+                        self.plan_acquired = False
+                    elif len(self.planned_path) > 0:
+                        next_step = self.planned_path.pop(0)
+                        # self.model.grid.move_agent(self, next_step)
+                        # self.steps_memory.insert(0, next_step)
+                        # print("Took my next step...")
+                        self.generic_movement(next_step)
 
-                    self.open_box()
-                    self.pickup_item()
-                    if self.pos == self.goal:
-                        self.goal_reached = True
+                        self.open_box()
+                        self.pickup_item()
+                        if self.pos == self.goal:
+                            self.goal_reached = True
 
             if self.goal_reached:
                 self.calculate_box_distances_from_current_pos()
@@ -2021,33 +2056,39 @@ class Walker(Agent):
 
     def loop_monitor(self, step_memory):
         if self.navigation_mode == 1:
-            if len(step_memory) >= 3:
-                if step_memory[0] == step_memory[2]:
-                    self.loop += 0.125  # this value is set cautiously to prevent unnecessary switching whilst in A*
-                    print("I may be looping. Loop Value now at: ", self.loop)
-            if len(step_memory) >= 4:
-                if step_memory[0] == step_memory[3]:
-                    self.loop += 0.125
-                    print("I may be looping. Loop Value now at: ", self.loop)
-            if len(step_memory) >= 5:
-                if step_memory[0] == step_memory[4]:
-                    # this will do for now, as long as the agent retraces steps in lines rather than going in CIRCLES
-                    # a circular catcher is harder as we have no idea the size of circle
-                    self.loop += 0.125
-                    print("I may be looping. Loop Value now at: ", self.loop)
+            if not self.step_memory_limit:
+                if len(step_memory) >= 3:
+                    if step_memory[0] == step_memory[2]:
+                        self.loop += self.loop_increment  # this value is set cautiously to prevent unnecessary switching whilst in A*
+                        print("I may be looping. Loop Value now at: ", self.loop)
+                if len(step_memory) >= 4:
+                    if step_memory[0] == step_memory[3]:
+                        self.loop += self.loop_increment
+                        print("I may be looping. Loop Value now at: ", self.loop)
+                if len(step_memory) >= 5:
+                    if step_memory[0] == step_memory[4]:
+                        # this will do for now, as long as the agent retraces steps in lines rather than going in CIRCLES
+                        # a circular catcher is harder as we have no idea the size of circle
+                        self.loop += self.loop_increment
+                        print("I may be looping. Loop Value now at: ", self.loop)
 
-            if len(step_memory) >= 7:
-                if step_memory[0] == step_memory[6]:
-                    self.loop += 0.125  # this should catch circular loops (I think?)
-                    print("I may be looping. Loop Value now at: ", self.loop)
-            if len(step_memory) >= 9:
-                if step_memory[0] == step_memory[8]:
-                    self.loop += 0.125  # this should catch circular loops (I think?)
-                    print("I may be looping. Loop Value now at: ", self.loop)
+                if len(step_memory) >= 7:
+                    if step_memory[0] == step_memory[6]:
+                        self.loop += self.loop_increment  # this should catch circular loops (I think?)
+                        print("I may be looping. Loop Value now at: ", self.loop)
+                if len(step_memory) >= 9:
+                    if step_memory[0] == step_memory[8]:
+                        self.loop += self.loop_increment  # this should catch circular loops (I think?)
+                        print("I may be looping. Loop Value now at: ", self.loop)
+            elif self.step_memory_limit:
+                if len(step_memory) >= 3:
+                    if step_memory[0] == step_memory[2]:
+                        self.loop += self.loop_increment  # this value is set cautiously to prevent unnecessary switching whilst in A*
+                        print("I may be looping. Loop Value now at: ", self.loop)
 
     def meta_monitoring(self, path_length, path_cost, running_time, step_memory, score, steps_since_last_goal,
                         distance_to_goal, ):
-        crowdedness = self.crowdedness(3)
+        crowdedness = self.crowdedness(self.comfort_radius)
         n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
 
         if len(self.step_time_memory) > 0:
@@ -2094,42 +2135,38 @@ class Walker(Agent):
 
     def meta_actor(self, time_performance, planning_performance, stuck_level, loop_check, crowdedness):
         # this needs to be done better
-        switch_threshold = 0
-        crowdedness_caution = 3
-        time_caution = 0.75
-        plan_time_threshold = 6
 
         if self.switchable:
             if stuck_level >= 1:
-                switch_threshold += 1
+                self.switch_threshold += 1
 
             if loop_check >= 1:  # alter the value that increments for loops & switches if not switch/switch too much
-                switch_threshold += 1
+                self.switch_threshold += 1
 
-            if switch_threshold >= 1:
+            if self.switch_threshold >= 1:
                 self.switch()
 
             if self.navigation_mode == 1:
-                if crowdedness > crowdedness_caution:
+                if crowdedness > self.crowdedness_caution:
                     self.switch()
 
-            if self.navigation_mode == 2 and self.plan_time > plan_time_threshold: # set cautiously at 6
+            if self.navigation_mode == 2 and self.plan_time > self.plan_time_allowance: # set cautiously at 6
                 self.switch()
 
             if self.navigation_mode == 2:
                 total_time = self.model.time_limit
                 current_time = self.tt_step
 
-                if current_time > (total_time*time_caution) and self.check_for_freedom(self.goal, self.pos) \
-                        and self.closed_box_list > 0:
+                if current_time > (total_time*self.time_caution) and self.check_for_freedom(self.goal, self.pos) \
+                        and len(self.closed_box_list) > 0:
                     # may not need the second statement there - could just be time-cautious in general
                     # basically, if there is time left, we're still deliberating, and there are still boxes to open
                     self.switch()
 
     def switch(self):
         generate_switch = random.randint(0, self.switch_likelihood)
-        if generate_switch >= self.switch_threshold:
-            print("I can switch.")  # At the moment, 0 vs 9 means normally it is 90% likely to switch normally
+        if generate_switch >= self.switch_minimum:
+            # At the moment, 0 vs 9 means normally it is 90% likely to switch normally
             # either increase the threshold or likelihood and that will make switching less likely
 
             if self.navigation_mode == 1:
@@ -2143,6 +2180,8 @@ class Walker(Agent):
                 # switch in the future.
                 # This is done utilising a random mechanism, but could be done more planned with monitoring of
                 # what proportion the current switch likelihood vs. original likelihood
+                if self.shift_impairment:
+                    time.sleep(self.shift_impairment_value)
             elif self.navigation_mode == 2:
                 print("Switching BETA to ALPHA")
                 self.navigation_mode = 1
@@ -2151,14 +2190,52 @@ class Walker(Agent):
                 self.steps_memory = []
                 self.steps_memory.insert(0, self.pos)
                 self.switch_likelihood -= self.switch_cost
+                if self.shift_impairment:
+                    time.sleep(self.shift_impairment_value)
 
     # this needs to be a system that checks the reliability of the other system
     # type 1 falls down when we train on a subset and then fail to generalise
     # bayesian trustworthiness based on some kind of memory?
 
     # can override the meta actors in META A if it does not trust the response based on a lookup table
-    # calculate some kind of distance from current (new) scenario to learned scenarios, and the greater the distance
+    # calculate distance from current (new) scenario to learned scenarios, and the greater the distance
     # the less trustworthy the response should be?
+
+    def stress_changes(self):
+        counter = 0
+        # stress currently increases at a rate of 5 per yellow item/negative reward, on high map that's 5*6=30
+        # so thresholds could be 10, 20, 30
+        if counter == 0 and self.stress == 10:
+            if self.k >=3:  # this doesn't actually do anything
+                self.k -= 2
+
+            self.crowdedness_caution -= 1  # make the agent 1 radius more cautious
+            # self.switch_cost += 1  # higher switch costs mean less chances to switch in the future
+            self.switch_cost = int(self.switch_cost / 2)
+            self.loop_increment += 0.125  # increasing LP increases the speed at which it will switch from looping
+            # could alternatively increase the loop threshold
+
+            counter += 1
+            return
+
+        if counter == 1 and self.stress == 20:
+            self.shift_impairment = True  # switching now causes pausing
+            self.step_memory_limit = True
+            self.time_caution -= 2
+            self.loop_increment += 0.125
+
+            counter += 1
+            return
+
+        if counter == 2 and self.stress == 30:
+            self.shift_impairment_value += 2
+            self.crowdedness_caution -= 1
+            self.loop_increment += 0.125
+            self.time_caution -= 2
+
+            counter += 1
+            return
+
 
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -2179,6 +2256,9 @@ class Walker(Agent):
         start = time.clock()
         # print("obl: ", len(self.open_box_list))
         if self.stepCount != 0:
+            # ----- Stress Impairment ------
+            if self.model.stress_mode:
+                self.stress_changes()
             # print("Inter goal step:", self.inter_goal_stepCount)
             # print("Goal distance: ", self.goal_distance)
             av_step, tt_step, crowdedness, n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.meta_monitoring(0, 0, 0, self.steps_memory,

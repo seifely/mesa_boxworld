@@ -56,7 +56,8 @@ class ThirdTestModel(Model):
                  simple=3,
                  timed_mode=True,
                  test=False,
-                 high_yellow=False):
+                 high_yellow=False,
+                 stress_mode=False):
 
         # Model Parameters Init
         self.height = height
@@ -78,6 +79,7 @@ class ThirdTestModel(Model):
         self.step_count = 0
         self.simple = simple
         self.test = test
+        self.stress_mode = stress_mode
 
         self.start_timer = 0
 
@@ -435,15 +437,15 @@ class ThirdTestModel(Model):
                 print("Map ", self.map_choice)
 
             elif self.simple == 2:
-                available_maps = ["testeight", "testfifteen", "testthirteen"]
-                self.map_choice = random.choice(available_maps)
-                # self.map_choice = "testthirteen"
+                # available_maps = ["testeight", "testfifteen", "testthirteen", "testseven"]
+                # self.map_choice = random.choice(available_maps)
+                self.map_choice = "testseven"
                 print("Map ", self.map_choice)
 
             elif self.simple == 3:
-                available_maps = ["testone", "testtwo", "testthree", "testseven", "testnine", "testten", "testeleven"]
+                available_maps = ["testone", "testtwo", "testthree", "testnine", "testten", "testeleven"]
                 self.map_choice = random.choice(available_maps)
-                # self.map_choice = "testeleven"
+                # self.map_choice = ""
                 print("Map ", self.map_choice)
 
     # create Boxes:
