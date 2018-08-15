@@ -35,6 +35,7 @@ class ThirdTestModel(Model):
     obstacles = []
     map_choice = []
     timed_mode = True
+    high_yellow = False
 
     verbose = False  # Print-monitoring
 
@@ -44,9 +45,6 @@ class ThirdTestModel(Model):
                  initial_walkers=1,
                  initial_boxes=10,
                  # initial_items=initial_boxes//2,
-                 initial_yellow_items=3,
-                 initial_blue_items=4,
-                 initial_green_items=3,
                  initial_total_items=10,
                  # initial_obstacles=3,
                  # obstacle_length=7,
@@ -57,7 +55,8 @@ class ThirdTestModel(Model):
                  map_choice=[],
                  simple=3,
                  timed_mode=True,
-                 test=False):
+                 test=False,
+                 high_yellow=False):
 
         # Model Parameters Init
         self.height = height
@@ -65,9 +64,14 @@ class ThirdTestModel(Model):
         self.initial_walkers = initial_walkers
         self.initial_boxes = initial_boxes
         self.initial_total_items = initial_total_items
-        self.initial_yellow_items = initial_yellow_items
-        self.initial_blue_items = initial_blue_items
-        self.initial_green_items = initial_green_items
+
+        if high_yellow:
+            self.available_items = [1, 1, 1, 1, 1, 1, 2, 2, 3, 3]
+
+        elif not high_yellow:
+
+            self.available_items = [1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
+
         # self.initial_obstacles = initial_obstacles
         # self.obstacle_length = obstacle_length
         self.map_choice = map_choice
@@ -798,27 +802,31 @@ class ThirdTestModel(Model):
             self.schedule.add(walker)
 
     def make_items(self):
-        # this function takes the dictionary of empty boxes, selects one and puts an item in it
+        # this function takes the dictionary of empty boxes, selects one at random and puts an item in it:
         for j in range(self.initial_total_items):
             chosen_box = self.empty_boxes.pop(j)
             # print("Box Selected")
-                    # chosen_box = self.empty_boxes.popitem()
-                    # print("Box Selected")
-                    # use the above to pop an arbitrary value from the empty boxes list
-            types_available = ["yellow", "blue", "pink"]
+            # chosen_box = self.empty_boxes.popitem()
+            # print("Box Selected")
+            # use the above to pop an arbitrary value from the empty boxes list
+            types_available = self.available_items
             item_type = random.choice(types_available)
-            if item_type == "yellow":
+            if item_type == 1:
                 item = yellowItem(chosen_box, self, True)
-            elif item_type == "blue":
+                self.available_items.remove(1)
+            elif item_type == 2:
                 item = blueItem(chosen_box, self, True)
-            elif item_type == "pink":
+                self.available_items.remove(2)
+            elif item_type == 3:
                 item = pinkItem(chosen_box, self, True)
+                self.available_items.remove(3)
 
             self.grid.place_agent(item, chosen_box)
             self.schedule.add(item)
             # print("Coloured Item Added")
             self.full_boxes[j] = chosen_box
             # print("Box Filled")
+
 
         self.running = True
         self.datacollector.collect(self)

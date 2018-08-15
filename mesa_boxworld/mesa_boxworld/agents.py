@@ -94,6 +94,7 @@ class Walker(Agent):
         self.current_step_time = 0
         self.tt_step = 0
         self.planning_steps_taken = 0
+        self.plan_time = 0
         self.stuck = 0
         self.loop = 0
         self.stress = 0
@@ -101,7 +102,10 @@ class Walker(Agent):
         self.planning_step_memory = []
         self.average_step_time = 0
         self.goal_distance = 0
-        self.switch_cost = 10
+
+        self.switch_cost = 1
+        self.switch_likelihood = 9
+        self.switch_threshold = 0
         self.switchable = False
 
         self.k = 3
@@ -1586,8 +1590,8 @@ class Walker(Agent):
         # now we need a navigation system to take this path and use it
         # we also need to time this process so that we can have feedback on it
 
-        plan_time = time.clock() - starter
-        print("Planning Time Taken: ", plan_time)
+        self.plan_time = time.clock() - starter
+        print("Planning Time Taken: ", self.plan_time)
 
         return path, path_cost, planning_step
 
@@ -1737,8 +1741,7 @@ class Walker(Agent):
                     self.planned_path = path
                     self.planned_path_cost = path_cost
                     self.planning_steps_taken = planning_step
-                    # self.current_step_time = time_elapsed
-                    # print("Planning Time Elapsed: ", time_elapsed)
+
                     self.plan_acquired = True
 
                 if self.plan_acquired:
@@ -2005,16 +2008,16 @@ class Walker(Agent):
         if scipy.stats.mode(trust_decisions, axis=None)[0] == 1:
             if self.model.simple == 3:
                 print("The KNN judgement is unrealiable, but the time limit can afford deliberation.")
-                self.navigation_mode = 2
+                return 2
             else:
                 print("The KNN judgement is relying on distant data. Using first-principle thinking instead.")
-                self.navigation_mode = 1
                 self.switchable = True
+                return 1
         # elif q_values in map_memory = ((difference is very small)):
         #     return
         else:
             print("The KNN judgement is acceptable. Navigation mode confirmed.")
-            self.navigation_mode = suggestion
+            return suggestion
 
     def loop_monitor(self, step_memory):
         if self.navigation_mode == 1:
@@ -2094,6 +2097,7 @@ class Walker(Agent):
         switch_threshold = 0
         crowdedness_caution = 3
         time_caution = 0.75
+        plan_time_threshold = 6
 
         if self.switchable:
             if stuck_level >= 1:
@@ -2109,6 +2113,9 @@ class Walker(Agent):
                 if crowdedness > crowdedness_caution:
                     self.switch()
 
+            if self.navigation_mode == 2 and self.plan_time > plan_time_threshold: # set cautiously at 6
+                self.switch()
+
             if self.navigation_mode == 2:
                 total_time = self.model.time_limit
                 current_time = self.tt_step
@@ -2120,20 +2127,30 @@ class Walker(Agent):
                     self.switch()
 
     def switch(self):
-        if self.navigation_mode == 1:
-            print("Switching ALPHA to BETA")
-            self.navigation_mode = 2
-            self.stuck = 0
-            self.loop = 0
-            self.steps_memory = []
-            self.steps_memory.insert(0, self.pos)
-        elif self.navigation_mode == 2:
-            print("Switching BETA to ALPHA")
-            self.navigation_mode = 1
-            self.stuck = 0
-            self.loop = 0
-            self.steps_memory = []
-            self.steps_memory.insert(0, self.pos)
+        generate_switch = random.randint(0, self.switch_likelihood)
+        if generate_switch >= self.switch_threshold:
+            print("I can switch.")  # At the moment, 0 vs 9 means normally it is 90% likely to switch normally
+            # either increase the threshold or likelihood and that will make switching less likely
+
+            if self.navigation_mode == 1:
+                print("Switching ALPHA to BETA")
+                self.navigation_mode = 2
+                self.stuck = 0
+                self.loop = 0
+                self.steps_memory = []
+                self.steps_memory.insert(0, self.pos)
+                self.switch_likelihood -= self.switch_cost  # this means each time it switches it is less likely to
+                # switch in the future.
+                # This is done utilising a random mechanism, but could be done more planned with monitoring of
+                # what proportion the current switch likelihood vs. original likelihood
+            elif self.navigation_mode == 2:
+                print("Switching BETA to ALPHA")
+                self.navigation_mode = 1
+                self.stuck = 0
+                self.loop = 0
+                self.steps_memory = []
+                self.steps_memory.insert(0, self.pos)
+                self.switch_likelihood -= self.switch_cost
 
     # this needs to be a system that checks the reliability of the other system
     # type 1 falls down when we train on a subset and then fail to generalise
@@ -2156,7 +2173,7 @@ class Walker(Agent):
             n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
             suggested_nav, distance_vector = self.use_q(n_obstacles, total_branches, mean_branch_per_obs)
             actual_nav = self.judge_choice(suggested_nav, distance_vector)
-
+            self.navigation_mode = actual_nav
             self.stepCount += 1
 
         start = time.clock()
