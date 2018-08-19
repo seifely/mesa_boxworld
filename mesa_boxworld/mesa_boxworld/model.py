@@ -67,7 +67,7 @@ class ThirdTestModel(Model):
         self.initial_total_items = initial_total_items
 
         if high_yellow:
-            self.available_items = [1, 1, 1, 1, 1, 1, 2, 2, 3, 3]
+            self.available_items = [1, 1, 1, 1, 1, 1, 1, 2, 1, 3]
 
         elif not high_yellow:
 
@@ -431,9 +431,9 @@ class ThirdTestModel(Model):
 
         if self.test:
             if self.simple == 1:
-                available_maps = ["testfour", "testfive", "testsix", "testtwelve", "testfourteen"]
-                self.map_choice = random.choice(available_maps)
-                # self.map_choice = "testfourteen"
+                # available_maps = ["testfour", "testfive", "testsix", "testtwelve", "testfourteen"]
+                # self.map_choice = random.choice(available_maps)
+                self.map_choice = "testfourteen"
                 print("Map ", self.map_choice)
 
             elif self.simple == 2:
@@ -443,9 +443,9 @@ class ThirdTestModel(Model):
                 print("Map ", self.map_choice)
 
             elif self.simple == 3:
-                available_maps = ["testone", "testtwo", "testthree", "testnine", "testten", "testeleven"]
-                self.map_choice = random.choice(available_maps)
-                # self.map_choice = ""
+                # available_maps = ["testone", "testtwo", "testthree", "testnine", "testten", "testeleven"]
+                # self.map_choice = random.choice(available_maps)
+                self.map_choice = "testnine"
                 print("Map ", self.map_choice)
 
     # create Boxes:

@@ -12,7 +12,7 @@ from scipy.spatial import distance
 import numpy as np
 import scipy.stats
 
-# priotyQs (also: Heap Q's) are binary trees where every parent node has a value >= any of its children. It keeps
+# priorityQs (also: Heap Q's) are binary trees where every parent node has a value >= any of its children. It keeps
 # track # of the minimum value, helping retrieve that min value at all times
 
 ###########################################################################################################
@@ -95,6 +95,7 @@ class Walker(Agent):
         self.tt_step = 0
         self.planning_steps_taken = 0
         self.plan_time = 0
+        self.progress_ratio = 0
         self.stuck = 0
         self.loop = 0
         self.stress = 0
@@ -117,7 +118,10 @@ class Walker(Agent):
         self.shift_impairment_value = 3
         self.step_memory_limit = False
         self.comfort_radius = 1
+        self.stress_plan = False
+        self.switched = False
 
+        self.trustworthy_distance_threshold = 15  # 15 is an acceptable limit. 10 is very untrustworthy, 20 too lax
         self.k = 3
 
 
@@ -1114,12 +1118,12 @@ class Walker(Agent):
                 self.reactive_nav()
                 time_elapsed = (time.clock() - time_start)
                 self.current_step_time = time_elapsed
-                print("Reactive Time: ", self.current_step_time)
+                # print("Reactive Time: ", self.current_step_time)
                 self.open_box()
                 self.pickup_item()
-                print("Current Step:", self.pos)
-                print("Next Step: ", self.next_move)
-                print("Current Goal:", self.goal)
+                # print("Current Step:", self.pos)
+                # print("Next Step: ", self.next_move)
+                # print("Current Goal:", self.goal)
 
             if self.goal_reached:
                 self.calculate_box_distances_from_current_pos()
@@ -1610,6 +1614,49 @@ class Walker(Agent):
             n_obstacles, total_branches, modal_branch_per_obs, mean_branch_per_obs = self.model.map_complexity_data[29]
             return n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
 
+    def replan(self, start, goal):
+        for n in range(1,4,1):
+            frontier = PriorityQueue()
+            if self.delib_verbose:
+                print("Established Frontier Q")
+            frontier.put(start, 0)
+            if self.delib_verbose:
+                print("Put start location")
+            came_from = {}
+            if self.delib_verbose:
+                print("Opened Came From")
+            cost_so_far = {}
+            if self.delib_verbose:
+                print("Opened Cost So Far")
+            came_from[start] = None
+            cost_so_far[start] = 0
+            planning_step = 0
+
+            while not frontier.empty():
+                planning_step += 1
+                if self.delib_verbose:
+                    print("Frontier isn't empty")
+                current = frontier.get()
+                if self.delib_verbose:
+                    print("Current:", current)
+                if current == goal:
+                    break
+
+                for next in self.get_neighbours(current):
+                    if self.delib_verbose:
+                        print("Neighbours of current are:", self.get_neighbours(current))
+                    new_cost = cost_so_far[current] + self.get_cost(current, next)
+                    if next not in cost_so_far or new_cost < cost_so_far[next]:
+                        cost_so_far[next] = new_cost
+                        priority = new_cost + self.heuristic(goal, next)
+                        frontier.put(next, priority)
+                        came_from[next] = current
+
+            if self.delib_verbose:
+                print("Came From List: ", came_from)
+                print("Cost So Far: ", cost_so_far)
+            return came_from, cost_so_far, planning_step
+
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # DELIBERATIVE NAVIGATION - A* ALGORITHM
 
@@ -1720,6 +1767,8 @@ class Walker(Agent):
                 break
 
             for next in self.get_neighbours(current):
+                if self.stress_plan:
+                    self.replan((24,24), (0,0))
                 if self.delib_verbose:
                     print("Neighbours of current are:", self.get_neighbours(current))
                 new_cost = cost_so_far[current] + self.get_cost(current, next)
@@ -1776,7 +1825,7 @@ class Walker(Agent):
 
                     self.plan_acquired = True
 
-                if self.plan_acquired:
+                elif self.plan_acquired:
                     if not self.planned_path:
                         self.plan_acquired = False
                     elif len(self.planned_path) > 0:
@@ -1791,7 +1840,7 @@ class Walker(Agent):
                         if self.pos == self.goal:
                             self.goal_reached = True
 
-            if self.goal_reached:
+            elif self.goal_reached:
                 self.calculate_box_distances_from_current_pos()
                 self.set_goal()
                 self.goal_distance = self.get_distance(self.pos, self.goal, False)
@@ -2032,10 +2081,9 @@ class Walker(Agent):
 
     def judge_choice(self, suggestion, distances):
 
-        trustworthy_distance_threshold = 15  # 15 is an acceptable limit. 10 is very untrustworthy, 20 too lax
         trust_decisions = []
         for i in range(len(distances)):
-            if distances[i] > trustworthy_distance_threshold:
+            if distances[i] > self.trustworthy_distance_threshold:
                 trust_decisions.append(1)
             else:
                 trust_decisions.append(0)
@@ -2052,7 +2100,9 @@ class Walker(Agent):
         #     return
         else:
             print("The KNN judgement is acceptable. Navigation mode confirmed.")
-            return suggestion
+            self.switchable = True
+            # return suggestion
+            return 1
 
     def loop_monitor(self, step_memory):
         if self.navigation_mode == 1:
@@ -2106,92 +2156,101 @@ class Walker(Agent):
         # steps left, time left
 
         if steps_since_last_goal != 0 and distance_to_goal != 0:
-            progress_ratio = steps_since_last_goal / distance_to_goal
+            self.progress_ratio = steps_since_last_goal / distance_to_goal
 
-            print("Progress Ratio: ", progress_ratio)
+            print("Progress Ratio: ", self.progress_ratio)
             progress_queue = []
             if len(progress_queue) < 2:
-                progress_queue.append(progress_ratio)
+                progress_queue.append(self.progress_ratio)
 
             elif len(progress_queue) >= 2:
                 progress_queue.pop(0)
-                progress_queue.append(progress_ratio)
+                progress_queue.append(self.progress_ratio)
 
             if len(progress_queue) >= 2:
                 if progress_queue.index(0) < progress_queue.index(
                         1):  # if the previous step's ratio is lower than our current ratio, doing better
                     print("Progress Queue: ", progress_queue)
-                    return
+                    # return
 
                 elif progress_queue.index(0) > progress_queue.index(
                         1):  # if the previous step's ratio is higher than ours, doing worse
                     print("Progress Queue: ", progress_queue)
-                    return
+                    # return
 
         # NEED AN 'IF PERFORMANCE DROPS, CHANGE AN X VALUE IN THE SYSTEM TO IMPROVE PERFORMANCE'
 
         self.loop_monitor(step_memory)
-        return self.average_step_time, total_time, crowdedness, n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches
+        return self.average_step_time, total_time, crowdedness, n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches, self.progress_ratio
 
-    def meta_actor(self, time_performance, planning_performance, stuck_level, loop_check, crowdedness):
-        # this needs to be done better
+    def meta_actor(self, time_performance, planning_performance, stuck_level, loop_check, crowdedness, progress):
+        # the problem with this is that it executes sequentially, and there is a priority level
+        # regardless, we need to start using elifs here.
 
         if self.switchable:
             if stuck_level >= 1:
-                self.switch_threshold += 1
+                self.switch()
 
             if loop_check >= 1:  # alter the value that increments for loops & switches if not switch/switch too much
-                self.switch_threshold += 1
-
-            if self.switch_threshold >= 1:
                 self.switch()
+
+            # if self.switch_threshold >= 1:
+            #     self.switch()
 
             if self.navigation_mode == 1:
                 if crowdedness > self.crowdedness_caution:
                     self.switch()
 
-            if self.navigation_mode == 2 and self.plan_time > self.plan_time_allowance: # set cautiously at 6
-                self.switch()
-
-            if self.navigation_mode == 2:
-                total_time = self.model.time_limit
-                current_time = self.tt_step
-
-                if current_time > (total_time*self.time_caution) and self.check_for_freedom(self.goal, self.pos) \
-                        and len(self.closed_box_list) > 0:
-                    # may not need the second statement there - could just be time-cautious in general
-                    # basically, if there is time left, we're still deliberating, and there are still boxes to open
+                elif progress > 3:
                     self.switch()
 
-    def switch(self):
-        generate_switch = random.randint(0, self.switch_likelihood)
-        if generate_switch >= self.switch_minimum:
-            # At the moment, 0 vs 9 means normally it is 90% likely to switch normally
-            # either increase the threshold or likelihood and that will make switching less likely
+            if self.navigation_mode == 2 and self.plan_time > self.plan_time_allowance:  # set cautiously at 6
+                self.switch()
 
-            if self.navigation_mode == 1:
-                print("Switching ALPHA to BETA")
-                self.navigation_mode = 2
-                self.stuck = 0
-                self.loop = 0
-                self.steps_memory = []
-                self.steps_memory.insert(0, self.pos)
-                self.switch_likelihood -= self.switch_cost  # this means each time it switches it is less likely to
-                # switch in the future.
-                # This is done utilising a random mechanism, but could be done more planned with monitoring of
-                # what proportion the current switch likelihood vs. original likelihood
-                if self.shift_impairment:
-                    time.sleep(self.shift_impairment_value)
-            elif self.navigation_mode == 2:
-                print("Switching BETA to ALPHA")
-                self.navigation_mode = 1
-                self.stuck = 0
-                self.loop = 0
-                self.steps_memory = []
-                self.steps_memory.insert(0, self.pos)
-                self.switch_likelihood -= self.switch_cost
-                if self.shift_impairment:
-                    time.sleep(self.shift_impairment_value)
+            # if self.navigation_mode == 2:
+            #     total_time = self.model.time_limit
+            #     current_time = self.tt_step
+            #
+            #     if current_time > (total_time*self.time_caution) and self.check_for_freedom(self.goal, self.pos) \
+            #             and len(self.closed_box_list) > 0:
+                    # may not need the second statement there - could just be time-cautious in general
+                    # basically, if there is time left, we're still deliberating, and there are still boxes to open
+                    # self.switch()
+
+    def switch(self):
+        if not self.switched:
+            generate_switch = random.randint(0, self.switch_likelihood)
+            if generate_switch >= self.switch_minimum:
+                # At the moment, 0 vs 9 means normally it is 90% likely to switch normally
+                # either increase the threshold or likelihood and that will make switching less likely
+
+                if self.navigation_mode == 1:
+                    print("Switching ALPHA to BETA")
+                    self.navigation_mode = 2
+                    self.stuck = 0
+                    self.loop = 0
+                    self.steps_memory = []
+                    self.steps_memory.insert(0, self.pos)
+                    self.switch_likelihood -= self.switch_cost  # this means each time it switches it is less likely to
+                    # switch in the future.
+                    # This is done utilising a random mechanism, but could be done more planned with monitoring of
+                    # what proportion the current switch likelihood vs. original likelihood
+                    self.switched = True
+                    if self.shift_impairment:
+                        # time.sleep(self.shift_impairment_value)
+                        self.replan((24,24), (0,0))
+                elif self.navigation_mode == 2:
+                    print("Switching BETA to ALPHA")
+                    self.navigation_mode = 1
+                    self.stuck = 0
+                    self.loop = 0
+                    self.steps_memory = []
+                    self.steps_memory.insert(0, self.pos)
+                    self.switch_likelihood -= self.switch_cost
+                    self.switched = True
+                    if self.shift_impairment:
+                        self.replan((12, 12), (0, 0))
+                        # time.sleep(self.shift_impairment_value)
 
     # this needs to be a system that checks the reliability of the other system
     # type 1 falls down when we train on a subset and then fail to generalise
@@ -2206,36 +2265,37 @@ class Walker(Agent):
         # stress currently increases at a rate of 5 per yellow item/negative reward, on high map that's 5*6=30
         # so thresholds could be 10, 20, 30
         if counter == 0 and self.stress == 10:
-            if self.k >=3:  # this doesn't actually do anything
-                self.k -= 2
-
-            self.crowdedness_caution -= 1  # make the agent 1 radius more cautious
-            # self.switch_cost += 1  # higher switch costs mean less chances to switch in the future
+            # if self.k >=3:  # this doesn't actually do anything
+            #     self.k -= 2
+            self.shift_impairment = True  # switching now causes pausing
+            self.crowdedness_caution -= 2  # make the agent require 2 less in its radius (initially set to 1)
+            self.comfort_radius += 1
+            self.switch_cost += 1  # higher switch costs mean less chances to switch in the future
             self.switch_cost = int(self.switch_cost / 2)
-            self.loop_increment += 0.125  # increasing LP increases the speed at which it will switch from looping
+            self.loop_increment -= 0.025  # increasing LP increases the speed at which it will switch from looping
             # could alternatively increase the loop threshold
 
             counter += 1
             return
 
         if counter == 1 and self.stress == 20:
-            self.shift_impairment = True  # switching now causes pausing
+
             self.step_memory_limit = True
-            self.time_caution -= 2
-            self.loop_increment += 0.125
+            self.time_caution -= 3
+            self.loop_increment -= 0.025
+            self.stress_plan = True
 
             counter += 1
             return
 
         if counter == 2 and self.stress == 30:
             self.shift_impairment_value += 2
-            self.crowdedness_caution -= 1
-            self.loop_increment += 0.125
-            self.time_caution -= 2
+            self.crowdedness_caution -= 2
+            self.loop_increment -= 0.025
+            self.time_caution -= 3
 
             counter += 1
             return
-
 
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -2246,7 +2306,9 @@ class Walker(Agent):
         unopened box, or use A* navigation to traverse the map.
         '''
 
-        if self.stepCount == 0:
+        if self.stepCount == 0:  # ---- this sets the initial navigation mode, based on prev. data & trust of that data
+            # if self.model.stress_mode:
+            #     self.trustworthy_distance_threshold -= 7
             n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.complexity_judge()
             suggested_nav, distance_vector = self.use_q(n_obstacles, total_branches, mean_branch_per_obs)
             actual_nav = self.judge_choice(suggested_nav, distance_vector)
@@ -2254,22 +2316,23 @@ class Walker(Agent):
             self.stepCount += 1
 
         start = time.clock()
-        # print("obl: ", len(self.open_box_list))
+
         if self.stepCount != 0:
+            self.switched = False
             # ----- Stress Impairment ------
             if self.model.stress_mode:
                 self.stress_changes()
-            # print("Inter goal step:", self.inter_goal_stepCount)
-            # print("Goal distance: ", self.goal_distance)
-            av_step, tt_step, crowdedness, n_obstacles, modal_branch_per_obs, mean_branch_per_obs, total_branches = self.meta_monitoring(0, 0, 0, self.steps_memory,
+
+            av_step, tt_step, crowdedness, n_obstacles, modal_branch_per_obs, mean_branch_per_obs,\
+                total_branches, progress_ratio = self.meta_monitoring(0, 0, 0, self.steps_memory,
                                                                         self.score, self.inter_goal_stepCount,
                                                                         self.goal_distance)
-            # print("Average and Total Step Time:", av_step, tt_step)
-            self.meta_actor(0, 0, self.stuck, self.loop, crowdedness)
+
+            self.meta_actor(0, 0, self.stuck, self.loop, crowdedness, progress_ratio)
             self.tt_step = tt_step
             # self.output_data(tt_step, crowdedness, map_complex, branch_complex
 
-            # Navigation Systems
+            # ------- Navigation Systems --------
             if self.navigation_mode == 1:
                 self.SYSTEM_ALPHA()
 
@@ -2286,8 +2349,6 @@ class Walker(Agent):
                 # self.output_learned_data(q_val)
                 sys.exit()
 
-            # depending on what stress levels are, set resources available: how far we can check back (for looping),
-            # change switching costs/thresholds (so we under or overvalue switching), less access to information such as
 
 ############################################################################################################
 
@@ -2355,7 +2416,6 @@ class pinkItem(Agent):
     def step(self):
             self.decay -= 1
             print(self.decay)
-
 
 
 #########################################################################################################
