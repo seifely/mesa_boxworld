@@ -11,6 +11,7 @@ import pickle
 from scipy.spatial import distance
 import numpy as np
 import scipy.stats
+import copy
 
 # priorityQs (also: Heap Q's) are binary trees where every parent node has a value >= any of its children. It keeps
 # track # of the minimum value, helping retrieve that min value at all times
@@ -1657,6 +1658,12 @@ class Walker(Agent):
                 print("Cost So Far: ", cost_so_far)
             return came_from, cost_so_far, planning_step
 
+    def waste_time(self, length, increment):
+        for each in range(length):
+            time.sleep(increment)
+            print("I'm distracted...")
+        return
+
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
     # DELIBERATIVE NAVIGATION - A* ALGORITHM
 
@@ -1768,7 +1775,8 @@ class Walker(Agent):
 
             for next in self.get_neighbours(current):
                 if self.stress_plan:
-                    self.replan((24,24), (0,0))
+                    # self.replan((24,24), (0,0))
+                    self.waste_time(3,1)
                 if self.delib_verbose:
                     print("Neighbours of current are:", self.get_neighbours(current))
                 new_cost = cost_so_far[current] + self.get_cost(current, next)
@@ -2207,15 +2215,15 @@ class Walker(Agent):
             if self.navigation_mode == 2 and self.plan_time > self.plan_time_allowance:  # set cautiously at 6
                 self.switch()
 
-            # if self.navigation_mode == 2:
-            #     total_time = self.model.time_limit
-            #     current_time = self.tt_step
-            #
-            #     if current_time > (total_time*self.time_caution) and self.check_for_freedom(self.goal, self.pos) \
-            #             and len(self.closed_box_list) > 0:
+            if self.navigation_mode == 2:
+                total_time = self.model.time_limit
+                current_time = self.tt_step
+
+                if current_time > (total_time*self.time_caution) and self.check_for_freedom(self.goal, self.pos) \
+                        and len(self.closed_box_list) > 0:
                     # may not need the second statement there - could just be time-cautious in general
                     # basically, if there is time left, we're still deliberating, and there are still boxes to open
-                    # self.switch()
+                    self.switch()
 
     def switch(self):
         if not self.switched:
@@ -2238,7 +2246,8 @@ class Walker(Agent):
                     self.switched = True
                     if self.shift_impairment:
                         # time.sleep(self.shift_impairment_value)
-                        self.replan((24,24), (0,0))
+                        # self.replan((24,24), (0,0))
+                        self.waste_time(5,1)
                 elif self.navigation_mode == 2:
                     print("Switching BETA to ALPHA")
                     self.navigation_mode = 1
@@ -2258,7 +2267,7 @@ class Walker(Agent):
 
     # can override the meta actors in META A if it does not trust the response based on a lookup table
     # calculate distance from current (new) scenario to learned scenarios, and the greater the distance
-    # the less trustworthy the response should be?
+    # the less trustworthy the response should be
 
     def stress_changes(self):
         counter = 0
