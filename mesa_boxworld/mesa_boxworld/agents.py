@@ -2279,7 +2279,7 @@ class Walker(Agent):
             self.shift_impairment = True  # switching now causes pausing
             self.crowdedness_caution -= 2  # make the agent require 2 less in its radius (initially set to 1)
             self.comfort_radius += 1
-            self.switch_cost += 1  # higher switch costs mean less chances to switch in the future
+            # self.switch_cost += 1  # higher switch costs mean less chances to switch in the future
             self.switch_cost = int(self.switch_cost / 2)
             self.loop_increment -= 0.025  # increasing LP increases the speed at which it will switch from looping
             # could alternatively increase the loop threshold
