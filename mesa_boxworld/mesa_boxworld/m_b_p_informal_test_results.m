@@ -2,10 +2,12 @@
 
 map = [1 2 3];
 
-map_one_basic = [7 7 6 8 7];
-mob_switch = [2 2 3 2 1];
-map_two_basic = [6 5 6 4 3];
-mtb_switch = [3 2 3 9 2];
+map_one_basic = [6 5 6 4 3];
+mob_switch = [3 2 3 9 2];
+
+map_two_basic = [7 7 6 8 7];
+mtb_switch = [2 2 3 2 1];
+
 map_three_basic = [10 10 10 9 10];
 mthb_switch = [9 9 9 9 9];
 
