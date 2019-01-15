@@ -1,4 +1,4 @@
-from queue import PriorityQueue
+from queue import PriorityQueue 
 import math
 
 # this is a test file to experiment with the A* solver algorithm and workable solutions
